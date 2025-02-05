@@ -28,7 +28,7 @@ var handler = async (m, { conn, command }) => {
                 conn.ev.emit('messages.upsert', {
                     messages: [{ key: { remoteJid: 'status@broadcast' }, message: { conversation: '.settest' } }]
                 });
-            }, 30 * 60 * 1000); // 🔥 **Cada 30 minutos**
+            }, 10 * 60 * 1000); // 🔥 **Cada 30 minutos**
         }
     }
 };
