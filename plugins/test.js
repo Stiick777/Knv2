@@ -28,7 +28,7 @@ var handler = async (m, { conn, command }) => {
                 conn.ev.emit('messages.upsert', {
                     messages: [{ key: { remoteJid: 'status@broadcast' }, message: { conversation: '.settest' } }]
                 });
-            }, 10 * 60 * 1000); // 🔥 **Cada 30 minutos**
+            }, 5 * 60 * 1000); // 🔥 **Cada 5 minutos**
         }
     }
 };
@@ -64,5 +64,4 @@ async function enviarTest(conn, numeroLimpio, canalID) {
 }
 
 handler.command = ['settest', 'stoptest'];
-handler.owner = true
 export default handler;
