@@ -1,0 +1,336 @@
+[
+    {
+        "question": "¿Qué le dice un pingüino a otro pingüino?",
+        "response": "Te quiero como a ningüino"
+    },
+    { 
+        "question": "¿Quien es el Creador de KanBot?",
+        "response": "Stiiven"
+    },
+    { 
+        "question": "¿Quien es el mejor bot de WhatsApp?",
+        "response": "KanBot"
+    },
+    {
+        "question": "Siempre estoy en el medio de la mesa, pero nunca me puedes comer. ¿Qué soy?",
+        "response": "El mantel."
+    },
+    
+    {
+        "question": "¿Qué le dice un ciego a otro ciego?",
+        "response": "Después nos vemos"
+    },
+    {
+        "question": "Me tienes cuando no me necesitas, pero me necesitas cuando no me tienes. ¿Qué soy?",
+        "response": "Un paraguas"
+    },
+    {
+        "question": "¿Qué se congela cuando se calienta?",
+        "response": "La computadora"
+    },
+    {
+        "question": "¿Qué fruta tiene muchos ojos, pero no puede ver?",
+        "response": "La piña"
+    },
+    {
+        "question": "¿En qué idioma se comunican las tortugas?",
+        "response": "En tortugués"
+    },
+    {
+        "question": "Tiene agujas, pero no cose. Tiene números, pero no sabe contar. ¿Qué es?",
+        "response": "Un reloj."
+    },
+    {
+        "question": "¿Qué es todo para uno y nada para lo demás?",
+        "response": "La mente"
+    },
+    {
+        "question": "¿Cuál es el colmo de una aspiradora?",
+        "response": "Ser alérgica al polvo"
+    },
+    {
+        "question": "Tiene ciudades, pero no casas; tiene montañas, pero no árboles; tiene agua, pero no peces. ¿Qué es?",
+        "response": "Un mapa"
+    },
+    {
+        "question": "¿Qué necesitamos para escribir durmiendo?",
+        "response": "Estar despiertos"
+    },
+    {
+        "question": "¿Qué objeto puede tener cara sin poseer cuerpo?",
+        "response": "Una moneda"
+    },
+    {
+        "question": "Alimenta la casa, Gabinete con hielo",
+        "response": "La nevera"
+    },
+    {
+        "question": "¿Qué tienen las mujeres en medio de las piernas?",
+        "response": "Las rodillas"
+    },
+    {
+        "question": "Entra duro y seco y sale blandito y mojado ¿Qué es?",
+        "response": "Un chicle"
+    },
+    {
+        "question": "Tengo 88 teclas, pero no soy un teclado de computadora. ¿Qué soy?",
+        "response": "Un piano"
+    },
+    {
+        "question": "Continuas en rojo, pero te paras en verde. ¿Qué soy?",
+        "response": "Una sandía"
+    },
+    {
+        "question": "¿Qué es negro cuando lo compras, rojo cuando lo usas, y gris cuando lo tiras?",
+        "response": "El carbón"
+    },
+    {
+        "question": "¿Qué hay delante de ti siempre pero que no se puede ver?",
+        "response": "El futuro"
+    },
+    {
+        "question": "¿Qué mes tiene 28 días?",
+        "response": "Todos"
+    },
+    {
+        "question": "¿Qué tiene cabeza, pero no cerebro; pies, pero no camina?",
+        "response": "Una cama"
+    },
+    {
+        "question": "¿De qué llenarías un barril para que pese lo menos posible?",
+        "response": "De agujeros"
+    },
+    {
+        "question": "Si durante una carrera adelantas a quien va segundo, ¿en qué posición estás?",
+        "response": "Segundo"
+    },
+    {
+        "question": "¿En qué lugar el jueves va antes que el miércoles?",
+        "response": "En el diccionario"
+    },
+    {
+        "question": "¿Qué sube y baja pero se queda siempre en el mismo sitio?",
+        "response": "Las escaleras"
+    },
+    {
+        "question": "¿Cómo llaman a un ascensor en China?",
+        "response": "Apretando el botón"
+    },
+    {
+        "question": "¿Qué es lo primero que hace un elefante al salir el sol?",
+        "response": "Sombra"
+    },
+    {
+        "question": "¿Por qué un Tiranosaurus Rex no puede aplaudir?",
+        "response": "Porque se extinguió"
+    },
+    {
+        "question": "¿Qué tiene un ojo, pero no puede ver?",
+        "response": "Una aguja"
+    },
+    {
+        "question": "¿Qué es lo primero que todos hacemos al despertar?",
+        "response": "Abrir los ojos"
+    },
+    {
+        "question": "¿Cuál es el número que si le quitas la mitad, vale 0?",
+        "response": "El ocho"
+    },
+    {
+        "question": "Me puedes romper sin tocarme. ¿Qué soy?",
+        "response": "Una promesa"
+    },
+    {
+        "question": "¿Cuál es el país donde termina todo?",
+        "response": "Finlandia"
+    },
+    {
+        "question": "Entre más seco, más moja. ¿Qué es?",
+        "response": "La toalla"
+    },
+    {
+        "question": "Cuál es el final de todo",
+        "response": "La letra o"
+    },
+    {
+        "question": "¿Dónde se encuentra una pared con otra pared?",
+        "response": "En la esquina"
+    },
+    {
+        "question": "¿Qué tiene muchas palabras, pero nunca habla?",
+        "response": "Un libro"
+    },
+    {
+        "question": "¿Qué cosa te pertenece, pero los demás usan más que tú?",
+        "response": "Tu nombre"
+    },
+    {
+        "question": "¿Qué tiene dientes, pero no muerde?",
+        "response": "Un cepillo"
+    },
+    {
+        "question": "Un gallo pone un huevo en el tejado de una casa. Si el tejado es inclinado, ¿hacia dónde rodará el huevo?",
+        "response": "Los gallos no ponen huevos."
+    },
+    {
+        "question": "¿Qué palabra del diccionario se escribe incorrectamente?",
+        "response": "Incorrectamente"
+    },
+    {
+        "question": "Húmedo por dentro, con pelos por fuera. Comienza por la C. ¿De qué se trata?",
+        "response": "Un coco"
+    },
+    {
+        "question": "David y Fabián están jugando al ajedrez. Llevan 5 partidas, pero ambos han ganado 3. ¿Cómo es posible?",
+        "response": "Porque juegan con más personas"
+    },
+    {
+        "question": "¿Cuántos 9 hay entre el 1 y el 100?",
+        "response": "20"
+    },
+    {
+        "question": "Son dos abanicos que están todo el día sin parar, pero cuando te duermas se paran y quietos se quedarán",
+        "response": "Las pestañas"
+    },
+    {
+        "question": "Vuela sin alas, llora sin ojos.",
+        "response": "Una nube"
+    },
+    {
+        "question": "Círculo bien redondo al que si le pegas, das un brinco del susto",
+        "response": "Un tambor"
+    },
+    {
+        "question": "Un caballo blanco entró en el Mar Negro. ¿Cómo salió?",
+        "response": "Salió mojado"
+    },
+    {
+        "question": "Si un tren eléctrico va de Norte a Sur, ¿Hacia qué lado echará el humo?",
+        "response": "Es eléctrico, no echa humo"
+    },
+    {
+       "question": "Tiene 4 letras, empieza por C y termina por O y esta en la parte trasera",
+        "response": "El codo"
+    },
+    {
+       "question": "Soy alto cuando soy joven y corto cuando soy viejo. ¿Qué soy?",
+        "response": "Una vela"
+    },
+    {
+       "question": "¿Qué animal salta más alto que una casa?",
+        "response": "Todos, porque las casas no saltan."
+    },
+    {
+       "question": "Algunos meses tienen 31 días, otros solo 30.¿Cuantos tienen 28 días?",
+        "response": "Todos"
+    },
+    {
+       "question": "No lo puedes ver, pero no puedes vivir sin él. ¿Qué es?",
+       "response": "El aire"
+},
+{
+        "question": "¿Qué le dice un pingüino a otro pingüino?",
+        "response": "Te quiero como a ningüino"
+    },
+    {
+        "question": "Siempre subo pero nunca bajo. ¿Qué soy?",
+        "response": "La edad"
+    },
+    {
+        "question": "Soy ligero como una pluma, pero ni el hombre más fuerte puede sostenerme por mucho tiempo. ¿Qué soy?",
+        "response": "La respiracion"
+    },
+    {
+        "question": "¿Qué pasa si tiras una piedra blanca al mar rojo?",
+        "response": "se moja"
+    },
+    {
+        "question": "¿Qué se cae al agua pero no se moja?",
+        "response": "La sombra"
+    },
+    {
+        "question": "Vivo en el agua, pero si me sacas de ella, muero. ¿Qué soy?",
+        "response": "Un pez"
+    },
+    {
+        "question": "¿Qué es todo para uno y nada para lo demás?",
+        "response": "La mente"
+    },
+    {
+        "question": "Cuanto más rápido corres, más lejos estoy. ¿Qué soy?",
+        "response": "El horizonte"
+    },
+    {
+        "question": "¿Qué es lo que entre más grande es, menos se ve?",
+        "response": "La oscuridad"
+    },
+    {
+        "question": "Estoy lleno de agujeros, pero nunca dejo escapar el aire. ¿Qué soy?",
+        "response": "La luna"
+    },
+    {
+        "question": "No tengo huesos, pero puedo estar duro o suave. ¿Qué soy?",
+        "response": "El pan"
+    },
+    {
+        "question": "¿Qué es algo que entre más lo lavas, más pequeño se vuelve?",
+        "response": "El jabon"
+    },
+    {
+        "question": "¿Qué tiene un cuerpo pero no alma, pies pero no camina?",
+        "response": "Un muñeco de nieve"
+    },
+    {
+        "question": "¿Qué corre y corre, pero nunca se mueve del lugar?",
+        "response": "Un reloj"
+    },
+    {
+        "question": "¿Qué puedes sostener en tu mano derecha pero no en tu mano izquierda?",
+        "response": "Tu mano izquierda "
+    },
+    {
+        "question": "Continuas en rojo, pero te paras en verde. ¿Qué soy?",
+        "response": "Una sandía"
+    },
+    {
+        "question": "Me puedes oír, pero no me puedes ver ni tocar. ¿Qué soy?",
+        "response": "Tu voz"
+    },
+    {
+        "question": "¿Qué puede llenar una habitación sin ocupar espacio?",
+        "response": "La luz"
+    },
+    {
+        "question": "¿Qué le dice un gusano a otro gusano?",
+        "response": "Denos la vuelta a la manzana"
+    },
+    {
+        "question": "¿Qué palabra se escribe mal en todos los diccionarios?",
+        "response": "mal"
+    },
+    {
+        "question": "¿Qué es algo que nunca puede volar, pero tiene alas?",
+        "response": "Un avion de papel"
+    },
+    {
+        "question": "Luzco como un árbol pero no soy un árbol, crezco sin raíces y me doy por hecho. ¿Qué soy?",
+        "response": "Un arbusto"
+    },
+    {
+        "question": "¿En qué lugar el jueves va antes que el miércoles?",
+        "response": "En el diccionario"
+    },
+    {
+        "question": "¿Qué crece sin ser regado y da frutos sin ser sembrado?",
+        "response": "El conocimiento"
+    },
+    {
+        "question": "Si tienes una caja de fósforos y te la entregan cerrada, ¿cómo puedes encender un fósforo?",
+        "response": "Abriendo la caja"
+    },
+    {
+        "question": "¿Qué es lo que no puede ser tocado, visto ni oído, pero siempre está en todos lados?",
+        "response": "El aire"
+    }
+    
+      ]
