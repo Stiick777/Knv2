@@ -29,37 +29,39 @@ let handler = async (m, { conn }) => {
         return await conn.sendMessage(chatId, { text: `😖 ${await conn.getName(proposer)} ya está casado y no puedes aceptar su propuesta.` }, { quoted: m });  
     }  
   
-    // Si el mensaje contiene "aceptar"  
-    if (m.text.toLowerCase() === 'aceptar') {  
-        // ✅ Eliminar la propuesta pendiente del proponente antes de registrar el matrimonio  
-        delete global.db.data.marry[proposer];  
-  
-        // Registrar a ambos usuarios correctamente con el tiempo de inicio  
-        let startTime = Date.now(); // Guardar el timestamp de inicio  
-  
-        global.db.data.marry[recipient] = { status: 'married', partner: proposer, chatId, startTime };  
-        global.db.data.marry[proposer] = { status: 'married', partner: recipient, chatId, startTime };  
-  
-        // Obtener nombres correctamente  
-        let nameProposer = await conn.getName(proposer); // Nombre del proponente  
-        let nameRecipient = await conn.getName(recipient); // Nombre de quien acepta  
-  
-        // Enviar mensaje de confirmación  
-        return await conn.sendMessage(chatId, {  
-            text: `💍 *${nameProposer} y ${nameRecipient} ahora están casados!* 💍\n🎉 ¡Felicidades! 🥳\n⏳ El contador ha comenzado desde ahora.`,  
-        }, { quoted: m });  
-    }  
-  
-    // Si el mensaje contiene "rechazar"  
-    if (m.text.toLowerCase() === 'rechazar') {  
-        // ✅ Eliminar la propuesta tanto del proponente como del destinatario  
-        delete global.db.data.marry[proposer];  
-        delete global.db.data.marry[recipient];  
-  
-        return await conn.sendMessage(chatId, {  
-            text: '💔 La propuesta de matrimonio ha sido rechazada porque no te ama.',  
-        }, { quoted: m });  
-    }  
+// Si el mensaje contiene "aceptar"
+if (m.text.toLowerCase() === 'aceptar') {  
+    clearTimeout(global.db.data.marryTimers[recipient]); // Cancelar temporizador
+    delete global.db.data.marryTimers[recipient]; // Eliminar referencia al temporizador
+
+    delete global.db.data.marry[proposer];  
+
+    let startTime = Date.now();
+    global.db.data.marry[recipient] = { status: 'married', partner: proposer, chatId, startTime };  
+    global.db.data.marry[proposer] = { status: 'married', partner: recipient, chatId, startTime };  
+
+    let nameProposer = await conn.getName(proposer);
+    let nameRecipient = await conn.getName(recipient);
+
+    return await conn.sendMessage(chatId, {  
+        text: `💍 *${nameProposer} y ${nameRecipient} ahora están casados!* 💍\n🎉 ¡Felicidades! 🥳`,  
+    }, { quoted: m });  
+}
+
+if (m.text.toLowerCase() === 'rechazar') {
+    // Cancelar el timeout si existe
+    if (global.db.data.marry[recipient]?.timeoutId) {
+        clearTimeout(global.db.data.marry[recipient].timeoutId);
+    }
+
+    // Eliminar la propuesta
+    delete global.db.data.marry[proposer];
+    delete global.db.data.marry[recipient];
+
+    return await conn.sendMessage(chatId, {  
+        text: '💔 La propuesta de matrimonio ha sido rechazada porque no te ama.',  
+    }, { quoted: m });
+}
 };  
   
 // Detectar los comandos "aceptar" y "rechazar"  
