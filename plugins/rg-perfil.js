@@ -6,27 +6,31 @@ var handler = async (m, { conn }) => {
     let ppUrl = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://qu.ax/wkMgN.jpg');
     let { premium, level, cookies, exp, registered, role } = global.db.data.users[who] || {};
 
+    if (!global.db.data.marry) global.db.data.marry = {};
+    if (!global.db.data.divorced) global.db.data.divorced = {};
+
     // Verificar matrimonio
-    let marriage = global.db.data.marry[who]?.partner;
-    let startTime = global.db.data.marry[who]?.startTime;
-    let partnerName = marriage ? await conn.getName(marriage) : null;
+    let marriage = global.db.data.marry[who] || {};
+    let partnerId = marriage.partner || null;
+    let startTime = marriage.startTime || null;
+    let partnerName = partnerId ? await conn.getName(partnerId).catch(() => 'su pareja') : null;
 
     // Calcular tiempo de casados si están casados
     let durationText = '';
-    if (marriage && startTime) {
+    if (partnerId && startTime) {
         let elapsedTime = Date.now() - startTime;
         durationText = formatDuration(elapsedTime);
     }
 
-    // Verificar si estuvieron casados antes (divorciados)
-    let divorced = global.db.data.divorced[who];
+    // Verificar si estuvo casado antes (divorciado)
+    let divorced = global.db.data.divorced[who] || null;
     let divorcedText = '';
     if (divorced) {
         divorcedText = `💔 *Duración del matrimonio:* ${formatDuration(divorced.duration)}`;
     }
 
-    let marriedText = marriage
-        ? `💍 *Casad@ con:* ${partnerName} (@${marriage.replace(/@.+/, '')})\n💞 *Durante:* ${durationText}`
+    let marriedText = partnerId
+        ? `💍 *Casad@ con:* ${partnerName} (@${partnerId.replace(/@.+/, '')})\n💞 *Duración:* ${durationText}`
         : divorcedText || '💍 *Estado Civil:* Nadie te quiere 😹';
 
     let username = await conn.getName(who);
@@ -57,7 +61,7 @@ ${marriedText}
             profileText,
             m,
             null,
-            { mentions: [who, marriage].filter(Boolean) }
+            { mentions: [who, partnerId].filter(Boolean) }
         );
     } catch (e) {
         console.error(e);
