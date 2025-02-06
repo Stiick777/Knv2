@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 
 var handler = async (m, { conn }) => {
     let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender;
-    let ppUrl = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://qu.ax/wkMgN.jpg');
+    let ppUrl = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://files.catbox.moe/mz39y2.jpg');
     let { premium, level, cookies, exp, registered, role } = global.db.data.users[who] || {};
 
     if (!global.db.data.marry) global.db.data.marry = {};
