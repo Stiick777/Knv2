@@ -3,16 +3,31 @@ import fetch from 'node-fetch';
 
 var handler = async (m, { conn }) => {
     let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender;
-    let ppUrl = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://qu.ax/wkMgN.jpg'); // Imagen predeterminada
+    let ppUrl = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://qu.ax/wkMgN.jpg');
     let { premium, level, cookies, exp, registered, role } = global.db.data.users[who] || {};
 
-    // Verificar si el usuario está casado y obtener el nombre de su pareja
+    // Verificar matrimonio
     let marriage = global.db.data.marry[who]?.partner;
+    let startTime = global.db.data.marry[who]?.startTime;
     let partnerName = marriage ? await conn.getName(marriage) : null;
-    
+
+    // Calcular tiempo de casados si están casados
+    let durationText = '';
+    if (marriage && startTime) {
+        let elapsedTime = Date.now() - startTime;
+        durationText = formatDuration(elapsedTime);
+    }
+
+    // Verificar si estuvieron casados antes (divorciados)
+    let divorced = global.db.data.divorced[who];
+    let divorcedText = '';
+    if (divorced) {
+        divorcedText = `💔 *Duración del matrimonio:* ${formatDuration(divorced.duration)}`;
+    }
+
     let marriedText = marriage
-        ? `💍 *Casad@ con:* ${partnerName} (@${marriage.replace(/@.+/, '')})`
-        : '💍 *Estado Civil:* Nadie te quiere 😹';
+        ? `💍 *Casad@ con:* ${partnerName} (@${marriage.replace(/@.+/, '')})\n💞 *Durante:* ${durationText}`
+        : divorcedText || '💍 *Estado Civil:* Nadie te quiere 😹';
 
     let username = await conn.getName(who);
 
@@ -31,12 +46,10 @@ ${marriedText}
 `.trim();
 
     try {
-        // Descargar la imagen de perfil como Buffer
         let response = await fetch(ppUrl);
         if (!response.ok) throw new Error('Error al descargar la imagen');
         let ppBuffer = await response.buffer();
 
-        // Enviar la imagen con el perfil
         await conn.sendFile(
             m.chat,
             ppBuffer,
@@ -51,6 +64,16 @@ ${marriedText}
         await conn.sendMessage(m.chat, { text: 'Hubo un error al obtener la imagen de perfil.' }, { quoted: m });
     }
 };
+
+// Función para formatear duración en días, horas, minutos y segundos
+function formatDuration(ms) {
+    let seconds = Math.floor(ms / 1000) % 60;
+    let minutes = Math.floor(ms / (1000 * 60)) % 60;
+    let hours = Math.floor(ms / (1000 * 60 * 60)) % 24;
+    let days = Math.floor(ms / (1000 * 60 * 60 * 24));
+
+    return `${days} días, ${hours}h ${minutes}m ${seconds}s`;
+}
 
 handler.help = ['profile'];
 handler.group = true;

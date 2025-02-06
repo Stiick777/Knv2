@@ -47,16 +47,14 @@ export default handler; */
 import fs from 'fs';
 
 let handler = async (m, { conn }) => {
-    // Asegurarnos de que la base de datos esté inicializada
     if (!global.db.data) global.db.data = {};
-    if (!global.db.data.marry) global.db.data.marry = {}; // Crear el objeto marry si no existe
+    if (!global.db.data.marry) global.db.data.marry = {}; // Inicializar datos de matrimonio
+    if (!global.db.data.divorced) global.db.data.divorced = {}; // Inicializar divorcios
 
-    // Verificar si el usuario está casado como m.sender o como partner
     let marriage = global.db.data.marry[m.sender];
     let partnerId = marriage?.partner;
 
     if (!marriage || marriage.status !== 'married') {
-        // Intentar encontrar al usuario como partner en otro registro
         partnerId = Object.keys(global.db.data.marry).find(
             key => global.db.data.marry[key]?.partner === m.sender
         );
@@ -68,22 +66,32 @@ let handler = async (m, { conn }) => {
         }
     }
 
-    // Determinar quién es la pareja y sus nombres
-    let name1 = conn.getName(m.sender) || 'Tú'; // Nombre del solicitante
-    let name2 = partnerId ? (conn.getName(partnerId) || 'su pareja') : 'su pareja'; // Nombre de la pareja
+    // Obtener nombres
+    let name1 = await conn.getName(m.sender) || 'Tú';
+    let name2 = partnerId ? (await conn.getName(partnerId) || 'su pareja') : 'su pareja';
 
-    // Eliminar la información del matrimonio de ambos usuarios
-    delete global.db.data.marry[m.sender]; // Eliminar registro del solicitante
-    if (partnerId) {
-        delete global.db.data.marry[partnerId]; // Eliminar registro de la pareja
+    // Calcular duración del matrimonio
+    let startTime = marriage?.startTime;
+    if (startTime) {
+        let elapsedTime = Date.now() - startTime;
+        global.db.data.divorced[m.sender] = { partner: partnerId, duration: elapsedTime };
+        if (partnerId) {
+            global.db.data.divorced[partnerId] = { partner: m.sender, duration: elapsedTime };
+        }
     }
 
-    // Notificar el divorcio en el chat principal
+    // Eliminar registros de matrimonio
+    delete global.db.data.marry[m.sender];
+    if (partnerId) {
+        delete global.db.data.marry[partnerId];
+    }
+
+    // Notificar en el chat
     await conn.sendMessage(m.chat, { 
-        text: `💔 ${name1} y ${name2} se han divorciado. Su matrimonio ha acabado😔.` 
+        text: `💔 ${name1} y ${name2} se han divorciado. Su matrimonio ha acabado 😔.` 
     }, { quoted: m });
 
-    // Notificar al otro usuario (la pareja), si es posible
+    // Notificar a la pareja
     if (partnerId && partnerId !== m.sender) {
         await conn.sendMessage(partnerId, { 
             text: `💔 ${name1} ha solicitado el divorcio. Ya no están casados nunca te amo 🥺.` 
