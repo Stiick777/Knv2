@@ -3,7 +3,16 @@ import fetch from 'node-fetch';
 
 var handler = async (m, { conn }) => {
     let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender;
-    let ppUrl = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://files.catbox.moe/mz39y2.jpg');
+    
+    // Intentar obtener la foto de perfil con manejo de errores
+    let ppUrl;
+    try {
+        ppUrl = await conn.profilePictureUrl(who, 'image');
+    } catch (e) {
+        console.error('Error obteniendo la foto de perfil:', e);
+        ppUrl = 'https://files.catbox.moe/mz39y2.jpg'; // Imagen por defecto
+    }
+
     let { premium, level, cookies, exp, registered, role } = global.db.data.users[who] || {};
 
     if (!global.db.data.marry) global.db.data.marry = {};
@@ -64,8 +73,8 @@ ${marriedText}
             { mentions: [who, partnerId].filter(Boolean) }
         );
     } catch (e) {
-        console.error(e);
-        await conn.sendMessage(m.chat, { text: 'Hubo un error al obtener la imagen de perfil.' }, { quoted: m });
+        console.error('Error al enviar la imagen:', e);
+        await conn.sendMessage(m.chat, { text: profileText, mentions: [who, partnerId].filter(Boolean) }, { quoted: m });
     }
 };
 
