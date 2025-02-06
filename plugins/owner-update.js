@@ -14,7 +14,7 @@ var handler = async (m, { conn, text }) => {
     }
 
     // Actualizar el repositorio
-    const stdout = execSync('git pull --rebase' + (m.fromMe && text ? ' ' + text : ''))
+    const stdout = execSync('git pull' + (m.fromMe && text ? ' ' + text : ''))
     let messager = stdout.toString()
 
     // Restaurar los cambios locales si se hizo stash
