@@ -6,27 +6,22 @@ let handler = async (m, { conn, usedPrefix }) => {
     if (!global.db.data.marry) global.db.data.marry = {};
 
     let who;
-    if (m.isGroup) {
-        who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : false;
-    } else {
-        who = m.chat;
-    }
+    if (m.isGroup) who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : false;
+    else who = m.chat;
 
-    if (!who) {
-        return await conn.sendMessage(m.chat, { 
-            text: 'Etiqueta o menciona a alguien para proponer matrimonio 👰🏻‍♀' 
-        }, { quoted: m });
-    }
-
-    // Asegurar que el destinatario tiene el formato correcto
-    who = who.replace(/@/g, '') + '@s.whatsapp.net';
-
-    // Verificar si el proponente ya está casado
+    // Verificar si el proponente (m.sender) ya está casado
     if (global.db.data.marry[m.sender]?.status === 'married') {
         let partner = global.db.data.marry[m.sender].partner;
         let namePartner = await conn.getName(partner);
         return await conn.sendMessage(m.chat, { 
-            text: `🤨 Ya estás casado con ${namePartner}. No puedes hacer otra propuesta, infiel.` 
+            text: `🤨 Ya estás casado con ${namePartner}. No puedes hacer otra propuesta infiel.` 
+        }, { quoted: m });
+    }
+
+    // Si no se menciona a nadie, mostrar un mensaje
+    if (!who) {
+        return await conn.sendMessage(m.chat, { 
+            text: 'Etiqueta o menciona a alguien para proponer matrimonio 👰🏻‍♀' 
         }, { quoted: m });
     }
 
