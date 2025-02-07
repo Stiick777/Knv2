@@ -13,12 +13,15 @@ let handler = async (m, { conn }) => {
     let recipient = marryData[0];
     let chatId = marryData[1].chatId;
 
-    if (m.sender !== recipient) {
-        return await conn.sendMessage(chatId, { 
-            text: '⚠️ Solo la persona a la que se le propuso puede responder a esta propuesta.' 
-        }, { quoted: m });
-    }
+    const normalizeJid = (jid) => jid.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
 
+if (normalizeJid(m.sender) !== normalizeJid(recipient)) {  
+    return await conn.sendMessage(chatId, {   
+        text: '⚠️ Solo la persona a la que se le propuso puede responder a esta propuesta.'   
+    }, { quoted: m });  
+}
+    
+    
     if (global.db.data.marry[recipient]?.status === 'married') {
         return await conn.sendMessage(chatId, { 
             text: '🤨 Ya estás casado y no puedes aceptar otra propuesta.' 
