@@ -9,10 +9,10 @@ const handler = async (m, { conn, usedPrefix, text }) => {
   conn.tekateki = conn.tekateki || {};
   const id = m.chat;
 
-  // Si el mensaje es un intento de respuesta
-  if (id in conn.tekateki && text) {
+  // Si el usuario está respondiendo un acertijo activo
+  if (id in conn.tekateki && m.quoted && m.quoted.id === conn.tekateki[id].message.id) {
     const game = conn.tekateki[id];
-    const userAnswer = text.toLowerCase().trim();
+    const userAnswer = m.text.toLowerCase().trim();
     const correctAnswer = game.json.response.toLowerCase().trim();
 
     if (userAnswer === correctAnswer) {
@@ -39,7 +39,7 @@ const handler = async (m, { conn, usedPrefix, text }) => {
   const json = tekateki[Math.floor(Math.random() * tekateki.length)];
 
   const caption = `    
-ⷮ🚩 *ACERTIJOS*    
+ⷮ🚩 *ACERTIJOS - KANBOT*    
 ✨️ *${json.question}*    
 
 ⏱️ *Tiempo:* ${(timeout / 1000).toFixed(2)} Segundos    
@@ -60,9 +60,11 @@ const handler = async (m, { conn, usedPrefix, text }) => {
   };
 };
 
+// Configuración del comando
 handler.help = ['acertijo'];
 handler.tags = ['fun'];
 handler.group = true;
 handler.command = ['acertijo', 'acert', 'adivinanza', 'tekateki'];
 
+// Exportar el handler
 export default handler;
