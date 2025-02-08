@@ -46,7 +46,7 @@ let handler = async (m, { conn }) => {
   
         // Enviar mensaje de confirmación  
         return await conn.sendMessage(chatId, {  
-            text: `💍 *${nameProposer} y ${nameRecipient} ahora están casados!* 💍\n🎉 ¡Felicidades! 🥳\n⏳ El contador ha comenzado desde ahora.`,  
+            text: `💍 *${nameProposer} y ${nameRecipient} ahora están casados!* 💍\n🎉 ¡Felicidades! 🥳`,  
         }, { quoted: m });  
     }  
   

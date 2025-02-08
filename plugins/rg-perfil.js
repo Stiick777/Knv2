@@ -22,7 +22,14 @@ var handler = async (m, { conn }) => {
     let marriage = global.db.data.marry[who] || {};
     let partnerId = marriage.partner || null;
     let startTime = marriage.startTime || null;
-    let partnerName = partnerId ? await conn.getName(partnerId).catch(() => 'su pareja') : null;
+    let partnerName = 'Desconocid@';
+if (partnerId) {
+    try {
+        partnerName = await conn.getName(partnerId);
+    } catch (e) {
+        console.error('Error obteniendo el nombre del cónyuge:', e);
+    }
+}
 
     // Calcular tiempo de casados si están casados
     let durationText = '';
