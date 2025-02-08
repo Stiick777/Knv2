@@ -1,67 +1,36 @@
-import fs from 'fs';
-import similarity from 'similarity';
+import fetch from 'node-fetch';
 
-const timeout = 60000;
-const points = 10;
-const threshold = 0.72;
+const acertijos = [
+  { pregunta: "Tengo llaves pero no abro puertas. ¿Qué soy?", respuesta: "teclado" },
+  { pregunta: "Vuelo sin alas, lloro sin ojos. ¿Qué soy?", respuesta: "nube" },
+  { pregunta: "Cuanto más quitas, más grande soy. ¿Qué soy?", respuesta: "agujero" },
+  { pregunta: "No tengo boca y grito sin cesar. ¿Qué soy?", respuesta: "viento" },
+  { pregunta: "Mientras más lavo, más sucia me pongo. ¿Qué soy?", respuesta: "agua" }
+];
 
-const handler = async (m, { conn, text }) => {
-  conn.acertijos = conn.acertijos || {};
-  const id = m.chat;
+// Objeto global para almacenar acertijos activos
+global.acertijos = {};
 
-  // Si el usuario está respondiendo a un acertijo
-  if (m.quoted && conn.acertijos[id] && m.quoted.id === conn.acertijos[id].msgId) {
-    const { answer, msg, timeoutRef } = conn.acertijos[id];
-    const userAnswer = text.toLowerCase().trim();
-    const correctAnswer = answer.toLowerCase().trim();
-
-    if (userAnswer === correctAnswer) {
-      global.db.data.users[m.sender].estrellas = (global.db.data.users[m.sender].estrellas || 0) + points;
-      m.reply(`✅ *¡Respuesta correcta!*\n+${points} Centavos 🪙`);
-      clearTimeout(timeoutRef);
-      delete conn.acertijos[id];
-    } else if (similarity(userAnswer, correctAnswer) >= threshold) {
-      m.reply(`⚠️ *Casi lo logras!*`);
+const handler = async (m, { conn, command }) => {
+  if (command === "acertijo") {
+    let ac = acertijos[Math.floor(Math.random() * acertijos.length)];
+    
+    let msg = await conn.sendMessage(m.chat, { text: `🤔 *A ver si puedes resolverlo...*\n\n${ac.pregunta}` }, { quoted: m });
+    
+    // Guardamos el acertijo con su ID de mensaje
+    global.acertijos[msg.key.id] = { respuesta: ac.respuesta.toLowerCase(), chat: m.chat };
+  } else if (m.quoted && global.acertijos[m.quoted.id]) {
+    // Si el mensaje es respuesta a un acertijo
+    let acertijo = global.acertijos[m.quoted.id];
+    
+    if (m.text.toLowerCase() === acertijo.respuesta) {
+      delete global.acertijos[m.quoted.id]; // Eliminamos el acertijo resuelto
+      conn.sendMessage(m.chat, { text: "🎉 ¡Correcto! Eres un genio 🤯" }, { quoted: m });
     } else {
-      m.reply(`❌ *Respuesta incorrecta!*`);
+      conn.sendMessage(m.chat, { text: "❌ Incorrecto. ¡Sigue intentándolo!" }, { quoted: m });
     }
-    return;
   }
-
-  // Si ya hay un acertijo activo
-  if (conn.acertijos[id]) {
-    return m.reply('⏳ *Aún hay un acertijo sin responder en este chat!*');
-  }
-
-  // Cargar un acertijo aleatorio
-  const acertijos = JSON.parse(fs.readFileSync(`./src/game/acertijo.json`));
-  const randomAcertijo = acertijos[Math.floor(Math.random() * acertijos.length)];
-
-  const caption = `    
-🚩 *ACERTIJO*    
-✨ *${randomAcertijo.question}*    
-
-⏱ *Tiempo:* ${(timeout / 1000).toFixed(2)} Segundos    
-🎁 *Premio:* *+${points}* Centavos 🪙`.trim();
-
-  // Enviar acertijo y guardar la referencia
-  const msg = await conn.reply(m.chat, caption, m);
-  conn.acertijos[id] = {
-    msgId: msg.id,
-    answer: randomAcertijo.response,
-    msg,
-    timeoutRef: setTimeout(() => {
-      if (conn.acertijos[id]) {
-        conn.reply(m.chat, `⏳ *¡Se acabó el tiempo!*\n📝 *Respuesta correcta:* ${randomAcertijo.response}`, msg);
-        delete conn.acertijos[id];
-      }
-    }, timeout)
-  };
 };
 
-handler.help = ['acertijo'];
-handler.tags = ['fun'];
-handler.group = true;
-handler.command = ['acertijo', 'acert', 'adivinanza', 'tekateki'];
-
+handler.command = ["acertijo"];
 export default handler;
