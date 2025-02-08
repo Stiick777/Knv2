@@ -5,47 +5,51 @@ const timeout = 60000;
 const points = 10;
 const threshold = 0.72;
 
-const handler = async (m, { conn, usedPrefix, text }) => {
+const handler = async (m, { conn, text }) => {
   conn.tekateki = conn.tekateki || {};
   const id = m.chat;
 
-  // Si el usuario está respondiendo un acertijo activo
-  if (id in conn.tekateki && m.quoted && m.quoted.id === conn.tekateki[id].message.id) {
+  // Comprobar si el mensaje es una respuesta a un acertijo activo
+  if (m.quoted && id in conn.tekateki) {
     const game = conn.tekateki[id];
-    const userAnswer = m.text.toLowerCase().trim();
-    const correctAnswer = game.json.response.toLowerCase().trim();
 
-    if (userAnswer === correctAnswer) {
-      global.db.data.users[m.sender].estrellas = (global.db.data.users[m.sender].estrellas || 0) + game.points;
-      m.reply(`🤍 *Respuesta correcta!*\n+${game.points} Centavos`);
-      clearTimeout(game.timeout);
-      delete conn.tekateki[id];
-    } else if (similarity(userAnswer, correctAnswer) >= threshold) {
-      m.reply(`Casi lo logras!`);
-    } else {
-      m.reply('Respuesta incorrecta!');
+    // Verificar si el usuario está respondiendo al mensaje correcto
+    if (m.quoted.id === game.message.id) {
+      const userAnswer = text.toLowerCase().trim();
+      const correctAnswer = game.json.response.toLowerCase().trim();
+
+      if (userAnswer === correctAnswer) {
+        global.db.data.users[m.sender].estrellas = (global.db.data.users[m.sender].estrellas || 0) + game.points;
+        m.reply(`✅ *¡Respuesta correcta!*\n+${game.points} Centavos 🪙`);
+        clearTimeout(game.timeout);
+        delete conn.tekateki[id];
+      } else if (similarity(userAnswer, correctAnswer) >= threshold) {
+        m.reply(`⚠️ *Casi lo logras!*`);
+      } else {
+        m.reply(`❌ *Respuesta incorrecta!*`);
+      }
+      return;
     }
-    return;
   }
 
-  // Si el usuario intenta iniciar un nuevo acertijo cuando ya hay uno activo
+  // Si ya hay un acertijo en curso
   if (id in conn.tekateki) {
-    conn.reply(m.chat, 'Todavía hay un acertijo sin responder en este chat', conn.tekateki[id].message);
+    conn.reply(m.chat, '⏳ *Aún hay un acertijo sin responder en este chat!*', conn.tekateki[id].message);
     return;
   }
 
-  // Carga y selecciona un acertijo al azar
+  // Cargar y seleccionar un acertijo aleatorio
   const tekateki = JSON.parse(fs.readFileSync(`./src/game/acertijo.json`));
   const json = tekateki[Math.floor(Math.random() * tekateki.length)];
 
   const caption = `    
 ⷮ🚩 *ACERTIJOS - KANBOT*    
-✨️ *${json.question}*    
+✨ *${json.question}*    
 
-⏱️ *Tiempo:* ${(timeout / 1000).toFixed(2)} Segundos    
+⏱ *Tiempo:* ${(timeout / 1000).toFixed(2)} Segundos    
 🎁 *Premio:* *+${points}* Centavos 🪙`.trim();
 
-  // Envía el acertijo y guarda la referencia
+  // Enviar el acertijo y guardar la referencia
   const message = await conn.reply(m.chat, caption, m);
   conn.tekateki[id] = {
     message,
@@ -53,18 +57,16 @@ const handler = async (m, { conn, usedPrefix, text }) => {
     points,
     timeout: setTimeout(async () => {
       if (conn.tekateki[id]) {
-        await conn.reply(m.chat, `🤍 Se acabó el tiempo!\n*Respuesta:* ${json.response}`, conn.tekateki[id].message);
+        await conn.reply(m.chat, `⏳ *¡Se acabó el tiempo!*\n📝 *Respuesta correcta:* ${json.response}`, conn.tekateki[id].message);
         delete conn.tekateki[id];
       }
     }, timeout)
   };
 };
 
-// Configuración del comando
 handler.help = ['acertijo'];
 handler.tags = ['fun'];
 handler.group = true;
 handler.command = ['acertijo', 'acert', 'adivinanza', 'tekateki'];
 
-// Exportar el handler
 export default handler;
