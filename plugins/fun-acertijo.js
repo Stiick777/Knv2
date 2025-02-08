@@ -14,23 +14,23 @@ global.acertijos = {};
 const handler = async (m, { conn, command }) => {
   if (command === "acertijo") {
     let ac = acertijos[Math.floor(Math.random() * acertijos.length)];
-    
-    let msg = await conn.sendMessage(m.chat, { text: `🤔 *A ver si puedes resolverlo...*\n\n${ac.pregunta}` }, { quoted: m });
-    
-    // Guardamos el acertijo con su ID de mensaje
-    global.acertijos[msg.key.id] = { respuesta: ac.respuesta.toLowerCase(), chat: m.chat };
-  } else if (m.quoted && global.acertijos[m.quoted.id]) {
-    // Si el mensaje es respuesta a un acertijo
-    let acertijo = global.acertijos[m.quoted.id];
-    
-    if (m.text.toLowerCase() === acertijo.respuesta) {
-      delete global.acertijos[m.quoted.id]; // Eliminamos el acertijo resuelto
+    global.acertijos[m.sender] = ac.respuesta.toLowerCase();
+
+    conn.sendMessage(m.chat, { text: `🤔 *A ver si puedes resolverlo...*\n\n${ac.pregunta}` }, { quoted: m });
+  } else {
+    // Si el usuario responde, verificamos si hay un acertijo pendiente
+    let respuestaCorrecta = global.acertijos[m.sender];
+    if (respuestaCorrecta && m.text.toLowerCase() === respuestaCorrecta) {
+      delete global.acertijos[m.sender]; // Eliminamos el acertijo una vez respondido correctamente
       conn.sendMessage(m.chat, { text: "🎉 ¡Correcto! Eres un genio 🤯" }, { quoted: m });
-    } else {
+    } else if (respuestaCorrecta) {
       conn.sendMessage(m.chat, { text: "❌ Incorrecto. ¡Sigue intentándolo!" }, { quoted: m });
     }
   }
 };
 
 handler.command = ["acertijo"];
+handler.customPrefix = /^(?!acertijo$).*$/; // Maneja todas las respuestas excepto el comando
+handler.check = m => global.acertijos[m.sender]; // Verifica si el usuario está respondiendo un acertijo
+
 export default handler;
