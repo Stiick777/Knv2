@@ -1,0 +1,147 @@
+[
+  {
+    "pregunta": "¿Cuál es el planeta más grande del sistema solar?",
+    "opciones": { "a": "Marte", "b": "Júpiter", "c": "Saturno" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos lados tiene un hexágono?",
+    "opciones": { "a": "5", "b": "6", "c": "8" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién escribió 'Don Quijote de la Mancha'?",
+    "opciones": { "a": "Gabriel García Márquez", "b": "Miguel de Cervantes", "c": "Pablo Neruda" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el océano más grande del mundo?",
+    "opciones": { "a": "Atlántico", "b": "Índico", "c": "Pacífico" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el país con mayor población del mundo?",
+    "opciones": { "a": "India", "b": "Estados Unidos", "c": "China" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el metal más abundante en la corteza terrestre?",
+    "opciones": { "a": "Oro", "b": "Aluminio", "c": "Hierro" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué gas respiramos principalmente?",
+    "opciones": { "a": "Oxígeno", "b": "Nitrógeno", "c": "Dióxido de carbono" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el desierto más grande del mundo?",
+    "opciones": { "a": "Sahara", "b": "Antártico", "c": "Gobi" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué unidad se usa para medir la intensidad del sonido?",
+    "opciones": { "a": "Hertz", "b": "Decibelios", "c": "Lúmenes" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos huesos tiene un ser humano adulto?",
+    "opciones": { "a": "206", "b": "214", "c": "180" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué país tiene forma de bota?",
+    "opciones": { "a": "Italia", "b": "España", "c": "Grecia" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el símbolo químico del oxígeno?",
+    "opciones": { "a": "O", "b": "O2", "c": "Ox" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos corazones tiene un pulpo?",
+    "opciones": { "a": "1", "b": "2", "c": "3" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el ave más grande del mundo?",
+    "opciones": { "a": "Cóndor", "b": "Avestruz", "c": "Águila" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién pintó 'La última cena'?",
+    "opciones": { "a": "Leonardo da Vinci", "b": "Miguel Ángel", "c": "Raphael" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué país tiene la ciudad de Machu Picchu?",
+    "opciones": { "a": "Ecuador", "b": "Perú", "c": "Colombia" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién es conocido como el 'Padre de la Relatividad'?",
+    "opciones": { "a": "Isaac Newton", "b": "Albert Einstein", "c": "Stephen Hawking" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el río más largo del mundo?",
+    "opciones": { "a": "Amazonas", "b": "Nilo", "c": "Yangtsé" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos jugadores hay en un equipo de fútbol en el campo?",
+    "opciones": { "a": "9", "b": "10", "c": "11" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el monte más alto del mundo?",
+    "opciones": { "a": "K2", "b": "Everest", "c": "Aconcagua" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué continente se encuentra Egipto?",
+    "opciones": { "a": "África", "b": "Asia", "c": "Europa" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el país con más copas del mundo de fútbol?",
+    "opciones": { "a": "Argentina", "b": "Brasil", "c": "Alemania" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué animal es conocido por ser el rey de la selva?",
+    "opciones": { "a": "Tigre", "b": "León", "c": "Jaguar" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el idioma oficial de Brasil?",
+    "opciones": { "a": "Portugués", "b": "Español", "c": "Francés" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es la capital de Canadá?",
+    "opciones": { "a": "Toronto", "b": "Montreal", "c": "Ottawa" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuántos anillos tiene el logo de los Juegos Olímpicos?",
+    "opciones": { "a": "4", "b": "5", "c": "6" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué animal es el símbolo de Australia?",
+    "opciones": { "a": "Canguro", "b": "Koala", "c": "Dingo" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Quién descubrió América en 1492?",
+    "opciones": { "a": "Fernando de Magallanes", "b": "Cristóbal Colón", "c": "Américo Vespucio" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántas patas tiene una araña?",
+    "opciones": { "a": "6", "b": "8", "c": "10" },
+    "respuestaCorrecta": "b"
+  }
+]
