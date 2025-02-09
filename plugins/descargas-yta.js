@@ -15,37 +15,37 @@ const handler = async (m, { args, conn }) => {
   await m.react('⏳');
 
   try {
-    const apiUrl = `https://api.vreden.web.id/api/ytmp3?url=${encodeURIComponent(youtubeLink)}`;
+    
+    const apiUrl = `https://api.davidcyriltech.my.id/download/ytmp3?url=${encodeURIComponent(youtubeLink)}`;
     const response = await fetch(apiUrl, { method: 'GET' });
 
     if (response.ok) {
-      const result = await response.json();
+        const result = await response.json();
 
-      // Validar respuesta y enlace de descarga
-      if (result.status === 200 && result.result?.download?.url) {
-        const downloadUrl = result.result.download.url;
-        const title = result.result.metadata.title;
+        // Validar respuesta y enlace de descarga
+        if (result.status === 200 && result.result?.download_url) {
+            const downloadUrl = result.result.download_url;
+            const title = result.result.title;
 
-        // Enviar el archivo como audio en formato .opus
-        await conn.sendMessage(m.chat, {
-          audio: { url: downloadUrl },
-          mimetype: 'audio/ogg; codecs=opus', // Especificar el formato .opus
-          fileName: `${title}.opus`,
-          ptt: false // Cambia a true si deseas que se envíe como nota de voz
-        }, { quoted: m });
+            // Enviar el archivo como audio en formato .mp3
+            await conn.sendMessage(m.chat, {
+                audio: { url: downloadUrl },
+                mimetype: 'audio/mpeg', // Formato MP3
+                fileName: `${title}.mp3`
+            }, { quoted: m });
 
-        await m.react('✅');
-        return;
-      } else {
-        return m.reply('*[❗𝐄𝐑𝐑𝐎𝐑❗] 𝙉𝙊 𝙎𝙀 𝙀𝙉𝘾𝙊𝙉𝙏𝙍𝙊́ 𝙀𝙇 𝘼𝙐𝘿𝙄𝙊. 𝙋𝙍𝙐𝙀𝘽𝘼 𝙊𝙏𝙍𝘼 𝙑𝙀𝙕.*');
-      }
+            await m.react('✅');
+            return;
+        } else {
+            return m.reply('*[❗𝐄𝐑𝐑𝐎𝐑❗] No se encontró el audio. Prueba otra vez.*');
+        }
     } else {
-      return m.reply(`*[❗𝐄𝐑𝐑𝐎𝐑❗] 𝙁𝘼𝙇𝙇𝙊́ 𝙇𝘼 𝘾𝙊𝙈𝙐𝙉𝙄𝘾𝘼𝘾𝙄𝙊́𝙉 𝘾𝙊𝙉 𝙇𝘼 𝘼𝙋𝙄: ${response.statusText}*`);
+        return m.reply(`*[❗𝐄𝐑𝐑𝐎𝐑❗] Falló la comunicación con la API: ${response.statusText}*`);
     }
-  } catch (error) {
+} catch (error) {
     console.error('Error al obtener audio:', error);
-    return m.reply('*[❗𝐄𝐑𝐑𝐎𝐑❗] 𝙉𝙊 𝙎𝙀 𝙋𝙐𝙀𝘿𝙀 𝘿𝙀𝙎𝘾𝘼𝙍𝙂𝘼𝙍 𝙀𝙇 𝘼𝙐𝘿𝙄𝙊. 𝙑𝙐𝙀𝙇𝙑𝘼 𝘼 𝙄𝙉𝙏𝙀𝙉𝙏𝘼𝙍 𝙈𝘼𝙎 𝙏𝘼𝙍𝘿𝙀.*');
-  }
+    return m.reply('*[❗𝐄𝐑𝐑𝐎𝐑❗] No se puede descargar el audio. Vuelva a intentarlo más tarde.*');
+}
 };
 
 handler.help = ['yta'];
