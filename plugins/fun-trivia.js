@@ -27,13 +27,21 @@ let handler = async (m, { conn }) => {
   }
 
   let pregunta = elegirPreguntaAleatoria(preguntas);
-  gam.set(m.sender, { pregunta });
+  let tiempoExpira = setTimeout(() => {
+    if (gam.has(m.sender)) {
+      let juego = gam.get(m.sender);
+      conn.reply(m.chat, `⏳ ¡Tiempo agotado! La respuesta correcta era *${juego.pregunta.respuestaCorrecta.toUpperCase()}*`, m);
+      gam.delete(m.sender);
+    }
+  }, 60000); // 1 minuto
 
-  let mensaje = `🎲 *Trivia*\n\n*${pregunta.pregunta}*\n\n`;
+  gam.set(m.sender, { pregunta, tiempoExpira });
+
+  let mensaje = `🎲 *Trivia - KanBot*\n\n*${pregunta.pregunta}*\n\n`;
   for (const [key, value] of Object.entries(pregunta.opciones)) {
     mensaje += `*${key.toUpperCase()}.* ${value}\n`;
   }
-  mensaje += `\n📌 *Responde con A, B o C.*`;
+  mensaje += `\n📌 *Responde con A, B o C en 1 minuto.*`;
 
   conn.reply(m.chat, mensaje, m);
 };
@@ -46,9 +54,10 @@ handler.before = async (m, { conn }) => {
   
   if (!["a", "b", "c"].includes(respuestaUsuario)) return; // Solo permite A, B o C
 
-  let { pregunta } = juego;
+  let { pregunta, tiempoExpira } = juego;
   let respuestaCorrecta = pregunta.respuestaCorrecta;
 
+  clearTimeout(tiempoExpira); // Cancela el temporizador si responde a tiempo
   gam.delete(m.sender);
 
   if (respuestaUsuario === respuestaCorrecta) {
