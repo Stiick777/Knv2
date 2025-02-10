@@ -2,25 +2,17 @@ import fetch from 'node-fetch';
 
 let handler = async (m, { conn, usedPrefix, command, text }) => {
     if (!text) {
-        return conn.reply(m.chat, `🍟 *Ingrese su petición*\n🚩 *Ejemplo de uso:* ${usedPrefix + command} Hola, ¿cómo estás?`, m, rcanal);
+        return conn.reply(m.chat, `🍟 *Ingrese su petición*\n🚩 *Ejemplo de uso:* ${usedPrefix + command} Hola, ¿cómo estás?`, m);
     }
 
     try {
         await m.react('💭');
 
-        const response = await fetch('https://shinoa.us.kg/api/gpt/gpt3.5-Turbo', {
-            method: 'POST',
-            headers: {
-                'accept': '*/*',
-                'api_key': 'free',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ text })
-        });
+        const response = await fetch(`https://restapi.apibotwa.biz.id/api/chatgpt?message=${encodeURIComponent(text)}`);
         const data = await response.json();
 
-        if (data.status) {
-            await conn.reply(m.chat, `*Hola!👋 soy KanBot Provided By Stiiven*: ${data.data}`, m);
+        if (data.status === 200 && data.data?.response) {
+            await conn.reply(m.chat, `*Hola!👋 soy KanBot Provided By Stiiven*:\n${data.data.response}`, m);
         } else {
             await conn.reply(m.chat, '🚩 Error: No se obtuvo una respuesta válida.', m);
         }
@@ -30,7 +22,7 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
     }
 };
 
-handler.help = ['chatgpt <texto>', 'ia <texto>'];
+handler.help = ['ia <texto>'];
 handler.tags = ['ai'];
 handler.command = ['ia', 'chatgpt'];
 handler.group = true;
