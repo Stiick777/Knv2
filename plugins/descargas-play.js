@@ -58,9 +58,35 @@ try {
 
     await m.react('✅'); // Reaccionar con éxito
 } catch (error) {
+//
+try {
+    await m.react('🕓'); // Reaccionar con un ícono de reloj mientras procesa
+
+    // Construir URL de la API con el enlace del video
+    const apiUrl = `https://api.agungny.my.id/api/youtube-audio?url=${encodeURIComponent(yt_play[0].url)}`;
+    const apiResponse = await fetch(apiUrl);
+    const responseData = await apiResponse.json();
+
+    // Verificar si la API devolvió un resultado válido
+    if (!responseData.status || !responseData.result || !responseData.result.downloadUrl) {
+        await m.react('❌');
+        return await conn.sendMessage(m.chat, 'No se pudo procesar el video. Intenta con otro enlace.', { quoted: m });
+    }
+
+    // Enviar el audio directamente al chat sin almacenarlo ni convertirlo
+    await conn.sendMessage(m.chat, {
+        audio: { url: responseData.result.downloadUrl },
+        mimetype: 'audio/mpeg',
+        fileName: `${responseData.result.title}.mp3`,
+        ptt: false,
+    }, { quoted: m });
+
+    await m.react('✅'); // Reaccionar con éxito
+} catch (error1) {
     await m.react('❌'); // Reaccionar con error
     console.error(error);
     await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });
+}
 }
 
 }
