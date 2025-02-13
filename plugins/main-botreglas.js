@@ -8,7 +8,8 @@ para tener a Kanbot en tu grupo se debe tener en cuenta estos requerimientos y r
 
  │> El grupo debe tener como minimo 20 participantes
  │> Si eliminan el bot *NO* se volvera a agregar
- │> Si hay demasiado spam o cosas indevidas el Bot saldra automaticamente
+ │> Si hay demasiado spam o cosas indevidas el Bot saldra automáticamente
+ │> Si no se usa el Bot también se saldrá y no se volverá agregar
  │> Se agrega 1 grupo por persona y 1 bot por grupo
  │> *NO* llamadas al Bot
  
