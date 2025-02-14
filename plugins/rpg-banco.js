@@ -8,7 +8,7 @@ let handler = async (m, { conn, args }) => {
 
     let { exp, estrellas, bank } = user;
 
-    let mensaje = `🏦 *Banco de XP y Estrellas* 🏦\n\n` +
+    let mensaje = `🏦 *Banco KanBot* 🏦\n\n` +
                   `👤 *Usuario:* @${who.split('@')[0]}\n` +
                   `⭐ *Estrellas por fuera:* ${estrellas || 0}\n` +
                   `💰 *Estrellas en el banco:* ${bank || 0}\n` +

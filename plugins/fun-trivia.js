@@ -61,7 +61,10 @@ handler.before = async (m, { conn }) => {
   gam.delete(m.sender);
 
   if (respuestaUsuario === respuestaCorrecta) {
-    return conn.reply(m.chat, `🎉 ¡Correcto! ✅ La respuesta era *${respuestaCorrecta.toUpperCase()}*`, m);
+    let expGanada = Math.floor(Math.random() * 7000) + 3000; // XP entre 3000 y 10000
+    global.db.data.users[m.sender].exp += expGanada;
+
+    return conn.reply(m.chat, `🎉 ¡Correcto! ✅ La respuesta era *${respuestaCorrecta.toUpperCase()}*\n\n✨ *Has ganado +${expGanada} XP* ⚡`, m);
   } else {
     return conn.reply(m.chat, `❌ Incorrecto. La respuesta correcta era *${respuestaCorrecta.toUpperCase()}*`, m);
   }

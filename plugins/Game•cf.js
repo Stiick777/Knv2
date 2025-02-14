@@ -1,16 +1,16 @@
 let cooldowns = {}
 
 let handler = async (m, { conn, text, command, usedPrefix }) => {
-    let tiempoEspera = 5
+    let tiempoEspera = 5 // 5 segundos de cooldown
 
     if (cooldowns[m.sender] && Date.now() - cooldowns[m.sender] < tiempoEspera * 1000) {
         let tiempoRestante = segundosAHMS(Math.ceil((cooldowns[m.sender] + tiempoEspera * 1000 - Date.now()) / 1000))
-        m.reply(` Ya has iniciado una apuesta recientemente, espera *⏱ ${tiempoRestante}* para apostar nuevamente.`)
+        m.reply(`⚠️ Ya has iniciado una apuesta recientemente, espera *⏱ ${tiempoRestante}* para jugar nuevamente.`)
         return
     }
 
     if (!text || !['cara', 'cruz'].includes(text.toLowerCase())) {
-        return conn.reply(m.chat, ' Elige una opción ( *Cara o Cruz* ) para probar suerte.\n\n`» Ejemplo :`\n' + `> *${usedPrefix + command}* cara`, m)
+        return conn.reply(m.chat, '🎲 Elige una opción ( *Cara o Cruz* ) para probar suerte.\n\n`Ejemplo:`\n' + `> *${usedPrefix + command}* cara`, m)
     }
 
     cooldowns[m.sender] = Date.now()
@@ -18,11 +18,11 @@ let handler = async (m, { conn, text, command, usedPrefix }) => {
     let esGanador = text.toLowerCase() === resultado
 
     if (esGanador) {
-        global.db.data.users[m.sender].cookies += 1000
-        conn.reply(m.chat, `︎∆ La moneda cayó en *${resultado}*, ¡ganaste  500xp!`, m)
+        global.db.data.users[m.sender].exp += 10000 // Gana 10,000 XP
+        conn.reply(m.chat, `🎉 ¡Felicidades! La moneda cayó en *${resultado}* y ganaste *+10,000 XP* ⚡`, m)
     } else {
-        global.db.data.users[m.sender].cookies -= 500
-        conn.reply(m.chat, `∆ La moneda cayó en *${resultado}*, perdiste 500xp.`, m)
+        global.db.data.users[m.sender].exp -= 5000 // Pierde 5,000 XP
+        conn.reply(m.chat, `❌ Mala suerte... La moneda cayó en *${resultado}* y perdiste *-5,000 XP* ❌`, m)
     }
 }
 

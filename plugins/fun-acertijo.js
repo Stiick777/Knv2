@@ -2,7 +2,7 @@ import fs from 'fs';
 import similarity from 'similarity';
 
 const timeout = 60000; // 60 segundos
-const points = 10; // Puntos ganados por acertijo
+const points = 5000; // XP ganada por acertijo
 const threshold = 0.72; // Umbral de similitud para respuestas cercanas
 
 const handler = async (m, { conn }) => {
@@ -22,7 +22,7 @@ const handler = async (m, { conn }) => {
 ✨️ *${json.question}*
 
 ⏱️ *Tiempo:* ${(timeout / 1000).toFixed(0)} segundos
-🎁 *Premio:* *+${points}* Centavos 🪙
+🎁 *Premio:* *+${points} XP* ⚡
   
 📝 *Responde con la respuesta correcta en este mensaje.*`.trim();
 
@@ -53,8 +53,8 @@ handler.before = async function (m) {
   let correctAnswer = json.response.toLowerCase().trim();
 
   if (userResponse === correctAnswer) {
-    global.db.data.users[m.sender].estrellas += points;
-    m.reply(`✅ ¡Respuesta correcta!\n🎉 Has ganado *+${points}* Centavos 🪙`);
+    global.db.data.users[m.sender].exp += points;
+    m.reply(`✅ ¡Respuesta correcta!\n🎉 Has ganado *+${points} XP* ⚡`);
     clearTimeout(timeout);
     delete this.tekateki[id];
   } else if (similarity(userResponse, correctAnswer) >= threshold) {
