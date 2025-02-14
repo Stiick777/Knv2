@@ -6,21 +6,19 @@ let handler = async (m, { conn, args }) => {
 
     if (!user) return m.reply('⚠️ El usuario no está registrado en la base de datos.');
 
-    let { exp } = user;
-    
-    let estrellas = Math.floor(exp / 1000); // Puedes cambiar la lógica de estrellas si lo deseas
+    let { exp, estrellas, bank } = user;
 
-    let mensaje = `🏦 *Banco KanBot* 🏦\n\n` +
+    let mensaje = `🏦 *Banco de XP y Estrellas* 🏦\n\n` +
                   `👤 *Usuario:* @${who.split('@')[0]}\n` +
-                  `⭐ *Estrellas:* ${estrellas}\n` +
+                  `⭐ *Estrellas ppr fuera:* ${estrellas || 0}\n` +
+                  `💰 *Estrellas en el banco:* ${bank || 0}\n` +
                   `📈 *Experiencia:* ${exp || 0} XP`;
 
     conn.sendMessage(m.chat, { text: mensaje, mentions: [who] }, { quoted: m });
 };
 
 handler.help = ['banco'];
-handler.tags = ['rpg'];
+handler.tags = ['xp'];
 handler.command = ['banco', 'xp', 'stars'];
-handler.group = true
 
 export default handler;
