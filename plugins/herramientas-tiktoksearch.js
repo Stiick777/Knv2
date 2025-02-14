@@ -9,7 +9,7 @@ const {
 
 let handler = async (message, { conn, text, usedPrefix, command }) => {
   if (!text) {
-    return conn.reply(message.chat, "❕️ *¿QUÉ BÚSQUEDA DESEA REALIZAR EN TIKTOK?*", message, rcanal);
+    return conn.reply(message.chat, "❕️ *¿QUÉ BÚSQUEDA DESEA REALIZAR EN TIKTOK?*", message);
   }
 
   async function createVideoMessage(url) {
@@ -30,34 +30,39 @@ let handler = async (message, { conn, text, usedPrefix, command }) => {
 
   try {
     conn.reply(message.chat, '✨️ *ENVIANDO SUS RESULTADOS POR FAVOR ESPERE..*', message, {
-      contextInfo: { 
-        externalAdReply: { 
-          mediaUrl: null, 
-          mediaType: 1, 
-          showAdAttribution: true,
-          title: '♡  ͜ ۬︵࣪᷼⏜݊᷼𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨⏜࣪᷼︵۬ ͜ ',
-          body: '✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰',
-          previewType: 0, 
-          thumbnail: imagen3,
-          sourceUrl: cn 
-        }
-      }
+      contextInfo: {   
+        externalAdReply: {   
+          mediaUrl: null,   
+          mediaType: 1,   
+          showAdAttribution: true,  
+          title: '♡  ͜ ۬︵࣪᷼⏜݊᷼𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨⏜࣪᷼︵۬ ͜ ',  
+          body: '✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰',  
+          previewType: 0,   
+          thumbnail: imagen3,  
+          sourceUrl: cn   
+        }  
+      }  
     });
 
     let results = [];
-    let { data } = await axios.get("https://apis-starlights-team.koyeb.app/starlight/tiktoksearch?text=" + text);
-    let searchResults = data.data;
+    let { data } = await axios.get(`https://api.agungny.my.id/api/tiktok-search?q=${encodeURIComponent(text)}`);
+    let searchResults = data.result.videos || [];
+
+    if (searchResults.length === 0) {
+      return conn.reply(message.chat, "❌️ *NO SE ENCONTRARON RESULTADOS.*", message);
+    }
+
     shuffleArray(searchResults);
     let topResults = searchResults.splice(0, 7);
 
     for (let result of topResults) {
       results.push({
         body: proto.Message.InteractiveMessage.Body.fromObject({ text: null }),
-        footer: proto.Message.InteractiveMessage.Footer.fromObject({ text: titulowm }),
+        footer: proto.Message.InteractiveMessage.Footer.fromObject({ text: "✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰" }),
         header: proto.Message.InteractiveMessage.Header.fromObject({
-          title: '' + result.title,
+          title: result.title,
           hasMediaAttachment: true,
-          videoMessage: await createVideoMessage(result.nowm)
+          videoMessage: await createVideoMessage(result.play)
         }),
         nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({ buttons: [] })
       });
