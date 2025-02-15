@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 
 let handler = async (m, { conn, usedPrefix, command, text }) => {
     if (!text) {
-        return conn.reply(m.chat, `🍟 *Ingrese su petición*\n🚩 *Ejemplo de uso:* ${usedPrefix + command} Hola, ¿cómo estás?`, m);
+        return conn.reply(m.chat, `💡 *Ingrese su petición*\n⚡ *Ejemplo de uso:* ${usedPrefix + command} Hola, ¿cómo estás?`, m);
     }
 
     try {
@@ -14,10 +14,12 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
         if (data.status === 200 && data.data?.response) {
             await conn.reply(m.chat, `*Hola!👋 soy KanBot Provided By Stiiven*:\n${data.data.response}`, m);
         } else {
-            await conn.reply(m.chat, '🚩 Error: No se obtuvo una respuesta válida.', m);
+            await m.react('❌');
+            await conn.reply(m.chat, '❌ Error: No se obtuvo una respuesta válida.', m);
         }
     } catch (error) {
-        console.error('🚩 Error al obtener la respuesta:', error);
+        await m.react('❌');
+        console.error('❌ Error al obtener la respuesta:', error);
         await conn.reply(m.chat, 'Error: intenta más tarde.', m);
     }
 };
