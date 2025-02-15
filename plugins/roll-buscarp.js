@@ -28,6 +28,7 @@ let buscarHandler = async (m, { conn, text }) => {
             return await conn.reply(m.chat, `⫷✦⫸ No se encontró ningún personaje con el nombre o ID *${text}*. ⫷✦⫸`, m);
         }
 
+        // Si hay más de un resultado, listar sin mostrar disponibilidad
         if (filteredCharacters.length > 1) {
             let message = `⫷✦⫸ Se encontraron *${filteredCharacters.length}* personajes con el nombre o ID similar a *"${text}"*:\n\n`;
             filteredCharacters.forEach((char, index) => {
@@ -38,13 +39,17 @@ let buscarHandler = async (m, { conn, text }) => {
             return await conn.reply(m.chat, message, m);
         }
 
+        // Si solo hay un resultado, mostrar con disponibilidad
         const character = filteredCharacters[0];
+        const estado = character.user ? '❌ No' : '✅ Si';
+
         let message = `╔════════════════╗\n`;
         message += `  ✨ *Personaje Encontrado* ✨\n`;
         message += `╚════════════════╝\n\n`;
         message += `❀ *Nombre:* ${character.name}\n`;
         message += `✰ *Valor:* ${character.value} XP\n`;
         message += `🔹 *ID:* ${character.id}\n`;
+        message += `♡ *Disponible:* ${estado}\n`;
         message += `━━━━━━━━━━━━━━━━━━`;
 
         if (character.img) {
@@ -58,8 +63,8 @@ let buscarHandler = async (m, { conn, text }) => {
     }
 };
 
-buscarHandler.help = ['buscarp <nombre|ID>'];
+buscarHandler.help = ['buscar <nombre|ID>'];
 buscarHandler.tags = ['fun'];
-buscarHandler.command = ['buscarp'];
+buscarHandler.command = ['buscar'];
 
 export default buscarHandler;
