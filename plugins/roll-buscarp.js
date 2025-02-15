@@ -63,8 +63,8 @@ let buscarHandler = async (m, { conn, text }) => {
     }
 };
 
-buscarHandler.help = ['buscar <nombre|ID>'];
+buscarHandler.help = ['buscarp <nombre|ID>'];
 buscarHandler.tags = ['fun'];
-buscarHandler.command = ['buscar'];
+buscarHandler.command = ['buscarp'];
 
 export default buscarHandler;
