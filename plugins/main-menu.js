@@ -179,12 +179,12 @@ const pp = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://telegr
 
 await m.react('🚀') 
 
-await conn.sendFile(m.chat, imagen3, 'yaemori.jpg', text.trim(), fkontak, null, rcanal)
+await conn.sendFile(m.chat, imagen3, 'yaemori.jpg', text.trim(), fkontak, null)
 
 
     
   } catch (e) {
-    conn.reply(m.chat, '🔵 Lo sentimos, el menú tiene un error', m, rcanal, )
+    conn.reply(m.chat, '🔵 Lo sentimos, el menú tiene un error', m,  )
     throw e
   }
 }
