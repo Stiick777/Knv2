@@ -18,7 +18,7 @@ let handler = async (m, { conn, args }) => {
 };
 
 handler.help = ['banco'];
-handler.tags = ['xp'];
+handler.tags = ['rpg'];
 handler.command = ['banco', 'xp', 'stars'];
 handler.group = true
 
