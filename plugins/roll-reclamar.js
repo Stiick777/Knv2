@@ -69,10 +69,14 @@ let claimHandler = async (m, { conn }) => {
             // Verificar si el usuario tiene suficiente XP  
             const userXP = global.db.data.users[userId].exp || 0;  
             if (userXP < character.value) {  
+                const xpFaltante = character.value - userXP; // Calcular cuánto le falta
+
                 await conn.reply(m.chat, `⫷✦⫸ No tienes suficiente XP para reclamar a *${character.name}* ❌.
 
 🔹 Necesitas: ${character.value} XP
 🔸 Tienes: ${userXP} XP
+❗ Te falta: ${xpFaltante} XP
+
 ✨ ¡Sigue acumulando XP y vuelve a intentarlo! ⫷✦⫸`, m);
                 return;
             }
@@ -99,6 +103,6 @@ let claimHandler = async (m, { conn }) => {
 claimHandler.help = ['rc'];
 claimHandler.tags = ['fun'];
 claimHandler.command = ['rc'];
-claimHandler.group = true
+claimHandler.group = true;
 
 export default claimHandler;
