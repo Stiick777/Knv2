@@ -12,14 +12,15 @@ let handler = async (message, { conn, text, usedPrefix, command }) => {
     return conn.reply(message.chat, "❕️ *¿QUÉ BÚSQUEDA DESEA REALIZAR EN TIKTOK?*", message);
   }
 
-  async function createVideoMessage(url) {
-    const { videoMessage } = await generateWAMessageContent({
-      video: { url }
-    }, {
-      upload: conn.waUploadToServer
-    });
-    return videoMessage;
-  }
+  async function createVideoMessage(url) {  
+  const absoluteUrl = `https://api.agungny.my.id${url}`; // Agrega la URL base  
+  const { videoMessage } = await generateWAMessageContent({  
+    video: { url: absoluteUrl }  
+  }, {  
+    upload: conn.waUploadToServer  
+  });  
+  return videoMessage;  
+}
 
   function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -45,8 +46,8 @@ let handler = async (message, { conn, text, usedPrefix, command }) => {
     });
 
     let results = [];
-    let { data } = await axios.get(`https://api.agungny.my.id/api/tiktok-search?q=${encodeURIComponent(text)}`);
-    let searchResults = data.result.videos || [];
+    let { data } = await axios.get(`https://api.agungny.my.id/api/tiktok-search?q=${text}`);
+let searchResults = data.result.videos; // Accede correctamente al array de videos
 
     if (searchResults.length === 0) {
       return conn.reply(message.chat, "❌️ *NO SE ENCONTRARON RESULTADOS.*", message);
