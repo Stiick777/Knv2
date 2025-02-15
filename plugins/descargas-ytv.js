@@ -15,9 +15,9 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         return conn.reply(m.chat, `*[❗𝐈𝐍𝐅𝐎❗] Asegúrese de que sea un enlace de YouTube.*`, m, rcanal);
     }
 
-    await conn.reply(m.chat, `*🚀 𝙎𝙀 𝙀𝙎𝙏𝘼 𝘿𝙀𝙎𝘼𝙍𝙂𝘼𝙉𝘿𝙊 𝙎𝙐 𝙑𝙄𝘿𝙀𝙊, 𝙀𝙎𝙋𝙀𝙍𝙀 𝙐𝙉 𝙈𝙊𝙈𝙀𝙉𝙏𝙊*`, m, rcanal);
 
     try {
+        await m.react('🕛')
     let apiResponse = await fetch(`https://api.davidcyriltech.my.id/download/ytmp4?url=${encodeURIComponent(youtubeLink)}`);
     let data = await apiResponse.json();
 
@@ -32,10 +32,13 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
             mimetype: 'video/mp4',
             caption: `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${videoTitle}\n📌 *Calidad:* ${videoQuality}`,
         }, { quoted: m });
+        await m.react('✅')
     } else {
+        await m.react('❌')
         await conn.reply(m.chat, `*[❗𝐈𝐍𝐅𝐎❗] No se pudo obtener el video.*`, m);
     }
 } catch (error) {
+        await m.react('❌')
     console.error('Error en la API de David Cyril:', error);
     await conn.reply(m.chat, `*[❗𝐈𝐍𝐅𝐎❗] Ocurrió un error al intentar descargar el video, intente con otra opción {/yt4doc}.*`, m);
 }
