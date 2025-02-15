@@ -2,30 +2,18 @@ import { igdl } from 'ruhend-scraper';
 
 const handler = async (m, { text, conn, args, usedPrefix, command }) => {
   if (!args[0]) {
-    return conn.reply(m.chat, '🍟 *Ingresa un link de Facebook*', m, rcanal);
+    return conn.reply(m.chat, '🎈 *Ingresa un link de Facebook*', m, rcanal);
   }
 
   // Verificación válida del enlace de Facebook
   const facebookRegex = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.watch)\/.+$/;
   if (!facebookRegex.test(args[0])) {
-    return conn.reply(m.chat, '🚩 *El enlace proporcionado no es válido. Asegúrate de ingresar un enlace correcto de Facebook.*', m, rcanal);
+    return conn.reply(m.chat, '❌ *El enlace proporcionado no es válido. Asegúrate de ingresar un enlace correcto de Facebook.*', m, rcanal);
   }
 
   let res;
   try {
-    conn.reply(m.chat, `🕒 *Descargando su video de Facebook...*`, m, {
-      contextInfo: {
-        externalAdReply: {
-          mediaUrl: null,
-          mediaType: 1,
-          showAdAttribution: true,
-          title: '♡  ͜ ۬︵࣪᷼⏜݊᷼𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨⏜࣪᷼︵۬ ͜ ',
-          body: '✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰',
-          previewType: 0,
-          sourceUrl: channel,
-        },
-      },
-    });
+  
     await m.react(rwait);
     res = await igdl(args[0]);
   } catch {
@@ -62,7 +50,7 @@ const handler = async (m, { text, conn, args, usedPrefix, command }) => {
     await m.react(done);
   } catch {
     await m.react(error);
-    return conn.reply(m.chat, '🚩 *Error al enviar el video.*', m, rcanal);
+    return conn.reply(m.chat, '❌ *Error al enviar el video.*', m, rcanal);
   }
 };
 
