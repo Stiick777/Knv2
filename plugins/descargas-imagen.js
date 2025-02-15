@@ -1,7 +1,7 @@
 import { googleImage } from '@bochilteam/scraper';
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
-    if (!text) return conn.reply(m.chat, `*🚩 Uso Correcto: ${usedPrefix + command} Bart Simpson*`, m);
+    if (!text) return conn.reply(m.chat, `*💡 Uso Correcto: ${usedPrefix + command} Bart Simpson*`, m);
 
     // Lista de palabras prohibidas
     const prohibited = [
@@ -25,23 +25,12 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     // Verificación de palabras prohibidas
     const foundProhibitedWord = prohibited.find(word => text.toLowerCase().includes(word));
     if (foundProhibitedWord) {
-        return conn.reply(m.chat, `🚩 *No daré resultado a tu solicitud por pajin* - Palabra prohibida: ${foundProhibitedWord}`, m);
+        return conn.reply(m.chat, `⚠️ *No daré resultado a tu solicitud por pajin* - Palabra prohibida: ${foundProhibitedWord}`, m);
     }
 
     // Respuesta mientras se descarga la imagen
-    conn.reply(m.chat, '🚩 *Descargando su imagen, espere...*', m, {
-        contextInfo: {
-            externalAdReply: {
-                mediaUrl: null,
-                mediaType: 1,
-                showAdAttribution: true,
-                title: packname,
-                body: wm,
-                previewType: 0,
-                sourceUrl: channel
-            }
-        }
-    });
+    await m.react('💭');
+                
 
     const res = await googleImage(text);
     const image = await res.getRandom();
@@ -54,7 +43,8 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         ['Imagen 4', dev, await res.getRandom(), [[]], [[]], [[]], [[]]]
     ];
 
-    await conn.sendCarousel(m.chat, `🚩 Resultado de ${text}`, '🔎 ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰ by Stiiven', null, messages, m);
+    await conn.sendCarousel(m.chat, `⚡ Resultado de ${text}`, '🔎 ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰ by Stiiven', null, messages, m);
+    await m.react('✅');
 };
 
 handler.help = ['imagen <query>'];
