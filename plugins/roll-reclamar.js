@@ -86,7 +86,7 @@ let claimHandler = async (m, { conn }) => {
             delete global.timestamps[character.id]; // ✅ Borrar timestamp al reclamar  
 
             await conn.reply(m.chat, `⫷✨⫸ ¡Has reclamado a *${character.name}* con éxito! 🎉`, m);  
-            cooldowns[userId] = now + 60 * 60 * 1000;  
+            cooldowns[userId] = now + 1 * 60 * 1000;  
 
         } catch (error) {  
             await conn.reply(m.chat, `✘ Error al reclamar el personaje: ${error.message}`, m);  
