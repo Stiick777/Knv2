@@ -12,12 +12,12 @@ global.conns = []
 }
 let handler = async (m, { conn, args, usedPrefix, command, isOwner, isPrems, isROwner }) => {
 if (!global.db.data.settings[conn.user.jid].jadibotmd && !isROwner) {
-conn.reply(m.chat, '🚩 Este Comando está deshabilitado por mi creador.', m, rcanal)
+conn.reply(m.chat, '⚠️ Este Comando está deshabilitado por mi creador.', m, )
 return
 }
 let parentw = args[0] && args[0] == "plz" ? conn : await global.conn
 if (!(args[0] && args[0] == 'plz' || (await global.conn).user.jid == conn.user.jid)) {
-return conn.reply(m.chat, `「💭」Solo puedes usar este comando en el bot principal.\n\n• Wa.me/${global.conn.user.jid.split`@`[0]}?text=${usedPrefix + command}`, m, rcanal)
+return conn.reply(m.chat, `「💭」Solo puedes usar este comando en el bot principal.\n\n• Wa.me/${global.conn.user.jid.split`@`[0]}?text=${usedPrefix + command}`, m,)
 }
 async function serbot() {
 let serbotFolder = crypto.randomBytes(10).toString('hex').slice(0, 8)
@@ -60,7 +60,7 @@ conn.isInit = true
 if (qr) {
 let txt = '*✪ S U B B O T - K A N B O T ✪* \n\n*𝐸𝑠𝑐𝑎𝑛𝑒𝑎 𝑒𝑠𝑡𝑒 𝑄𝑅 𝑝𝑎𝑟𝑎 𝑠𝑒𝑟 𝑢𝑛 𝑆𝑢𝑏 𝐵𝑜𝑡*\n𝑷𝒂𝒔𝒐𝒔 𝒑𝒂𝒓𝒂 𝒆𝒔𝒄𝒂𝒏𝒆𝒂𝒓:\n`1` : 𝐻𝑎𝑔𝑎 𝑐𝑙𝑖𝑐𝑘 𝑒𝑛 𝑙𝑜𝑠 3 𝑝𝑢𝑛𝑡𝑜𝑠\n `2` : 𝑇𝑜𝑞𝑢𝑒 𝑑𝑖𝑠𝑝𝑜𝑠𝑖𝑡𝑖𝑣𝑜𝑠 𝑣𝑖𝑛𝑐𝑢𝑙𝑎𝑑𝑜𝑠\n `3` : 𝐸𝑠𝑐𝑎𝑛𝑒𝑎 𝑒𝑠𝑡𝑒 𝑄𝑅\n > *𝑵𝒐𝒕𝒂:* 𝑬𝒔𝒕𝒆 𝒄ó𝒅𝒊𝒈𝒐 𝑸𝑹 𝒆𝒙𝒑𝒊𝒓𝒂 𝒆𝒏 60 𝒔𝒆𝒈𝒖𝒏𝒅𝒐𝒔.\n'
 
-let sendQR = await parentw.sendFile(m.chat, await qrcode.toDataURL(qr, { scale: 8 }), "qrcode.png", txt, m, null, rcanal)
+let sendQR = await parentw.sendFile(m.chat, await qrcode.toDataURL(qr, { scale: 8 }), "qrcode.png", txt, m, null)
 setTimeout(() => {
 parentw.sendMessage(m.chat, { delete: sendQR.key })
 }, 60000)
@@ -74,7 +74,7 @@ return console.log(await creloadHandler(true).catch(console.error))
 delete global.conns[i]
 global.conns.splice(i, 1)
 if (code !== DisconnectReason.connectionClosed) {
-await parentw.reply(conn.user.jid, "🚩 Conexión perdida con el servidor.", m)
+await parentw.reply(conn.user.jid, "⚠️ Conexión perdida con el servidor.", m)
 }
 }
 if (global.db.data == null) {
@@ -84,12 +84,12 @@ if (connection == "open") {
 conn.isInit = true;
  conn.startTime = Date.now();
 global.conns.push(conn)
-await parentw.reply(m.chat, args[0] ? '🐢 Conectado con éxito al WhatsApp.' : '🚩 Vinculaste un Sub-Bot con éxito\nEsto puede ser temporal *PENDIENTE DEL CANAL PARA CUALQUIER NOVEDAD.*', m, rcanal)
+await parentw.reply(m.chat, args[0] ? '🐢 Conectado con éxito al WhatsApp.' : '⚡ Vinculaste un Sub-Bot con éxito\nEsto puede ser temporal *PENDIENTE DEL CANAL PARA CUALQUIER NOVEDAD.*', m, )
 await sleep(5000)
 if (args[0]) {
 return
 }
-await parentw.reply(conn.user.jid, `🚩 *Para volver a vincular un sub Bot use su token*`, m, rcanal)
+await parentw.reply(conn.user.jid, `🚩 *Para volver a vincular un sub Bot use su token*`, m, )
 }
 }
 const timeoutId = setTimeout(() => {
