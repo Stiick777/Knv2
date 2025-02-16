@@ -2,13 +2,13 @@ import { igdl } from 'ruhend-scraper';
 
 const handler = async (m, { text, conn, args, usedPrefix, command }) => {
   if (!args[0]) {
-    return conn.reply(m.chat, '🎈 *Ingresa un link de Facebook*', m, rcanal);
+    return conn.reply(m.chat, '🎈 *Ingresa un link de Facebook*', m, );
   }
 
   // Verificación válida del enlace de Facebook
   const facebookRegex = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.watch)\/.+$/;
   if (!facebookRegex.test(args[0])) {
-    return conn.reply(m.chat, '❌ *El enlace proporcionado no es válido. Asegúrate de ingresar un enlace correcto de Facebook.*', m, rcanal);
+    return conn.reply(m.chat, '❌ *El enlace proporcionado no es válido. Asegúrate de ingresar un enlace correcto de Facebook.*', m, );
   }
 
   let res;
@@ -18,12 +18,12 @@ const handler = async (m, { text, conn, args, usedPrefix, command }) => {
     res = await igdl(args[0]);
   } catch {
     await m.react(error);
-    return conn.reply(m.chat, '🚩 *Error al obtener datos. Verifica el enlace.*', m, fake);
+    return conn.reply(m.chat, '❎ *Error al obtener datos. Verifica el enlace.*', m, );
   }
 
   let result = res.data;
   if (!result || result.length === 0) {
-    return conn.reply(m.chat, '🚩 *No se encontraron resultados.*', m, fake);
+    return conn.reply(m.chat, '⚠️ *No se encontraron resultados.*', m, );
   }
 
   let data;
@@ -32,11 +32,11 @@ const handler = async (m, { text, conn, args, usedPrefix, command }) => {
     data = result.find((i) => i.resolution === '720p (HD)') || result.find((i) => i.resolution === '360p (SD)');
   } catch {
     await m.react(error);
-    return conn.reply(m.chat, '🚩 *Error al procesar los datos.*', m, rcanal);
+    return conn.reply(m.chat, '🚩 *Error al procesar los datos.*', m, );
   }
 
   if (!data) {
-    return conn.reply(m.chat, '🚩 *No se encontró una resolución adecuada.*', m, rcanal);
+    return conn.reply(m.chat, '🚩 *No se encontró una resolución adecuada.*', m, );
   }
 
   let video = data.url;
@@ -50,7 +50,7 @@ const handler = async (m, { text, conn, args, usedPrefix, command }) => {
     await m.react(done);
   } catch {
     await m.react(error);
-    return conn.reply(m.chat, '❌ *Error al enviar el video.*', m, rcanal);
+    return conn.reply(m.chat, '❌ *Error al enviar el video.*', m, );
   }
 };
 
