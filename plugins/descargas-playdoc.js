@@ -15,7 +15,7 @@ if (command == 'play7' || command == 'playdoc') {
       m.chat, 
       `🧿 *Ingrese un nombre de una canción de YouTube*\n\nEjemplo: !${command} falling - Daniel Trevor`,  
       m, 
-      rcanal
+      
     );
   
   await m.react('🕛');
@@ -77,7 +77,7 @@ ${yt_play[0].author.url}
 }
 
 if (command == 'play8' || command == 'playdoc2') {
-    if (!text) return conn.reply(m.chat, `🧿 *Ingrese un nombre de una canción de YouTube*\n\nEjemplo: !${command} falling - Daniel Trevor`, m, rcanal);
+    if (!text) return conn.reply(m.chat, `🧿 *Ingrese un nombre de una canción de YouTube*\n\nEjemplo: !${command} falling - Daniel Trevor`, m,);
     await m.react('🕛');
     const yt_play = await search(args.join(' '));
     const texto1 = `
