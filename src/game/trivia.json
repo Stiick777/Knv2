@@ -143,5 +143,202 @@
     "pregunta": "¿Cuántas patas tiene una araña?",
     "opciones": { "a": "6", "b": "8", "c": "10" },
     "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos colores tiene el arcoíris?",
+    "opciones": { "a": "5", "b": "6", "c": "7" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el planeta más grande del sistema solar?",
+    "opciones": { "a": "Saturno", "b": "Júpiter", "c": "Neptuno" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el metal más abundante en la corteza terrestre?",
+    "opciones": { "a": "Aluminio", "b": "Hierro", "c": "Cobre" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué gas necesitan las plantas para hacer la fotosíntesis?",
+    "opciones": { "a": "Oxígeno", "b": "Nitrógeno", "c": "Dióxido de carbono" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuántos corazones tiene un pulpo?",
+    "opciones": { "a": "1", "b": "2", "c": "3" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el mamífero más grande del mundo?",
+    "opciones": { "a": "Elefante africano", "b": "Ballena azul", "c": "Jirafa" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién escribió 'Don Quijote de la Mancha'?",
+    "opciones": { "a": "Miguel de Cervantes", "b": "Gabriel García Márquez", "c": "William Shakespeare" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos lados tiene un hexágono?",
+    "opciones": { "a": "5", "b": "6", "c": "8" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el océano más grande del mundo?",
+    "opciones": { "a": "Atlántico", "b": "Índico", "c": "Pacífico" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cómo se llama la capital de Canadá?",
+    "opciones": { "a": "Toronto", "b": "Vancouver", "c": "Ottawa" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuántas patas tiene una araña?",
+    "opciones": { "a": "6", "b": "8", "c": "10" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos colores tiene el arcoíris?",
+    "opciones": { "a": "5", "b": "6", "c": "7" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el planeta más grande del sistema solar?",
+    "opciones": { "a": "Saturno", "b": "Júpiter", "c": "Neptuno" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué metal es líquido a temperatura ambiente?",
+    "opciones": { "a": "Mercurio", "b": "Plomo", "c": "Oro" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos corazones tiene un pulpo?",
+    "opciones": { "a": "1", "b": "2", "c": "3" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el país con más habitantes del mundo?",
+    "opciones": { "a": "Estados Unidos", "b": "China", "c": "India" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Quién escribió '1984'?",
+    "opciones": { "a": "George Orwell", "b": "Aldous Huxley", "c": "Ray Bradbury" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es la moneda de Japón?",
+    "opciones": { "a": "Yen", "b": "Won", "c": "Dólar" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿En qué año ocurrió la Revolución Francesa?",
+    "opciones": { "a": "1776", "b": "1789", "c": "1804" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos huesos tiene el cuerpo humano adulto?",
+    "opciones": { "a": "206", "b": "250", "c": "180" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el símbolo químico del oro?",
+    "opciones": { "a": "Au", "b": "Ag", "c": "Pb" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué significa FIFA?",
+    "opciones": { "a": "Federación Internacional de Fútbol Asociación", "b": "Fundación Internacional de Fútbol América", "c": "Federación Internacional de Federaciones Atléticas" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué equipo ha ganado más Copas del Mundo de fútbol?",
+    "opciones": { "a": "Brasil", "b": "Alemania", "c": "Argentina" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el océano más grande del mundo?",
+    "opciones": { "a": "Atlántico", "b": "Índico", "c": "Pacífico" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Qué país inventó la pizza?",
+    "opciones": { "a": "España", "b": "Italia", "c": "Francia" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el río más largo del mundo?",
+    "opciones": { "a": "Amazonas", "b": "Nilo", "c": "Yangtsé" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Quién pintó la Mona Lisa?",
+    "opciones": { "a": "Leonardo da Vinci", "b": "Pablo Picasso", "c": "Miguel Ángel" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cómo se llama el proceso por el cual las plantas producen su propio alimento?",
+    "opciones": { "a": "Respiración", "b": "Fotosíntesis", "c": "Fermentación" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué científico propuso la teoría de la relatividad?",
+    "opciones": { "a": "Isaac Newton", "b": "Albert Einstein", "c": "Nikola Tesla" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el órgano más grande del cuerpo humano?",
+    "opciones": { "a": "Corazón", "b": "Hígado", "c": "Piel" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿En qué año llegó el hombre a la Luna?",
+    "opciones": { "a": "1969", "b": "1958", "c": "1975" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos continentes hay en la Tierra?",
+    "opciones": { "a": "5", "b": "6", "c": "7" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el idioma más hablado del mundo?",
+    "opciones": { "a": "Español", "b": "Inglés", "c": "Chino mandarín" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cómo se llama el ave nacional de los Estados Unidos?",
+    "opciones": { "a": "Águila calva", "b": "Cóndor", "c": "Halcón" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es la capital de Canadá?",
+    "opciones": { "a": "Toronto", "b": "Vancouver", "c": "Ottawa" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuántos lados tiene un hexágono?",
+    "opciones": { "a": "5", "b": "6", "c": "8" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué gas es esencial para la respiración humana?",
+    "opciones": { "a": "Oxígeno", "b": "Nitrógeno", "c": "Hidrógeno" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué animal es conocido por su capacidad de imitar el habla humana?",
+    "opciones": { "a": "Perro", "b": "Loro", "c": "Delfín" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué año comenzó la Segunda Guerra Mundial?",
+    "opciones": { "a": "1914", "b": "1939", "c": "1945" },
+    "respuestaCorrecta": "b"
   }
+  
+
 ]
