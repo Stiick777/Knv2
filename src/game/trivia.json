@@ -338,7 +338,451 @@
     "pregunta": "¿En qué año comenzó la Segunda Guerra Mundial?",
     "opciones": { "a": "1914", "b": "1939", "c": "1945" },
     "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién fue el primer presidente de los Estados Unidos?",
+    "opciones": { "a": "Abraham Lincoln", "b": "George Washington", "c": "Thomas Jefferson" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el metal más abundante en la corteza terrestre?",
+    "opciones": { "a": "Aluminio", "b": "Hierro", "c": "Cobre" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿En qué país se encuentra la Torre Eiffel?",
+    "opciones": { "a": "Italia", "b": "Francia", "c": "España" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la película con mayor recaudación de la historia?",
+    "opciones": { "a": "Titanic", "b": "Avatar", "c": "Avengers: Endgame" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el símbolo químico del oxígeno?",
+    "opciones": { "a": "O", "b": "Ox", "c": "Om" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos jugadores componen un equipo de fútbol en el campo?",
+    "opciones": { "a": "9", "b": "10", "c": "11" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Qué país ganó la Copa del Mundo de la FIFA en 2018?",
+    "opciones": { "a": "Francia", "b": "Argentina", "c": "Brasil" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el libro más vendido de la historia?",
+    "opciones": { "a": "El Señor de los Anillos", "b": "La Biblia", "c": "Don Quijote de la Mancha" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué científico descubrió la penicilina?",
+    "opciones": { "a": "Louis Pasteur", "b": "Alexander Fleming", "c": "Marie Curie" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el desierto más grande del mundo?",
+    "opciones": { "a": "Sahara", "b": "Antártico", "c": "Gobi" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos anillos hay en la bandera olímpica?",
+    "opciones": { "a": "5", "b": "6", "c": "7" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántas notas musicales existen en la escala diatónica?",
+    "opciones": { "a": "6", "b": "7", "c": "8" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cómo se llama el famoso detective creado por Arthur Conan Doyle?",
+    "opciones": { "a": "Hercule Poirot", "b": "Sherlock Holmes", "c": "Philip Marlowe" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué país se encuentra la Gran Muralla China?",
+    "opciones": { "a": "Japón", "b": "China", "c": "Corea del Sur" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la capital de Australia?",
+    "opciones": { "a": "Sídney", "b": "Canberra", "c": "Melbourne" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién escribió 'Cien años de soledad'?",
+    "opciones": { "a": "Mario Vargas Llosa", "b": "Gabriel García Márquez", "c": "Isabel Allende" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el animal terrestre más rápido del mundo?",
+    "opciones": { "a": "Guepardo", "b": "León", "c": "Antílope" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué país es famoso por sus castillos de cuentos de hadas y Oktoberfest?",
+    "opciones": { "a": "Francia", "b": "Alemania", "c": "Austria" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién pintó 'La última cena'?",
+    "opciones": { "a": "Leonardo da Vinci", "b": "Vincent van Gogh", "c": "Pablo Picasso" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el país más grande del mundo en extensión territorial?",
+    "opciones": { "a": "Canadá", "b": "Estados Unidos", "c": "Rusia" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿En qué año terminó la Primera Guerra Mundial?",
+    "opciones": { "a": "1914", "b": "1918", "c": "1923" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el idioma oficial de Brasil?",
+    "opciones": { "a": "Español", "b": "Portugués", "c": "Italiano" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántas lunas tiene Marte?",
+    "opciones": { "a": "1", "b": "2", "c": "4" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué cantante es conocido como 'El Rey del Pop'?",
+    "opciones": { "a": "Elvis Presley", "b": "Michael Jackson", "c": "Freddie Mercury" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el nombre de la galaxia en la que se encuentra la Tierra?",
+    "opciones": { "a": "Andrómeda", "b": "Vía Láctea", "c": "Messier 87" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el mayor mamífero del mundo?",
+    "opciones": { "a": "Elefante", "b": "Ballena azul", "c": "Hipopótamo" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué año cayó el Muro de Berlín?",
+    "opciones": { "a": "1989", "b": "1991", "c": "1975" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Quién descubrió América en 1492?",
+    "opciones": { "a": "Cristóbal Colón", "b": "Fernando de Magallanes", "c": "Vasco da Gama" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos lados tiene un octágono?",
+    "opciones": { "a": "6", "b": "7", "c": "8" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el océano más grande del mundo?",
+    "opciones": { "a": "Atlántico", "b": "Índico", "c": "Pacífico" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿En qué año se fundó la ONU?",
+    "opciones": { "a": "1945", "b": "1950", "c": "1939" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es la moneda oficial de Japón?",
+    "opciones": { "a": "Yen", "b": "Won", "c": "Peso" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el gas más abundante en la atmósfera terrestre?",
+    "opciones": { "a": "Oxígeno", "b": "Nitrógeno", "c": "Dióxido de carbono" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué famosa pintura de Leonardo da Vinci muestra a una mujer con una sonrisa enigmática?",
+    "opciones": { "a": "La última cena", "b": "La Mona Lisa", "c": "La joven de la perla" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos continentes hay en el mundo?",
+    "opciones": { "a": "5", "b": "6", "c": "7" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el planeta más grande del sistema solar?",
+    "opciones": { "a": "Saturno", "b": "Júpiter", "c": "Neptuno" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué año se inventó el teléfono?",
+    "opciones": { "a": "1876", "b": "1901", "c": "1854" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué científico formuló la teoría de la relatividad?",
+    "opciones": { "a": "Isaac Newton", "b": "Albert Einstein", "c": "Galileo Galilei" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos corazones tiene un pulpo?",
+    "opciones": { "a": "Uno", "b": "Dos", "c": "Tres" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿En qué país nació el famoso físico Stephen Hawking?",
+    "opciones": { "a": "Estados Unidos", "b": "Reino Unido", "c": "Alemania" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué deporte se juega en Wimbledon?",
+    "opciones": { "a": "Fútbol", "b": "Tenis", "c": "Cricket" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué animal es el símbolo de WWF (World Wildlife Fund)?",
+    "opciones": { "a": "Oso polar", "b": "Panda", "c": "Águila" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el hueso más largo del cuerpo humano?",
+    "opciones": { "a": "Fémur", "b": "Radio", "c": "Húmero" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Quién dirigió la película 'El Padrino'?",
+    "opciones": { "a": "Francis Ford Coppola", "b": "Martin Scorsese", "c": "Quentin Tarantino" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué país tiene forma de bota en el mapa?",
+    "opciones": { "a": "España", "b": "Italia", "c": "Grecia" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el número atómico del hidrógeno?",
+    "opciones": { "a": "1", "b": "2", "c": "3" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el país más poblado del mundo?",
+    "opciones": { "a": "India", "b": "China", "c": "Estados Unidos" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué animal puede dormir de pie?",
+    "opciones": { "a": "Caballo", "b": "Perro", "c": "Gato" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿En qué año el hombre llegó a la Luna?",
+    "opciones": { "a": "1965", "b": "1969", "c": "1972" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el nombre de la esposa de Homero Simpson?",
+    "opciones": { "a": "Lisa", "b": "Marge", "c": "Maggie" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué país es conocido por la producción de tequila?",
+    "opciones": { "a": "México", "b": "España", "c": "Argentina" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué es un 'tsunami'?",
+    "opciones": { "a": "Un huracán", "b": "Una gran ola provocada por un terremoto", "c": "Un tipo de volcán" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la capital de Canadá?",
+    "opciones": { "a": "Toronto", "b": "Ottawa", "c": "Vancouver" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué instrumento se usa para medir la temperatura?",
+    "opciones": { "a": "Termómetro", "b": "Barómetro", "c": "Anemómetro" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos años tiene un lustro?",
+    "opciones": { "a": "3", "b": "5", "c": "10" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cómo se llama el río más largo del mundo?",
+    "opciones": { "a": "Amazonas", "b": "Nilo", "c": "Yangtsé" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el símbolo químico del oro?",
+    "opciones": { "a": "Ag", "b": "Au", "c": "Hg" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién escribió la obra 'Hamlet'?",
+    "opciones": { "a": "William Shakespeare", "b": "Miguel de Cervantes", "c": "Edgar Allan Poe" },
+    "respuestaCorrecta": "a"
+  },
+  
+  {
+    "pregunta": "¿Qué famoso físico desarrolló la ley de la gravitación universal?",
+    "opciones": { "a": "Isaac Newton", "b": "Albert Einstein", "c": "Nikola Tesla" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿En qué continente se encuentra el desierto del Sahara?",
+    "opciones": { "a": "Asia", "b": "África", "c": "América" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el órgano más grande del cuerpo humano?",
+    "opciones": { "a": "Corazón", "b": "Hígado", "c": "Piel" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuántos lados tiene un hexágono?",
+    "opciones": { "a": "5", "b": "6", "c": "8" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué gas es necesario para la respiración de los humanos?",
+    "opciones": { "a": "Dióxido de carbono", "b": "Oxígeno", "c": "Hidrógeno" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el país con más habitantes en América del Sur?",
+    "opciones": { "a": "Argentina", "b": "Brasil", "c": "Colombia" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién pintó 'La noche estrellada'?",
+    "opciones": { "a": "Claude Monet", "b": "Pablo Picasso", "c": "Vincent van Gogh" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Qué metal es líquido a temperatura ambiente?",
+    "opciones": { "a": "Hierro", "b": "Mercurio", "c": "Plata" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la montaña más alta del mundo?",
+    "opciones": { "a": "Monte Everest", "b": "Mont Blanc", "c": "Kilimanjaro" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿En qué país se encuentra la Torre Eiffel?",
+    "opciones": { "a": "Italia", "b": "Francia", "c": "España" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos anillos tiene el logotipo de los Juegos Olímpicos?",
+    "opciones": { "a": "4", "b": "5", "c": "6" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué animal es conocido por su habilidad para cambiar de color?",
+    "opciones": { "a": "Camaleón", "b": "Pulpo", "c": "Serpiente" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es la capital de Australia?",
+    "opciones": { "a": "Melbourne", "b": "Canberra", "c": "Sídney" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos colores tiene un cubo de Rubik tradicional?",
+    "opciones": { "a": "4", "b": "5", "c": "6" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿En qué deporte se usa el término 'strike'?",
+    "opciones": { "a": "Fútbol", "b": "Béisbol", "c": "Tenis" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué país es famoso por sus castillos y cerveza?",
+    "opciones": { "a": "Alemania", "b": "España", "c": "Portugal" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos huesos tiene un ser humano adulto?",
+    "opciones": { "a": "206", "b": "208", "c": "210" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿En qué año terminó la Segunda Guerra Mundial?",
+    "opciones": { "a": "1940", "b": "1945", "c": "1950" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el símbolo químico del hierro?",
+    "opciones": { "a": "Fe", "b": "Ir", "c": "In" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué nombre tenía la diosa griega del amor?",
+    "opciones": { "a": "Atenea", "b": "Afrodita", "c": "Hera" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el planeta más cercano al Sol?",
+    "opciones": { "a": "Mercurio", "b": "Venus", "c": "Marte" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿En qué país se encuentra la Gran Muralla China?",
+    "opciones": { "a": "Japón", "b": "Corea del Sur", "c": "China" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es la principal fuente de energía de la Tierra?",
+    "opciones": { "a": "El viento", "b": "El Sol", "c": "El petróleo" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos músculos tiene el cuerpo humano aproximadamente?",
+    "opciones": { "a": "500", "b": "650", "c": "850" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el libro más vendido de la historia?",
+    "opciones": { "a": "Don Quijote", "b": "La Biblia", "c": "Harry Potter" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién fue el primer presidente de Estados Unidos?",
+    "opciones": { "a": "Abraham Lincoln", "b": "George Washington", "c": "John Adams" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el idioma más hablado del mundo?",
+    "opciones": { "a": "Español", "b": "Chino mandarín", "c": "Inglés" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué país es famoso por la Torre de Pisa?",
+    "opciones": { "a": "Francia", "b": "Italia", "c": "Grecia" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué significa el símbolo 'H2O'?",
+    "opciones": { "a": "Dióxido de carbono", "b": "Agua", "c": "Hidrógeno" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el único mamífero capaz de volar?",
+    "opciones": { "a": "Murciélago", "b": "Ardilla voladora", "c": "Colibrí" },
+    "respuestaCorrecta": "a"
   }
+
+
+
   
 
 ]
