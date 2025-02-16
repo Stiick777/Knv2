@@ -57,21 +57,21 @@ const handler = async (m, { conn, args, text, usedPrefix, command }) => {
         // Mensaje de ayuda si no se proporciona ningún argumento
         await conn.reply(
             m.chat,
-            `🚩 *Etiqueta, responde al mensaje, o escribe el número del usuario que deseas desbanear.*\n\nEjemplo:\n- *${usedPrefix}unbanuser @usuario*\n- *${usedPrefix}unbanuser +573223336363*`,
+            `⚡ *Etiqueta, responde al mensaje, o escribe el número del usuario que deseas desbanear.*\n\nEjemplo:\n- *${usedPrefix}unbanuser @usuario*\n- *${usedPrefix}unbanuser +573223336363*`,
             m
         );
         return;
     }
 
     if (!user) {
-        await conn.reply(m.chat, `🚩 No se pudo determinar el usuario.`, m);
+        await conn.reply(m.chat, `⚠️ No se pudo determinar el usuario.`, m);
         return;
     }
 
     // Verificar si el usuario está en la base de datos
     if (db[user]) {
         if (db[user].banned === false) {
-            await conn.reply(m.chat, `🚩 El usuario ya está desbaneado.`, m);
+            await conn.reply(m.chat, `❎ El usuario ya está desbaneado.`, m);
             return;
         }
         // Eliminar el estado de baneado
@@ -87,7 +87,7 @@ const handler = async (m, { conn, args, text, usedPrefix, command }) => {
         );
     } else {
         // Si el usuario no está registrado en la base de datos
-        await conn.reply(m.chat, `🚩 El usuario no está registrado en la base de datos.`, m);
+        await conn.reply(m.chat, `🔰 El usuario no está registrado en la base de datos.`, m);
     }
 };
 
