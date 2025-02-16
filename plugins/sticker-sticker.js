@@ -27,17 +27,7 @@ let handler = async (m, { conn }) => {
 
         if (stiker) {
             await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m, true, { 
-                contextInfo: { 
-                    forwardingScore: 200, 
-                    isForwarded: false, 
-                    externalAdReply: { 
-                        showAdAttribution: false, 
-                        title: packname, 
-                        body: 'by Stiiven', 
-                        mediaType: 2, 
-                        sourceUrl: redes 
-                    } 
-                } 
+                
             })
         } else {
             conn.reply(m.chat, '⚠️ *_No se pudo crear el sticker. Intenta nuevamente._*', m)
