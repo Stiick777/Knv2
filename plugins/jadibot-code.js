@@ -29,7 +29,7 @@ let handler = async (m, {
     conn: _conn, args, usedPrefix, command, isOwner, isROwner
 }) => {
     if (!global.db.data.settings[_conn.user.jid].jadibotmd && !isROwner) {
-        conn.reply(m.chat, '🚩 Este Comando está deshabilitado por mi creador.', m, )
+        conn.reply(m.chat, '⚠️ Este Comando está deshabilitado por mi creador.', m, )
         return
     }
     let parent = args[0] && args[0] == 'plz' ? _conn: await global.conn;
@@ -129,7 +129,7 @@ let handler = async (m, {
                 global.conns.splice(i, 1);
                 if (code !== DisconnectReason.connectionClosed) {
                     parent.sendMessage(m.chat, {
-                        text: "🚩 Conexión perdida con el servidor."
+                        text: "❎ Conexión perdida con el servidor."
                     }, {
                         quoted: m
                     });
@@ -139,7 +139,7 @@ let handler = async (m, {
                 conn.isInit = true;
                 conn.startTime = Date.now();
                 global.conns.push(conn);
-                await parent.reply(m.chat, args[0] ? '🐢 Conectado con éxito al WhatsApp.': '🚩 Vinculaste un Sub-Bot con éxito\nEsto puede ser temporal *PENDIENTE DEL CANAL PARA CUALQUIER NOVEDAD.*', m, );
+                await parent.reply(m.chat, args[0] ? '🐢 Conectado con éxito al WhatsApp.': '⚡ Vinculaste un Sub-Bot con éxito\nEsto puede ser temporal *PENDIENTE DEL CANAL PARA CUALQUIER NOVEDAD.*\nhttps://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N', m, );
                 await sleep(5000);
                 if (args[0]) return;
                 await parentw.reply(conn.user.jid, `🚩 *Para volver a vincular un sub Bot use su token`, m, )
