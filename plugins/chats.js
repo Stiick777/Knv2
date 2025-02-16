@@ -14,7 +14,7 @@ let texto = ` _*Chats Totales:*_ ${chats.length}`.trim()
 
 m.react('⚠️')
 
-conn.reply(m.chat, texto, m, rcanal, )
+conn.reply(m.chat, texto, m, )
 
 }
 handler.command = ['chats', 'ch']
