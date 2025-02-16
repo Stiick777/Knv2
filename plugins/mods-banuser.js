@@ -63,7 +63,7 @@ var handler = async (m, { conn, text, usedPrefix, command }) => {
 
         // Verificar entrada: texto, mensaje citado o mención
         if (!text && !m.quoted && !m.mentionedJid) {
-            return conn.reply(m.chat, `🚩 *Proporcione un número, mencione a alguien o responda a un mensaje.*\n\nEjemplo:\n- !${command} @usuario\n- !${command} +573222356632`, m);
+            return conn.reply(m.chat, `⚠️ *Proporcione un número, mencione a alguien o responda a un mensaje.*\n\nEjemplo:\n- !${command} @usuario\n- !${command} +573222356632`, m);
         }
 
         number = text ? no(text) : null;
@@ -77,13 +77,13 @@ var handler = async (m, { conn, text, usedPrefix, command }) => {
         }
 
         if (!user) {
-            return conn.reply(m.chat, `🚩 *No se pudo determinar el usuario. Asegúrese de proporcionar un número válido, mencionar a alguien o responder a un mensaje.*`, m);
+            return conn.reply(m.chat, `⚡ *No se pudo determinar el usuario. Asegúrese de proporcionar un número válido, mencionar a alguien o responder a un mensaje.*`, m);
         }
 
         // Validar si el bot está siendo baneado
         bot = conn.user.jid.split`@`[0];
         if (user === conn.user.jid) {
-            return conn.reply(m.chat, `🚩 @${bot} *No puede ser baneado con este comando.*`, m, { mentions: [user] });
+            return conn.reply(m.chat, `🔰 @${bot} *No puede ser baneado con este comando.*`, m, { mentions: [user] });
         }
 
         // Validar si el propietario está siendo baneado
@@ -91,7 +91,7 @@ var handler = async (m, { conn, text, usedPrefix, command }) => {
             ownerNumber = global.owner[i][0];
             if (user.replace(/@s\.whatsapp\.net$/, '') === ownerNumber) {
                 aa = ownerNumber + '@s.whatsapp.net';
-                await conn.reply(m.chat, `🚩 *No puedo banear al propietario @${ownerNumber}.*`, m, { mentions: [aa] });
+                await conn.reply(m.chat, `⚡ *No puedo banear al propietario @${ownerNumber}.*`, m, { mentions: [aa] });
                 return;
             }
         }
@@ -104,7 +104,7 @@ var handler = async (m, { conn, text, usedPrefix, command }) => {
         }
 
         if (users[user].banned === true) {
-            return conn.reply(m.chat, `🚩 *El usuario ya está baneado.*`, m, { mentions: [user] });
+            return conn.reply(m.chat, `❎ *El usuario ya está baneado.*`, m, { mentions: [user] });
         }
 
         // Baneando al usuario
