@@ -2,10 +2,10 @@ import fetch from 'node-fetch';
 
 let handler = async (m, { conn: star, args }) => {
   if (!args || !args[0]) 
-    return star.reply(m.chat, '💣 _*Ingresa el enlace del video de YouTube junto al comando.*_\n\n`Ejemplo:`\n> *!ytmp4doc* https://youtube.com/watch?v=qHDJSRlNhVs', m, rcanal);
+    return star.reply(m.chat, '💣 _*Ingresa el enlace del video de YouTube junto al comando.*_\n\n`Ejemplo:`\n> *!ytmp4doc* https://youtube.com/watch?v=qHDJSRlNhVs', m, );
 
   if (!args[0].match(/youtu/gi)) 
-    return star.reply(m.chat, `Verifica que el enlace sea de YouTube.`, m, rcanal).then(() => m.react('✖️'));
+    return star.reply(m.chat, `Verifica que el enlace sea de YouTube.`, m, ).then(() => m.react('✖️'));
 
   await m.react('🕓');
   try {
@@ -23,7 +23,7 @@ let handler = async (m, { conn: star, args }) => {
     txt += `	🎥   *Calidad*: ${quality}\n\n`;
     txt += `> ️ *Se está enviando su video, por favor espere*`;
 
-    await star.reply(m.chat, txt, m, rcanal);
+    await star.reply(m.chat, txt, m, );
     await star.sendMessage(m.chat, {
       document: { url: download_url }, // Enlace directo para descargar el archivo como documento
       caption: `${title}\n🎥 *Calidad*: ${quality}\n\n*🌝 *Provided by KanBot* 🌚`,
