@@ -235,7 +235,7 @@ if (settings) {
 if (!('self' in settings)) settings.self = false
 if (!('autoread' in settings)) settings.autoread = false
 if (!('autoread2' in settings)) settings.autoread2 = false
-if (!('restrict' in settings)) settings.restrict = false
+if (!('restrict' in settings)) settings.restrict = true
 if (!('antiPrivate' in settings)) settings.antiPrivate = false
 if (!('antiCall' in settings)) settings.antiCall = true
 if (!('antiSpam' in settings)) settings.antiSpam = false
@@ -246,7 +246,7 @@ if (!('autobio' in settings)) settings.autobio = false
 self: false,
 autoread: false,
 autoread2: false,
-restrict: false,
+restrict: true,
 antiPrivate: false,
 antiCall: true,
 antiSpam: false,
