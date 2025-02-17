@@ -54,7 +54,7 @@ let handler = async (m, { conn }) => {
             statusMessage = ' *Libre*';
         }
 
-        const message = `╔════════════════╗    
+       const message = `╔════════════════╗    
   ✨ *¡Nuevo Personaje Disponible!* ✨
 ╚════════════════╝
 
@@ -62,7 +62,7 @@ let handler = async (m, { conn }) => {
 ✰ *Valor:* ${randomCharacter.value} XP
 ♡ *Estado:* ${statusMessage}
 
-🕒 Puedes reclamarlo con *rc* en los próximos 30 segundos
+${randomCharacter.user ? "🔥️ *Este personaje ya ha sido reclamado, intenta con otro*" : "🕒 Puedes reclamarlo con *rc* en los próximos 30 segundos"}
 
 🔹 ID: *${randomCharacter.id}*
 ━━━━━━━━━━━━━━━━━━`;
