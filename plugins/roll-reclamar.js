@@ -52,10 +52,15 @@ let claimHandler = async (m, { conn }) => {
                 return;  
             }  
 
-            /// 🔹 Verificar si el tiempo ha expirado
-            const expirationTime = global.timestamps[character.id] || 0;
-            console.log(`Tiempo actual: ${now}, Expiración: ${expirationTime}`); // Debug
+            // 🔹 Verificar si el personaje ya fue reclamado
+            if (character.user) {
+                const userTag = `@${character.user.split('@')[0]}`;
+                await conn.reply(m.chat, `⫷✦⫸ ❌ *Este personaje ya ha sido reclamado.* ❌\nFue reclamado por ${userTag}.`, m, { mentions: [character.user] });
+                return;
+            }
 
+            // 🔹 Verificar si el tiempo ha expirado
+            const expirationTime = global.timestamps[character.id] || 0;
             if (now > expirationTime) {  
                 await conn.reply(
                     m.chat, 
@@ -67,7 +72,7 @@ let claimHandler = async (m, { conn }) => {
             }
 
             // Verificar si el usuario tiene suficiente XP  
-            const userXP = global.db.data.users[userId].exp || 0;  
+            const userXP = global.db.data.users[userId]?.exp || 0;  
             if (userXP < character.value) {  
                 const xpFaltante = character.value - userXP; // Calcular cuánto le falta
 
