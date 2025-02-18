@@ -1051,6 +1051,152 @@
     "pregunta": "¿Cuántos huesos tiene el cuerpo humano adulto?",
     "opciones": { "a": "206", "b": "210", "c": "220" },
     "respuestaCorrecta": "a"
+  },
+  
+  {
+    "pregunta": "¿Qué científico formuló la teoría de la relatividad?",
+    "opciones": { "a": "Isaac Newton", "b": "Albert Einstein", "c": "Stephen Hawking" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la moneda oficial de Japón?",
+    "opciones": { "a": "Yen", "b": "Won", "c": "Peso" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué gas respiramos principalmente de la atmósfera?",
+    "opciones": { "a": "Oxígeno", "b": "Nitrógeno", "c": "Dióxido de carbono" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué año cayó el Muro de Berlín?",
+    "opciones": { "a": "1985", "b": "1989", "c": "1991" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el océano más grande del mundo?",
+    "opciones": { "a": "Atlántico", "b": "Índico", "c": "Pacífico" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuántos lados tiene un hexágono?",
+    "opciones": { "a": "5", "b": "6", "c": "8" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué famosa estructura fue construida por los antiguos egipcios?",
+    "opciones": { "a": "La Gran Muralla", "b": "Las Pirámides de Giza", "c": "El Coliseo" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué año comenzó la Primera Guerra Mundial?",
+    "opciones": { "a": "1914", "b": "1918", "c": "1939" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cómo se llama el proceso por el cual las plantas producen su propio alimento?",
+    "opciones": { "a": "Fotosíntesis", "b": "Respiración", "c": "Fermentación" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el metal más ligero?",
+    "opciones": { "a": "Hierro", "b": "Litio", "c": "Plata" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién pintó la Mona Lisa?",
+    "opciones": { "a": "Leonardo da Vinci", "b": "Pablo Picasso", "c": "Salvador Dalí" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué país ganó la Copa del Mundo de la FIFA en 2018?",
+    "opciones": { "a": "Brasil", "b": "Francia", "c": "Alemania" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el desierto más grande del mundo?",
+    "opciones": { "a": "Sahara", "b": "Atacama", "c": "Antártico" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el río más largo del mundo?",
+    "opciones": { "a": "Amazonas", "b": "Nilo", "c": "Yangtsé" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué año se fundó Google?",
+    "opciones": { "a": "1998", "b": "2001", "c": "1995" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué planeta tiene los anillos más grandes del sistema solar?",
+    "opciones": { "a": "Júpiter", "b": "Saturno", "c": "Urano" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué gas se usa en los globos aerostáticos?",
+    "opciones": { "a": "Helio", "b": "Oxígeno", "c": "Hidrógeno" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos corazones tiene un pulpo?",
+    "opciones": { "a": "1", "b": "2", "c": "3" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuál es el nombre del satélite natural de la Tierra?",
+    "opciones": { "a": "Europa", "b": "Luna", "c": "Fobos" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién escribió 'Romeo y Julieta'?",
+    "opciones": { "a": "William Shakespeare", "b": "Miguel de Cervantes", "c": "Dante Alighieri" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué animal es conocido por su habilidad para cambiar de color?",
+    "opciones": { "a": "Camaleón", "b": "Cebra", "c": "Leopardo" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el punto más alto de la Tierra?",
+    "opciones": { "a": "Monte Everest", "b": "Kilimanjaro", "c": "Monte McKinley" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué país tiene la mayor cantidad de islas?",
+    "opciones": { "a": "Indonesia", "b": "Suecia", "c": "Filipinas" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el nombre del proceso mediante el cual el agua se convierte en vapor?",
+    "opciones": { "a": "Sublimación", "b": "Evaporación", "c": "Condensación" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué animal puede dormir de pie?",
+    "opciones": { "a": "Perro", "b": "Caballo", "c": "Gato" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién fue el primer ser humano en viajar al espacio?",
+    "opciones": { "a": "Neil Armstrong", "b": "Yuri Gagarin", "c": "Buzz Aldrin" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué continente tiene más países?",
+    "opciones": { "a": "África", "b": "Asia", "c": "Europa" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es la capital de Canadá?",
+    "opciones": { "a": "Toronto", "b": "Ottawa", "c": "Vancouver" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos kilómetros hay en una milla?",
+    "opciones": { "a": "1.609", "b": "2.001", "c": "0.975" },
+    "respuestaCorrecta": "a"
   }
 
 
