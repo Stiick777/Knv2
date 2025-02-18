@@ -54,7 +54,7 @@ const handler = async (m, { conn, args, usedPrefix }) => {
 
     if (!user) return conn.reply(m.chat, `🚩 No se pudo determinar el usuario.`, m);
 
-    // Normalizar formato del usuario en la base de datos
+    // Buscar usuario en la base de datos
     let foundUser = Object.keys(db).find(jid => jid.includes(user.replace('@s.whatsapp.net', '')));
 
     if (!foundUser) return conn.reply(m.chat, `🚩 El usuario no está registrado en la base de datos.`, m);
@@ -63,8 +63,10 @@ const handler = async (m, { conn, args, usedPrefix }) => {
         return conn.reply(m.chat, `🚩 El usuario ya está desbaneado.`, m);
     }
 
-    // Quitar el baneo
+    // Resetear todas las propiedades relacionadas con el baneo
     db[foundUser].banned = false;
+    db[foundUser].BannedReason = '';
+    db[foundUser].Banneduser = false;
     db[foundUser].banRazon = '';
     db[foundUser].antispam = 0; // Resetear spam
 
