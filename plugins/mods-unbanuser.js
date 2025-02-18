@@ -27,59 +27,54 @@ handler.rowner = true;
 handler.group = true;
 export default handler;
 */
-const handler = async (m, { conn, args, text, usedPrefix, command }) => {
-    let user;
+const handler = async (m, { conn, args, usedPrefix }) => {
     let db = global.db.data.users;
+    let user;
 
-    // Función para limpiar el número y eliminar caracteres no deseados
-    function no(number) {
+    // Función para limpiar caracteres no deseados
+    function cleanNumber(number) {
         return number.replace(/\s/g, '').replace(/([@+-])/g, '');
     }
 
-    // Determinar el usuario
-    if (m.quoted && m.quoted.sender) {
+    // Determinar el usuario correctamente
+    if (m.quoted?.sender) {
         user = m.quoted.sender;
     } else if (args.length >= 1) {
-        const input = no(args[0]);
+        const input = cleanNumber(args[0]);
         user = isNaN(input) ? input.split`@`[1] + '@s.whatsapp.net' : input + '@s.whatsapp.net';
-    } else if (m.mentionedJid && m.mentionedJid[0]) {
+    } else if (m.mentionedJid?.[0]) {
         user = m.mentionedJid[0];
     } else {
-        await conn.reply(
+        return conn.reply(
             m.chat,
-            `🚩 *Etiqueta, responde al mensaje, o escribe el número del usuario que deseas desbanear.*\n\nEjemplo:\n- *${usedPrefix}unbanuser @usuario*\n- *${usedPrefix}unbanuser +573223336363*`,
+            `🚩 *Etiqueta, responde al mensaje o escribe el número del usuario que deseas desbanear.*\n\nEjemplo:\n- *${usedPrefix}unbanuser @usuario*\n- *${usedPrefix}unbanuser +573223336363*`,
             m
         );
-        return;
     }
 
-    if (!user) {
-        await conn.reply(m.chat, `🚩 No se pudo determinar el usuario.`, m);
-        return;
+    if (!user) return conn.reply(m.chat, `🚩 No se pudo determinar el usuario.`, m);
+
+    // Normalizar formato del usuario en la base de datos
+    let foundUser = Object.keys(db).find(jid => jid.includes(user.replace('@s.whatsapp.net', '')));
+
+    if (!foundUser) return conn.reply(m.chat, `🚩 El usuario no está registrado en la base de datos.`, m);
+    
+    if (!db[foundUser].banned) {
+        return conn.reply(m.chat, `🚩 El usuario ya está desbaneado.`, m);
     }
 
-    // Verificar si el usuario está en la base de datos
-    if (db[user]) {
-        if (!db[user].banned) {
-            await conn.reply(m.chat, `🚩 El usuario ya está desbaneado.`, m);
-            return;
-        }
-        
-        // Solo quitar el baneo, pero mantener los datos del usuario
-        db[user].banned = false;
-        db[user].banRazon = ''; // Limpiar la razón del baneo
-        db[user].antispam = 0; // Reiniciar contador de spam para evitar baneo inmediato
+    // Quitar el baneo
+    db[foundUser].banned = false;
+    db[foundUser].banRazon = '';
+    db[foundUser].antispam = 0; // Resetear spam
 
-        const nametag = await conn.getName(user);
-        await conn.reply(
-            m.chat,
-            `✅️ El usuario *${nametag || user.split('@')[0]}* ha sido desbaneado y puede volver a usar el bot.`,
-            m,
-            { mentions: [user] }
-        );
-    } else {
-        await conn.reply(m.chat, `🚩 El usuario no está registrado en la base de datos.`, m);
-    }
+    const nametag = await conn.getName(foundUser);
+    conn.reply(
+        m.chat,
+        `✅️ El usuario *${nametag || foundUser.split('@')[0]}* ha sido desbaneado y puede volver a usar el bot.`,
+        m,
+        { mentions: [foundUser] }
+    );
 };
 
 handler.help = ['unbanuser <@tag|número>'];
