@@ -89,7 +89,7 @@ let handler = async (m, { conn, args, command }) => {
         };
         ultimoPartido[id] = ahora;
 
-        conn.reply(m.chat, `⚽ *¡Nuevo Partido del Día!*\n🥅 Equipos:\n *${equipo1} vs ${equipo2}*\n\n🔹 *Solo el creador del partido puede votar y definir el marcador.*`, m);
+        conn.reply(m.chat, `⚽ *¡Nuevo Partido del Día!*\n🥅 Equipos:\n *${equipo1} vs ${equipo2}*\n\n🔹 *Ahora usa /voto <equipo>*`, m);
         return;
     }
 
