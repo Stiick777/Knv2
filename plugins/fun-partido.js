@@ -48,8 +48,8 @@ const equipos = [
     'Derby County', 'Parma', 'Red Star Belgrade', 'Steaua Bucarest', 'Maribor', 'Basel'
 ];
 
-const partidos = {}; // Almacena los partidos en curso
-const ultimoPartido = {}; // Almacena el tiempo del último partido por grupo/chat
+const partidos = {}; // Almacena los partidos en curso por usuario
+const ultimoPartido = {}; // Almacena el tiempo del último partido por usuario
 const timeout = 300000; // 5 minutos (300,000 ms)
 const limiteDiario = 86400000; // 24 horas (86,400,000 ms)
 const XP_Acierto = 20000;
@@ -57,12 +57,12 @@ const XP_Cercano = 5000;
 const umbralSimilitud = 0.8;
 
 let handler = async (m, { conn, args, command }) => {
-    const id = m.chat;
+    const id = m.sender; // Ahora cada usuario tiene su propio partido
     const ahora = Date.now();
 
     if (command === 'partido') {
         if (id in partidos) {
-            return conn.reply(m.chat, '⚠️ Ya hay un partido en curso. Espera a que termine.', m);
+            return conn.reply(m.chat, '⚠️ Ya tienes un partido en curso. Espera a que termine.', m);
         }
 
         if (ultimoPartido[id] && ahora - ultimoPartido[id] < limiteDiario) {
@@ -71,7 +71,7 @@ let handler = async (m, { conn, args, command }) => {
             let minutos = Math.floor((tiempoRestante % 3600000) / 60000);
             let segundos = Math.floor((tiempoRestante % 60000) / 1000);
 
-            return conn.reply(m.chat, `⚠️ Ya se generó un partido hoy. Vuelve en *${horas} horas, ${minutos} minutos y ${segundos} segundos*.`, m);
+            return conn.reply(m.chat, `⚠️ Ya generaste un partido hoy. Vuelve en *${horas}h ${minutos}m ${segundos}s*`, m);
         }
 
         let equipo1 = equipos[Math.floor(Math.random() * equipos.length)];
@@ -80,23 +80,16 @@ let handler = async (m, { conn, args, command }) => {
             equipo2 = equipos[Math.floor(Math.random() * equipos.length)];
         } while (equipo1 === equipo2);
 
-        partidos[id] = { 
-            equipo1, 
-            equipo2, 
-            marcador1: null, 
-            marcador2: null, 
-            creador: m.sender // Guardar al creador del partido
-        };
-        ultimoPartido[id] = ahora;
+        partidos[id] = { equipo1, equipo2, marcador1: null, marcador2: null };
+        ultimoPartido[id] = ahora; // Guarda la fecha de generación del partido
 
-        conn.reply(m.chat, `⚽ *¡Nuevo Partido del Día!*\n🥅 Equipos:\n *${equipo1} vs ${equipo2}*\n\n🔹 *Ahora usa /voto <equipo>*`, m);
+        conn.reply(m.chat, `⚽ *¡Nuevo Partido para ${m.pushName}!*\n🥅 Equipos:\n *${equipo1} vs ${equipo2}*\n\n🔹 Escribe: \`/voto <tu equipo>\`\n🔹 Ejemplo: \`/voto ${equipo1}\``, m);
         return;
     }
 
     if (command === 'voto') {
-        if (!(id in partidos)) return conn.reply(m.chat, '⚠️ No hay partidos en curso. Usa /partido para generar uno.', m);
-        if (m.sender !== partidos[id].creador) return conn.reply(m.chat, '❌ Solo el creador del partido puede votar.', m);
-        if (!args[0]) return conn.reply(m.chat, '❌ Debes elegir un equipo. Ejemplo: /voto <equipo>', m);
+        if (!(id in partidos)) return conn.reply(m.chat, '⚠️ No tienes un partido en curso. Usa `/partido` para iniciar uno.', m);
+        if (!args[0]) return conn.reply(m.chat, '❌ Debes elegir un equipo. Ejemplo: `/voto <equipo>`', m);
 
         let { equipo1, equipo2 } = partidos[id];
         let equipoSeleccionado = args.join(' ');
@@ -106,6 +99,7 @@ let handler = async (m, { conn, args, command }) => {
         }
 
         let user = global.db.data.users[m.sender] || { xp: 0 };
+
         if (user.xp < 1000) {
             return conn.reply(m.chat, '❌ No tienes suficiente XP para apostar. Necesitas al menos *1000 XP*.', m);
         }
@@ -113,22 +107,22 @@ let handler = async (m, { conn, args, command }) => {
         user.xp -= 1000;
         partidos[id].equipoUsuario = equipo1.toLowerCase() === equipoSeleccionado.toLowerCase() ? equipo1 : equipo2;
 
-        conn.reply(m.chat, `✅ Apostaste *1000 XP* y elegiste *${partidos[id].equipoUsuario}*.\n🔹 Ahora usa: \`/marcador <goles de ${partidos[id].equipoUsuario}> <goles del rival>\``, m);
+        conn.reply(m.chat, `✅ Apostaste *1000 XP* y elegiste *${partidos[id].equipoUsuario}*.\n🔹 Ahora usa: \`/marcador <goles de ${partidos[id].equipoUsuario}> <goles del rival>\`\n🔹 Ejemplo: \`/marcador 3 1\``, m);
         return;
     }
 
     if (command === 'delp') {
-        if (!(id in partidos)) return conn.reply(m.chat, '⚠️ No hay partido generado en curso para eliminar.', m);
-        if (m.sender !== partidos[id].creador) return conn.reply(m.chat, '❌ Solo el creador del partido puede eliminarlo.', m);
+        if (!(id in partidos)) {
+            return conn.reply(m.chat, '⚠️ No tienes un partido en curso para eliminar.', m);
+        }
 
         delete partidos[id];
-        conn.reply(m.chat, '⚠️ El partido ha sido eliminado. No podrás generar otro hasta pasadas 24 horas.', m);
+        conn.reply(m.chat, '⚠️ Tu partido ha sido eliminado. No podrás generar otro hasta mañana.', m);
         return;
     }
 
     if (command === 'marcador') {
-        if (!(id in partidos)) return conn.reply(m.chat, '⚠️ No hay partidos en curso. Usa `/partido` para generar uno.', m);
-        if (m.sender !== partidos[id].creador) return conn.reply(m.chat, '❌ Solo el creador del partido puede establecer el marcador.', m);
+        if (!(id in partidos)) return conn.reply(m.chat, '⚠️ No tienes un partido en curso. Usa `/partido` para generar uno.', m);
         if (!args[0] || !args[1] || isNaN(args[0]) || isNaN(args[1])) {
             return conn.reply(m.chat, '❌ Debes escribir dos números. Ejemplo: `/marcador 2 1`', m);
         }
@@ -148,7 +142,10 @@ let handler = async (m, { conn, args, command }) => {
             let marcadorReal1 = Math.floor(Math.random() * 5);
             let marcadorReal2 = Math.floor(Math.random() * 5);
 
-            let mensajeResultado = `🏆 Resultado Oficial: ⚽ ${equipo1} ${marcadorReal1} - ${marcadorReal2} ${equipo2}\n\n🔹 Tu predicción: ${equipoUsuario} ${marcador1} - ${marcador2} ${equipoRival} `;
+            let mensajeResultado = `
+🏆 Resultado Oficial: ⚽ ${equipo1} ${marcadorReal1} - ${marcadorReal2} ${equipo2}
+
+🔹 Tu predicción: ${equipoUsuario} ${marcador1} - ${marcador2} ${equipoRival}`;
 
             let xpGanado = 0;
             if (marcador1 === marcadorReal1 && marcador2 === marcadorReal2) {
