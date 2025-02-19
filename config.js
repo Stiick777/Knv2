@@ -38,7 +38,7 @@ global.yukiJadibts = true
 //• ↳ ◜𝑴𝑨𝑹𝑪𝑨𝑺 𝑫𝑬 𝑨𝑮𝑼𝑨◞ • 💌
 global.packsticker = ``
 global.packname = `✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`
-global.author = ` {\n   {\n      ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰\n      ────────\n      by Stiiven\n   }\n}`;
+global.author = `《 𝙺𝚊𝚗𝙱𝚘𝚝 》\n【 By Stiiven 】 `;
 global.wm = '✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰';
 global.titulowm = '✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰';
 global.titulowm2 = `✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`
