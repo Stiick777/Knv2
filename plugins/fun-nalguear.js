@@ -33,9 +33,9 @@ let handler = async (m, { conn, usedPrefix }) => {
   //  m.react('🔥');
 }
 
-handler.help = ['violar @tag'];
+handler.help = ['nalguear @tag'];
 handler.tags = ['fun'];
-handler.command = ['nalguear'];
+handler.command = ['nalguear', 'ng'];
 handler.group = true;
 
 export default handler;
