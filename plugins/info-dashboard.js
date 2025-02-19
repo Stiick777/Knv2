@@ -29,9 +29,9 @@ let handler = async (m, { conn, command }) => {
 
 }
 
-handler.help = ['dash', 'dashboard', 'views', 'database', 'usuarios', 'user']
+handler.help = ['dash', 'user']
 handler.tags = ['main']
-handler.command = ['dashboard', 'dash', 'views', 'database', 'usuarios', 'user']
+handler.command = [ 'dash', 'user']
 
 
 export default handler
