@@ -738,18 +738,18 @@ console.error(e)
 
 global.dfail = (type, m, conn) => {
 const msg = {
-rowner: '「👑」 *Esta función solo puede ser usada por mi creador*\n\n> Stiiven.', 
-owner: '「👑」 *Esta función solo puede ser usada por mi desarrollador.', 
-mods: '「🤴🏻」 *Esta función solo puede ser usada por mis desarrolladores.*', 
-premium: '「🍧」 *Esta función solo es para usuarios Premium.', 
-group: '「🐢」 *Esta funcion solo puede ser ejecutada en el grupo ofical del bot.*\nhttps://chat.whatsapp.com/C5xsN9KcmIs8O1wNeOkcX9.', 
-private: '「🍭」 *Esta función solo puede ser usada en chat privado.*', 
-admin: '「👑」 *Este comando solo puede ser usado por admins.*', 
-botAdmin: '「🚩」 *Para usar esta función debo ser admin.*', 
-unreg: '「🍟」 *¡Hey! no estas registrado, registrese para usar esta función*\n\n*/reg nombre.edad*\n\n*_❕ Ejemplo_* : */reg Kan.23*',
-restrict: '「💫」 *Esta característica esta desactivada.*'
+rowner: '「⚡」 *Esta función solo puede ser usada por mi creador*\n\n> Stiiven.', 
+owner: '「🔰」 *Esta función solo puede ser usada por mi desarrollador.', 
+mods: '「🌥️」 *Esta función solo puede ser usada por mis desarrolladores.*', 
+premium: '「💡」 *Esta función solo es para usuarios Premium.', 
+group: '「🔥」 *Esta funcion solo puede ser ejecutada en el grupo ofical del bot.*\nhttps://chat.whatsapp.com/C5xsN9KcmIs8O1wNeOkcX9.', 
+private: '「💝」 *Esta función solo puede ser usada en chat privado.*', 
+admin: '「⚠️」 *Este comando solo puede ser usado por admins.*', 
+botAdmin: '「✴️」 *Para usar esta función debo ser admin.*', 
+unreg: '「🔷」 *¡Hey! no estas registrado, registrese para usar esta función*\n\n*/reg nombre.edad*\n\n*_❕ Ejemplo_* : */reg Kan.23*',
+restrict: '「❌」 *Esta característica esta desactivada.*'
 }[type];
-if (msg) return conn.reply(m.chat, msg, m, rcanal).then(_ => m.react('✖️'))}
+if (msg) return conn.reply(m.chat, msg, m,).then(_ => m.react('✖️'))}
 const file = global.__filename(import.meta.url, true);
 
 // NO TOCAR
