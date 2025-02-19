@@ -4,7 +4,7 @@ const handler = async (m, {conn, usedPrefix, command}) => {
  try {    
   let q = m.quoted ? m.quoted : m;
   let mime = (q.msg || q).mimetype || q.mediaType || "";
-  if (!mime) return m.reply(`🚩 Envie una imagen o responda a la imagen utilizando el comando: ${usedPrefix + command}`);
+  if (!mime) return m.reply(`💡 Envie una imagen o responda a la imagen utilizando el comando: ${usedPrefix + command}`);
   if (!/image\/(jpe?g|png)/.test(mime)) return m.reply(`🍂 El formato del archivo (${mime}) no es compatible, envía o responda a una imagen`);
   await m.react('🕛')
   let img = await q.download?.();
@@ -16,8 +16,8 @@ const handler = async (m, {conn, usedPrefix, command}) => {
  return m.reply("🚩 Ocurrió un error");
  }
 };
-handler.help = ["remini", "hd", "enhance"];
-handler.tags = ["ai", "tools"];
+handler.help = [ "hd",];
+handler.tags = [ "tools"];
 handler.group = true;
 handler.command = ["remini", "hd", "enhance"];
 export default handler;
