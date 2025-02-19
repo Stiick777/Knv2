@@ -66,5 +66,6 @@ let buscarHandler = async (m, { conn, text }) => {
 buscarHandler.help = ['buscarp <nombre|ID>'];
 buscarHandler.tags = ['fun'];
 buscarHandler.command = ['buscarp'];
+buscarHandler.group = true;
 
 export default buscarHandler;
