@@ -109,7 +109,7 @@ var hawemod = [
  }
 loading()    
 };
-handler.help = ['gay <@tag> | <nombre>', 'lesbiana <@tag> | <nombre>', 'pajero <@tag> | <nombre>', 'pajera <@tag> | <nombre>', 'puto <@tag> | <nombre>', 'puta <@tag> | <nombre>', 'manco <@tag> | <nombre>', 'manca <@tag> | <nombre>', 'rata <@tag> | <nombre>', 'prostituta <@tag> | <nombre>', 'prostituto <@tag> | <nombre>'];
+handler.help = ['gay <@tag> | <nombre>', 'lesbiana <@tag> | <nombre>', 'pajer@ <@tag> | <nombre>', 'put@ <@tag> | <nombre>',  'manc@ <@tag> | <nombre>', 'rata <@tag> | <nombre>', 'prostitut@ <@tag> | <nombre>'];
 handler.tags = ['fun'];
 handler.group = true;
 handler.command = ['gay', 'lesbiana', 'pajero', 'pajera', 'puto', 'puta', 'manco', 'manca', 'rata', 'prostituta', 'prostituto'];
