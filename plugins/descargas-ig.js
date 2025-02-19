@@ -19,7 +19,7 @@ let handler = async (m, { args, conn }) => {
 
     for (let media of data) {
       await new Promise(resolve => setTimeout(resolve, 2000));    
-      await conn.sendFile(m.chat, media.url, 'instagram.mp4', '😎 *Tu video de Instagram by *KanBot.*\n' + textbot, fkontak);
+      await conn.sendFile(m.chat, media.url, 'instagram.mp4', '😎 *Tu video de Instagram by*\n' + textbot, fkontak);
       await m.react(done);
     }
   } catch {
