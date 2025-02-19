@@ -19,7 +19,7 @@ export async function before(m, { isAdmin, isBotAdmin }) {
     
     // Permitir admins enviar enlaces
     if (isAdmin && chat.antiLink && m.text.includes(grupo)) {
-        return conn.reply(m.chat, `🏷 *Hey!! el anti link está activo pero eres admin, ¡salvado!*`, m, rcanal);
+        return conn.reply(m.chat, `⚠️ *Hey!! el anti link está activo pero eres admin, ¡salvado!*`, m, );
     }
     
     // Si el anti-link está activado y el mensaje contiene un enlace
@@ -36,7 +36,7 @@ export async function before(m, { isAdmin, isBotAdmin }) {
 
         // Si el bot no es admin, no puede eliminar usuarios
         if (!isBotAdmin) {
-            return conn.reply(m.chat, `🌼 *No soy admin, no puedo eliminar intrusos*`, m, rcanal);
+            return conn.reply(m.chat, `⚡ *No soy admin, no puedo eliminar intrusos*`, m, );
         }
 
         // Eliminar mensaje y expulsar usuario
