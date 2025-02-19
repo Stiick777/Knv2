@@ -20,23 +20,23 @@ let chats = Object.entries(conn.chats).filter(([id, data]) => id && data.isChats
 let groups = Object.entries(conn.chats).filter(([jid, chat]) => jid.endsWith('@g.us') && chat.isChats && !chat.metadata?.read_only && !chat.metadata?.announce).map(v => v[0])
 
 
-let texto = `🚩 *${global.botname}*
-🚀 *Velocidad:*
+let texto = `⚡ *${global.botname}* ⚡
+💡 *Velocidad:*
 → ${latensi.toFixed(4)}
 
 🕒 *Activo Durante:*
 → ${muptime}
 
-💫 *Chats:*
+🍁 *Chats:*
 → ${chats.length} *Chats privados*
 → ${groups.length} *Grupos*
 
-🏆 *Servidor:*
+🔰 *Servidor:*
 ➤ *Ram ⪼* ${format(totalmem() - freemem())} / ${format(totalmem())}
 
 👑 *Provided by Stiiven*`.trim()
 
-m.react('✈️')
+m.react('✴️')
 
 conn.reply(m.chat, texto, m,)
 // await conn.sendFile(m.chat, icons, 'yaemori.jpg', texto, fkontak, false, { contextInfo: {externalAdReply :{ mediaUrl: null, mediaType: 1, description: null, title: packname, body: wm, previewType: 0, thumbnail: icons, sourceUrl: redes }}})
