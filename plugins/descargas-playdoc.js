@@ -138,7 +138,7 @@ ${yt_play[0].author.url}
 }
 
 }
-handler.help = ['play7', 'play8', 'playdoc2', 'playdoc'];
+handler.help = ['play7', 'play8'];
 handler.tags = ['descargas'];
 handler.command = ['play7', 'playdoc', 'playdoc2' , 'play8']
 handler.group = true;
