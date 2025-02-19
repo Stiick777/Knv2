@@ -52,15 +52,15 @@ if (partnerId) {
     let username = await conn.getName(who);
 
     let profileText = `
-🚩 *PERFIL DE USUARIO*
+⚡ *PERFIL DE USUARIO*
 ☁️ *Nombre:* ${username}
-💥 *Tag:* @${who.replace(/@.+/, '')}
+🔰 *Tag:* @${who.replace(/@.+/, '')}
 ${marriedText}
 
-👑 *RECURSOS*
-💥 *Nivel:* ${level || 0}
-💫 *Experiencia:* ${exp || 0}
-✨️ *Rango:* ${role || 'Sin rango'}
+🤍 *RECURSOS*
+⚠️ *Nivel:* ${level || 0}
+🍁 *Experiencia:* ${exp || 0}
+💡 *Rango:* ${role || 'Sin rango'}
 
 *_Provided by KanBot_*
 `.trim();
@@ -95,7 +95,7 @@ function formatDuration(ms) {
     return `${days} días, ${hours}h ${minutes}m ${seconds}s`;
 }
 
-handler.help = ['profile'];
+handler.help = ['perfil'];
 handler.group = true;
 handler.tags = ['rpg'];
 handler.command = ['profile', 'perfil'];
