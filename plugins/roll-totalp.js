@@ -37,7 +37,7 @@ let charactersInfoHandler = async (m, { conn }) => {
     }
 };
 
-charactersInfoHandler.help = ['lispersonajes'];
+charactersInfoHandler.help = ['listpersonajes'];
 charactersInfoHandler.tags = ['fun'];
 charactersInfoHandler.command = ['listp', 'listpersonajes'];
 charactersInfoHandler.group = true
