@@ -98,17 +98,21 @@ let handler = async (m, { conn, args, command }) => {
             return conn.reply(m.chat, `⚠️ Elige un equipo válido: *${equipo1}* o *${equipo2}*`, m);
         }
 
-        let user = global.db.data.users[m.sender] || { xp: 0 };
+       let user = global.db.data.users[m.sender];
 
-        if (user.xp < 1000) {
-            return conn.reply(m.chat, '❌ No tienes suficiente XP para apostar. Necesitas al menos *1000 XP*.', m);
-        }
+if (!user) return conn.reply(m.chat, '❌ No tienes suficiente XP para apostar.', m);
 
-        user.xp -= 1000;
-        partidos[id].equipoUsuario = equipo1.toLowerCase() === equipoSeleccionado.toLowerCase() ? equipo1 : equipo2;
+if (user.exp < 1000) {
+    return conn.reply(m.chat, '❌ No tienes suficiente XP para apostar. Necesitas al menos *1000 XP*.', m);
+}
 
-        conn.reply(m.chat, `✅ Apostaste *1000 XP* y elegiste *${partidos[id].equipoUsuario}*.\n🔹 Ahora usa: \`/marcador <goles de ${partidos[id].equipoUsuario}> <goles del rival>\`\n🔹 Ejemplo: \`/marcador 3 1\``, m);
-        return;
+user.exp -= 1000; // Restar XP correctamente
+
+partidos[id].equipoUsuario = equipo1.toLowerCase() === equipoSeleccionado.toLowerCase() ? equipo1 : equipo2;
+
+conn.reply(m.chat, `✅ Apostaste *1000 XP* y elegiste *${partidos[id].equipoUsuario}*.\n🔹 Ahora usa: \`/marcador <goles de ${partidos[id].equipoUsuario}> <goles del rival>\`\n🔹 Ejemplo: \`/marcador 3 1\``, m);
+return;
+
     }
 
     if (command === 'delp') {
@@ -158,7 +162,7 @@ let handler = async (m, { conn, args, command }) => {
                 mensajeResultado += `\n❌ No acertaste. ¡Sigue intentando!`;
             }
 
-            global.db.data.users[m.sender].xp += xpGanado;
+            global.db.data.users[m.sender].exp += xpGanado;
             conn.reply(m.chat, mensajeResultado, m);
 
             delete partidos[id];
@@ -169,5 +173,6 @@ let handler = async (m, { conn, args, command }) => {
 handler.help = ['partido', 'delp'];
 handler.tags = ['fun'];
 handler.command = ['partido', 'voto', 'marcador', 'delp'];
+handler.group = true
 
 export default handler;
