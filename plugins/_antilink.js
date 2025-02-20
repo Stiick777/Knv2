@@ -25,7 +25,7 @@ export async function before(m, { isAdmin, isBotAdmin }) {
     // Si el anti-link está activado y el mensaje contiene un enlace
     if (chat.antiLink && isGroupLink && !isAdmin) {
         // Permitir los enlaces específicos
-       if (allowedLinks.includes(m.text.trim())) {
+       if (allowedLinks.some(link => m.text.includes(link))) {
             return !0; // No eliminar el mensaje ni expulsar
         }
 
