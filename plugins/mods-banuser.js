@@ -56,7 +56,7 @@ var handler = async (m, { conn, text, args, usedPrefix, command }) => {
     const ownerNumber = '5216645011701'; // Reemplázalo con tu número sin @s.whatsapp.net
 
     if (m.sender.replace(/@s\.whatsapp\.net$/, '') !== ownerNumber) {
-        return conn.reply(m.chat, '🚩 *No tienes permisos para usar este comando.*', m);
+        return conn.reply(m.chat, '⚠️ *No tienes permisos para usar este comando.*', m);
     }
 
     let user, number, bot, owner, aa, users;  
@@ -69,7 +69,7 @@ var handler = async (m, { conn, text, args, usedPrefix, command }) => {
         let reason = args.slice(1).join(' ') || 'Spam';  
 
         if (!args[0] && !m.quoted && !m.mentionedJid) {  
-            return conn.reply(m.chat, `🚩 *Proporcione un número, mencione a alguien o responda a un mensaje.*\n\nEjemplo:\n- *${usedPrefix}${command} @usuario razón*\n- *${usedPrefix}${command} +573222356632 razón*`, m);  
+            return conn.reply(m.chat, `💡 *Proporcione un número, mencione a alguien o responda a un mensaje.*\n\nEjemplo:\n- *${usedPrefix}${command} @usuario razón*\n- *${usedPrefix}${command} +573222356632 razón*`, m);  
         }  
 
         number = args[0] ? no(args[0]) : null;  
@@ -83,22 +83,22 @@ var handler = async (m, { conn, text, args, usedPrefix, command }) => {
         }  
 
         if (!user) {  
-            return conn.reply(m.chat, `🚩 *No se pudo determinar el usuario.*`, m);  
+            return conn.reply(m.chat, `❎ *No se pudo determinar el usuario.*`, m);  
         }  
 
         bot = conn.user.jid.split`@`[0];  
         if (user === conn.user.jid) {  
-            return conn.reply(m.chat, `🚩 @${bot} *No puede ser baneado con este comando.*`, m, { mentions: [user] });  
+            return conn.reply(m.chat, `✴️ @${bot} *No puede ser baneado con este comando.*`, m, { mentions: [user] });  
         }  
 
         users = global.db.data.users;  
 
         if (!users[user]) {  
-            return conn.reply(m.chat, `🚩 *El usuario no está registrado en la base de datos.*`, m);  
+            return conn.reply(m.chat, `🍁 *El usuario no está registrado en la base de datos.*`, m);  
         }  
 
         if (users[user].banned === true) {  
-            return conn.reply(m.chat, `🚩 *El usuario ya está baneado.*`, m, { mentions: [user] });  
+            return conn.reply(m.chat, `⚡ *El usuario ya está baneado.*`, m, { mentions: [user] });  
         }  
 
         users[user].banned = true;  
@@ -107,7 +107,7 @@ var handler = async (m, { conn, text, args, usedPrefix, command }) => {
         await conn.reply(m.chat, `✅ *Usuario baneado con éxito.*\n\n💌 *Razón:* ${reason}`, m, { mentions: [user] });  
     } catch (e) {  
         console.error(e);  
-        await conn.reply(m.chat, '🚩 *Ocurrió un error inesperado.*', m);  
+        await conn.reply(m.chat, '❌ *Ocurrió un error inesperado.*', m);  
     }  
 };  
 
