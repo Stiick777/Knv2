@@ -1197,7 +1197,306 @@
     "pregunta": "¿Cuántos kilómetros hay en una milla?",
     "opciones": { "a": "1.609", "b": "2.001", "c": "0.975" },
     "respuestaCorrecta": "a"
+  },
+  
+  {
+    "pregunta": "¿Cuál es el animal terrestre más rápido?",
+    "opciones": { "a": "León", "b": "Guepardo", "c": "Antílope" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué año se lanzó el primer iPhone?",
+    "opciones": { "a": "2005", "b": "2007", "c": "2010" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el hueso más largo del cuerpo humano?",
+    "opciones": { "a": "Fémur", "b": "Húmero", "c": "Tibia" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es la lengua más hablada en el mundo?",
+    "opciones": { "a": "Inglés", "b": "Mandarín", "c": "Español" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos planetas enanos hay en el sistema solar reconocidos oficialmente?",
+    "opciones": { "a": "3", "b": "5", "c": "7" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién pintó 'La última cena'?",
+    "opciones": { "a": "Vincent van Gogh", "b": "Leonardo da Vinci", "c": "Pablo Picasso" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos anillos tiene un árbol en su tronco por cada año de vida?",
+    "opciones": { "a": "1", "b": "2", "c": "Depende del clima" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el metal más caro del mundo?",
+    "opciones": { "a": "Oro", "b": "Rodio", "c": "Platino" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué año se estrenó la primera película de 'Harry Potter'?",
+    "opciones": { "a": "2001", "b": "2003", "c": "1999" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el símbolo químico del mercurio?",
+    "opciones": { "a": "Me", "b": "Hg", "c": "Mc" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos lados tiene un octágono?",
+    "opciones": { "a": "6", "b": "8", "c": "10" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la capital de Australia?",
+    "opciones": { "a": "Sídney", "b": "Canberra", "c": "Melbourne" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué país tiene el mayor número de pirámides?",
+    "opciones": { "a": "Egipto", "b": "Sudán", "c": "México" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué continente se encuentra el río Amazonas?",
+    "opciones": { "a": "África", "b": "América del Sur", "c": "Asia" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el idioma oficial de Brasil?",
+    "opciones": { "a": "Español", "b": "Portugués", "c": "Francés" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántas notas musicales existen en la escala diatónica?",
+    "opciones": { "a": "5", "b": "7", "c": "12" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Quién fue el primer emperador de Roma?",
+    "opciones": { "a": "Julio César", "b": "Augusto", "c": "Nerón" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la montaña más alta de América?",
+    "opciones": { "a": "Everest", "b": "Aconcagua", "c": "McKinley" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el único mamífero capaz de volar?",
+    "opciones": { "a": "Murciélago", "b": "Ardilla voladora", "c": "Colibrí" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué gas hace que los globos de fiesta floten?",
+    "opciones": { "a": "Oxígeno", "b": "Hidrógeno", "c": "Helio" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Cuántos corazones tiene una lombriz de tierra?",
+    "opciones": { "a": "1", "b": "5", "c": "3" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la ciudad más poblada del mundo?",
+    "opciones": { "a": "Tokio", "b": "Delhi", "c": "Shanghái" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos continentes hay en la Tierra?",
+    "opciones": { "a": "5", "b": "6", "c": "7" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿En qué año se firmó la Declaración de Independencia de los Estados Unidos?",
+    "opciones": { "a": "1776", "b": "1789", "c": "1812" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el color que menos se percibe en la oscuridad?",
+    "opciones": { "a": "Rojo", "b": "Azul", "c": "Negro" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Qué órgano del cuerpo humano consume más oxígeno?",
+    "opciones": { "a": "Corazón", "b": "Cerebro", "c": "Pulmones" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la forma geométrica de las células vegetales?",
+    "opciones": { "a": "Cuadradas", "b": "Redondas", "c": "Triangulares" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué país tiene la mayor cantidad de volcanes activos?",
+    "opciones": { "a": "Indonesia", "b": "Estados Unidos", "c": "Japón" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Qué científico descubrió la radiactividad?",
+    "opciones": { "a": "Marie Curie", "b": "Henri Becquerel", "c": "Albert Einstein" },
+    "respuestaCorrecta": "b"
+  },
+  
+  {
+    "pregunta": "¿Cuál es el océano más grande del mundo?",
+    "opciones": { "a": "Atlántico", "b": "Índico", "c": "Pacífico" },
+    "respuestaCorrecta": "c"
+  },
+  {
+    "pregunta": "¿Qué vitamina se obtiene principalmente del sol?",
+    "opciones": { "a": "Vitamina C", "b": "Vitamina D", "c": "Vitamina A" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el gas más abundante en la atmósfera terrestre?",
+    "opciones": { "a": "Oxígeno", "b": "Nitrógeno", "c": "Dióxido de carbono" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué famoso físico desarrolló la teoría de la relatividad?",
+    "opciones": { "a": "Isaac Newton", "b": "Albert Einstein", "c": "Nikola Tesla" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el río más largo del mundo?",
+    "opciones": { "a": "Amazonas", "b": "Nilo", "c": "Yangtsé" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué gas es necesario para que ocurra la combustión?",
+    "opciones": { "a": "Nitrógeno", "b": "Oxígeno", "c": "Helio" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el metal más ligero?",
+    "opciones": { "a": "Aluminio", "b": "Litio", "c": "Titanio" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el país más pequeño del mundo?",
+    "opciones": { "a": "Mónaco", "b": "Ciudad del Vaticano", "c": "San Marino" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos huesos tiene el cuerpo humano adulto?",
+    "opciones": { "a": "206", "b": "212", "c": "198" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el elemento químico con símbolo 'O'?",
+    "opciones": { "a": "Oro", "b": "Oxígeno", "c": "Osmio" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué país ganó la Copa del Mundo de la FIFA en 2018?",
+    "opciones": { "a": "Brasil", "b": "Francia", "c": "Alemania" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el planeta más grande del sistema solar?",
+    "opciones": { "a": "Saturno", "b": "Júpiter", "c": "Neptuno" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la moneda oficial de Japón?",
+    "opciones": { "a": "Yen", "b": "Won", "c": "Peso" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuántos jugadores hay en un equipo de baloncesto en la cancha?",
+    "opciones": { "a": "5", "b": "6", "c": "7" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el país con más habitantes en el mundo?",
+    "opciones": { "a": "India", "b": "China", "c": "Estados Unidos" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la capital de Canadá?",
+    "opciones": { "a": "Toronto", "b": "Ottawa", "c": "Vancouver" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿En qué año cayó el Muro de Berlín?",
+    "opciones": { "a": "1989", "b": "1991", "c": "1985" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el autor de la novela 'Don Quijote de la Mancha'?",
+    "opciones": { "a": "Miguel de Cervantes", "b": "Gabriel García Márquez", "c": "Lope de Vega" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el planeta más cercano al Sol?",
+    "opciones": { "a": "Venus", "b": "Mercurio", "c": "Marte" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos corazones tiene un pulpo?",
+    "opciones": { "a": "1", "b": "3", "c": "5" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es la pintura más famosa de Leonardo da Vinci?",
+    "opciones": { "a": "La última cena", "b": "Mona Lisa", "c": "La creación de Adán" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué país tiene la mayor extensión territorial del mundo?",
+    "opciones": { "a": "Canadá", "b": "Rusia", "c": "China" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el desierto más grande del mundo?",
+    "opciones": { "a": "Sahara", "b": "Antártico", "c": "Gobi" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Qué color se obtiene al mezclar azul y amarillo?",
+    "opciones": { "a": "Verde", "b": "Naranja", "c": "Violeta" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿Cuál es el país de origen de los tacos?",
+    "opciones": { "a": "México", "b": "España", "c": "Argentina" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿En qué deporte se utiliza una red y un volante?",
+    "opciones": { "a": "Tenis", "b": "Bádminton", "c": "Voleibol" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el material principal del diamante?",
+    "opciones": { "a": "Carbono", "b": "Cuarzo", "c": "Grafito" },
+    "respuestaCorrecta": "a"
+  },
+  {
+    "pregunta": "¿En qué continente se encuentra Egipto?",
+    "opciones": { "a": "Asia", "b": "África", "c": "Europa" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuál es el planeta conocido como el 'planeta rojo'?",
+    "opciones": { "a": "Venus", "b": "Marte", "c": "Júpiter" },
+    "respuestaCorrecta": "b"
+  },
+  {
+    "pregunta": "¿Cuántos centímetros hay en un metro?",
+    "opciones": { "a": "100", "b": "10", "c": "1000" },
+    "respuestaCorrecta": "a"
   }
+
+
 
 
 
