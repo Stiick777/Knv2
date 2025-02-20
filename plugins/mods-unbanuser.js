@@ -31,7 +31,7 @@ const handler = async (m, { conn, args, usedPrefix }) => {
     const ownerNumber = '5216645011701'; // Reemplázalo con tu número sin @s.whatsapp.net
 
     if (m.sender.replace(/@s\.whatsapp\.net$/, '') !== ownerNumber) {
-        return conn.reply(m.chat, '🚩 *No tienes permisos para usar este comando.*', m);
+        return conn.reply(m.chat, '⚠️ *No tienes permisos para usar este comando.*', m);
     }
 
     let db = global.db.data.users;
@@ -49,17 +49,17 @@ const handler = async (m, { conn, args, usedPrefix }) => {
     } else if (m.mentionedJid?.[0]) {
         user = m.mentionedJid[0];
     } else {
-        return conn.reply(m.chat, `🚩 *Etiqueta, responde al mensaje o escribe el número del usuario que deseas desbanear.*\n\nEjemplo:\n- *${usedPrefix}unbanuser @usuario*\n- *${usedPrefix}unbanuser +573223336363*`, m);
+        return conn.reply(m.chat, `⚡ *Etiqueta, responde al mensaje o escribe el número del usuario que deseas desbanear.*\n\nEjemplo:\n- *${usedPrefix}unbanuser @usuario*\n- *${usedPrefix}unbanuser +573223336363*`, m);
     }
 
-    if (!user) return conn.reply(m.chat, `🚩 No se pudo determinar el usuario.`, m);
+    if (!user) return conn.reply(m.chat, `❌ No se pudo determinar el usuario.`, m);
 
     let foundUser = Object.keys(db).find(jid => jid.includes(user.replace('@s.whatsapp.net', '')));
 
-    if (!foundUser) return conn.reply(m.chat, `🚩 El usuario no está registrado en la base de datos.`, m);
+    if (!foundUser) return conn.reply(m.chat, `🔰 El usuario no está registrado en la base de datos.`, m);
     
     if (!db[foundUser].banned) {
-        return conn.reply(m.chat, `🚩 El usuario ya está desbaneado.`, m);
+        return conn.reply(m.chat, `🌥️ El usuario ya está desbaneado.`, m);
     }
 
     db[foundUser].banned = false;
