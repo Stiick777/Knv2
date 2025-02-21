@@ -15,36 +15,61 @@ const handler = async (m, { args, conn }) => {
   await m.react('⏳');
 
   try {
-    const apiUrl = `https://api.davidcyriltech.my.id/download/ytmp3?url=${encodeURIComponent(youtubeLink)}`;
-    const response = await fetch(apiUrl, { method: 'GET' });
+    await m.react('🕓'); // Indicador de proceso
 
-    if (response.ok) {
-        const result = await response.json();
+    // Primera API
+    const primaryApiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(youtubeLink)}`;
+    const primaryResponse = await fetch(primaryApiUrl, { method: 'GET' });
 
-        // Validar respuesta y enlace de descarga
-        if (result.status === 200 && result.result?.download_url) {
-            const downloadUrl = result.result.download_url;
-            const title = result.result.title;
+    if (primaryResponse.ok) {
+        const primaryResult = await primaryResponse.json();
 
-            // Enviar el archivo como audio en formato .mp3
+        if (primaryResult.status === "tunnel" && primaryResult.url) {
             await conn.sendMessage(m.chat, {
-                audio: { url: downloadUrl },
-                mimetype: 'audio/mpeg', // Especificar el formato .mp3
-                fileName: `${title}.mp3`,
-                ptt: false // Cambia a true si deseas que se envíe como nota de voz
+                audio: { url: primaryResult.url },
+                mimetype: 'audio/mpeg',
+                fileName: primaryResult.filename || `${primaryResult.title}.mp3`,
+                ptt: false,
             }, { quoted: m });
 
-            await m.react('✅');
+            await m.react('✅'); // Éxito
             return;
-        } else {
-            return m.reply('*[❗𝐄𝐑𝐑𝐎𝐑❗] 𝙉𝙊 𝙎𝙀 𝙀𝙉𝘾𝙊𝙉𝙏𝙍𝙊́ 𝙀𝙇 𝘼𝙐𝘿𝙄𝙊. 𝙋𝙍𝙐𝙀𝘽𝘼 𝙊𝙏𝙍𝘼 𝙑𝙀𝙕.*');
         }
-    } else {
-        return m.reply(`*[❗𝐄𝐑𝐑𝐎𝐑❗] 𝙁𝘼𝙇𝙇𝙊́ 𝙇𝘼 𝘾𝙊𝙈𝙐𝙉𝙄𝘾𝘼𝘾𝙄𝙊́𝙉 𝘾𝙊𝙉 𝙇𝘼 𝘼𝙋𝙄: ${response.statusText}*`);
     }
+
+    throw new Error('Fallo en la primera API');
 } catch (error) {
-    console.error('Error al obtener audio:', error);
-    return m.reply('*[❗𝐄𝐑𝐑𝐎𝐑❗] 𝙉𝙊 𝙎𝙀 𝙋𝙐𝙀𝘿𝙀 𝘿𝙀𝙎𝘾𝘼𝙍𝙂𝘼𝙍 𝙀𝙇 𝘼𝙐𝘿𝙄𝙊. 𝙑𝙐𝙀𝙇𝙑𝘼 𝘼 𝙄𝙉𝙏𝙀𝙉𝙏𝘼𝙍 𝙈𝘼𝙎 𝙏𝘼𝙍𝘿𝙀.*');
+    console.error('Error con la primera API:', error.message);
+
+    try {
+        await m.react('🕓'); // Reintento con la segunda API
+
+        // Segunda API
+        const fallbackApiUrl = `https://api.agungny.my.id/api/youtube-audio?url=${encodeURIComponent(youtubeLink)}`;
+        const fallbackResponse = await fetch(fallbackApiUrl, { method: 'GET' });
+
+        if (fallbackResponse.ok) {
+            const fallbackResult = await fallbackResponse.json();
+
+            if (fallbackResult.status && fallbackResult.result?.downloadUrl) {
+                await conn.sendMessage(m.chat, {
+                    audio: { url: fallbackResult.result.downloadUrl },
+                    mimetype: 'audio/mpeg',
+                    fileName: `${fallbackResult.result.title}.mp3`,
+                    ptt: false,
+                }, { quoted: m });
+
+                await m.react('✅'); // Éxito
+                return;
+            }
+        }
+
+        throw new Error('Fallo en la segunda API');
+    } catch (error2) {
+        console.error('Error con la segunda API:', error2.message);
+        await m.react('❌'); // Error final
+        await conn.sendMessage(m.chat, '*[❗𝐄𝐑𝐑𝐎𝐑❗] No se pudo procesar el audio con ninguna de las APIs. Inténtalo más tarde.*', { quoted: m });
+    }
 }
 };
 
