@@ -10,7 +10,7 @@ const LimitVid = 425 * 1024 * 1024; //425MB
 const handler = async (m, {conn, command, args, text, usedPrefix}) => {
 
 if (command == 'play') {
-  if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, );
+  if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
   await m.react('🕓');
 
   const yt_play = await search(args.join(' '));
@@ -32,67 +32,64 @@ if (command == 'play') {
 
 `.trim();
 
-  await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null,);
+  await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-try {
-    await m.react('🕓'); // Reaccionar con un ícono de reloj mientras procesa
+   try {
+    await m.react('🕓'); // Indicador de proceso
 
-    // Construir URL de la API con el enlace del video
-    const apiUrl = `https://api.davidcyriltech.my.id/download/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
-    const apiResponse = await fetch(apiUrl);
-    const responseData = await apiResponse.json();
+    // Primera API
+    let primaryApiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
+    let primaryApiResponse = await fetch(primaryApiUrl);
+    let primaryResponseData = await primaryApiResponse.json();
 
-    // Verificar si la API devolvió un resultado válido
-    if (!responseData.success || !responseData.result || !responseData.result.download_url) {
-        await m.react('❌');
-        return await conn.sendMessage(m.chat, 'No se pudo procesar el video. Intenta con otro enlace.', { quoted: m });
+    if (primaryResponseData.status === "tunnel" && primaryResponseData.url) {
+        await conn.sendMessage(m.chat, {
+            audio: { url: primaryResponseData.url },
+            mimetype: 'audio/mpeg',
+            fileName: primaryResponseData.filename || `${primaryResponseData.title}.mp3`,
+            ptt: false,
+        }, { quoted: m });
+
+        await m.react('✅'); // Éxito
+        return;
     }
 
-    // Enviar el audio directamente al chat sin almacenarlo ni convertirlo
-    await conn.sendMessage(m.chat, {
-        audio: { url: responseData.result.download_url },
-        mimetype: 'audio/mpeg',
-        fileName: `${responseData.result.title}.mp3`,
-        ptt: false,
-    }, { quoted: m });
-
-    await m.react('✅'); // Reaccionar con éxito
+    throw new Error('Fallo en la primera API');
 } catch (error) {
-//
-try {
-    await m.react('🕓'); // Reaccionar con un ícono de reloj mientras procesa
+    console.error('Error con la primera API:', error.message);
 
-    // Construir URL de la API con el enlace del video
-    const apiUrl = `https://api.agungny.my.id/api/youtube-audio?url=${encodeURIComponent(yt_play[0].url)}`;
-    const apiResponse = await fetch(apiUrl);
-    const responseData = await apiResponse.json();
+    try {
+        await m.react('🕓'); // Reintento con la segunda API
 
-    // Verificar si la API devolvió un resultado válido
-    if (!responseData.status || !responseData.result || !responseData.result.downloadUrl) {
-        await m.react('❌');
-        return await conn.sendMessage(m.chat, 'No se pudo procesar el video. Intenta con otro enlace.', { quoted: m });
+        // Segunda API
+        let fallbackApiUrl = `https://api.agungny.my.id/api/youtube-audio?url=${encodeURIComponent(yt_play[0].url)}`;
+        let fallbackApiResponse = await fetch(fallbackApiUrl);
+        let fallbackResponseData = await fallbackApiResponse.json();
+
+        if (!fallbackResponseData.status || !fallbackResponseData.result || !fallbackResponseData.result.downloadUrl) {
+            throw new Error('Fallo en la segunda API');
+        }
+
+        // Enviar el audio al chat
+        await conn.sendMessage(m.chat, {
+            audio: { url: fallbackResponseData.result.downloadUrl },
+            mimetype: 'audio/mpeg',
+            fileName: `${fallbackResponseData.result.title}.mp3`,
+            ptt: false,
+        }, { quoted: m });
+
+        await m.react('✅'); // Éxito
+    } catch (error2) {
+        console.error('Error con la segunda API:', error2.message);
+        await m.react('❌'); // Error final
+        await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace con ambas APIs.', { quoted: m });
     }
-
-    // Enviar el audio directamente al chat sin almacenarlo ni convertirlo
-    await conn.sendMessage(m.chat, {
-        audio: { url: responseData.result.downloadUrl },
-        mimetype: 'audio/mpeg',
-        fileName: `${responseData.result.title}.mp3`,
-        ptt: false,
-    }, { quoted: m });
-
-    await m.react('✅'); // Reaccionar con éxito
-} catch (error1) {
-    await m.react('❌'); // Reaccionar con error
-    console.error(error);
-    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });
-}
 }
 
 }
 
 if (command == 'play2') {
-    if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, );
+    if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
     
     await m.react('🕓'); 
 
@@ -114,39 +111,63 @@ if (command == 'play2') {
 > *Provided by Stiiven
 `.trim();
 
-    await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null, );
+    await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
 
 try {
     await m.react('🕓'); // Reaccionar con un ícono de reloj mientras procesa
 
-    // Construir la URL de la API con el enlace del video
-    const apiUrl = `https://api.davidcyriltech.my.id/download/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
+    // Primera API
+    const apiUrl1 = `https://api.agungny.my.id/api/youtube-video?url=${encodeURIComponent(yt_play[0].url)}`;
+    let apiResponse = await fetch(apiUrl1);
+    let response = await apiResponse.json();
 
     // Verificar si la API devolvió un resultado válido
-    if (!response.success || !response.result || !response.result.download_url) {
-        await m.react('❌'); // Reaccionar con un ícono de error
-        return await conn.sendMessage(m.chat, 'No se pudo procesar el video. Intenta con otro enlace.', { quoted: m });
+    if (response.status && response.result && response.result.downloadUrl) {
+        const { downloadUrl, title } = response.result;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: downloadUrl },
+            caption: `🎥 *${title}*\n😎 Su video by ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`,
+            mimetype: 'video/mp4',
+        }, { quoted: m });
+
+        return await m.react('✅'); // Reaccionar con éxito
     }
 
-    // Extraer datos de la respuesta de la API
-    const { download_url: downloadUrl, title } = response.result;
-
-    // Enviar el video al chat
-    await conn.sendMessage(m.chat, {
-        video: { url: downloadUrl },
-        caption: `🎥 *${title}*\n😎 Su video by ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`,
-        mimetype: 'video/mp4',
-    }, { quoted: m });
-
-    await m.react('✅'); // Reaccionar con un ícono de éxito
+    throw new Error("Primera API falló, intentando con la segunda...");
 } catch (error) {
-    await m.react('❌'); // Reaccionar con un ícono de error en caso de fallo
-    console.error(error); // Para poder depurar el error si es necesario
+    console.warn("Error en la primera API:", error.message);
+
+    try {
+        await m.react('🕓'); // Reaccionar de nuevo mientras procesa la segunda API
+
+        // Segunda API (Respaldo)
+        const apiUrl2 = `https://apidl.asepharyana.cloud/api/downloader/ytmp4?url=${encodeURIComponent(yt_play[0].url)}&quality=360`;
+        let apiResponse2 = await fetch(apiUrl2);
+        let response2 = await apiResponse2.json();
+
+        // Verificar si la API de respaldo devuelve un resultado válido
+        if (response2.url && response2.filename) {
+            const { url: downloadUrl, filename } = response2;
+
+            await conn.sendMessage(m.chat, {
+                video: { url: downloadUrl },
+                caption: `🎥 *${filename}*\n😎 Su video by ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`,
+                mimetype: 'video/mp4',
+            }, { quoted: m });
+
+            return await m.react('✅'); // Reaccionar con éxito
+        }
+
+        throw new Error("Segunda API también falló.");
+    } catch (backupError) {
+        console.error("Error en la segunda API:", backupError.message);
+        await m.react('❌'); // Reaccionar con un ícono de error si ambas fallan
+        await conn.sendMessage(m.chat, 'No se pudo procesar el video con ninguna API. Intenta con otro enlace.', { quoted: m });
+    }
 }
-    
+
 }
 
 
