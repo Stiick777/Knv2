@@ -38,8 +38,11 @@ let handler = async (m, { conn, command, text }) => {
     // Enviar imagen con el texto    
     await conn.sendFile(m.chat, songImage, 'spotify.jpg', HS, m);    
 
-    // Enviar el audio en MP3    
-    await conn.sendFile(m.chat, download, `${title}.mp3`, null, m, false, { mimetype: 'audio/mp3' });    
+    // Descargar el audio antes de enviarlo    
+    let audioBuffer = await (await fetch(download)).buffer();    
+
+    // Enviar el audio como mensaje de audio    
+    await conn.sendMessage(m.chat, { audio: audioBuffer, mimetype: 'audio/mp3' }, { quoted: m });    
 
   } catch (error) {    
     console.error(error);    
