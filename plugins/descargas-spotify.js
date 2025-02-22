@@ -1,52 +1,55 @@
-// [ ❀ SPOTIFY PLAY ]  
-import fetch from 'node-fetch';  
+// [ ❀ SPOTIFY PLAY ]    
+import fetch from 'node-fetch';    
 
-let handler = async (m, { conn, command, text, usedPrefix }) => {  
-  if (!text) return conn.reply(m.chat, '❀ Ingresa el texto de lo que quieras buscar', m);  
+let handler = async (m, { conn, command, text }) => {    
+  if (!text) return conn.reply(m.chat, '❀ Ingresa el texto de lo que quieras buscar', m);    
 
-  try {  
-    // Búsqueda en Spotify  
-    let apiSearch = await fetch(`https://api.davidcyriltech.my.id/search/spotify?text=${encodeURIComponent(text)}`);  
-    let jsonSearch = await apiSearch.json();  
+  try {    
+    // Búsqueda en Spotify    
+    let apiSearch = await fetch(`https://api.agungny.my.id/api/spotifys?q=${encodeURIComponent(text)}`);    
+    let jsonSearch = await apiSearch.json();    
 
-    if (!jsonSearch.success || !jsonSearch.result.length) {  
-      return conn.reply(m.chat, '❀ No se encontraron resultados.', m);  
-    }  
+    if (!jsonSearch.status || !jsonSearch.result.length) {    
+      return conn.reply(m.chat, '❀ No se encontraron resultados.', m);    
+    }    
 
-    let { trackName, artistName, albumName, duration, externalUrl } = jsonSearch.result[0];  
+    let { name, artists, link, image, duration_ms } = jsonSearch.result[0];    
 
-    // Descarga de Spotify  
-    let apiDL = await fetch(`https://api.davidcyriltech.my.id/spotifydl?url=${encodeURIComponent(externalUrl)}`);  
-    let jsonDL = await apiDL.json();  
+    // Descarga de Spotify    
+    let apiDL = await fetch(`https://api.agungny.my.id/api/spotify?url=${encodeURIComponent(link)}`);    
+    let jsonDL = await apiDL.json();    
 
-    if (!jsonDL.success) {  
-      return conn.reply(m.chat, '❀ No se pudo descargar la canción.', m);  
-    }  
+    if (!jsonDL.status) {    
+      return conn.reply(m.chat, '❀ No se pudo descargar la canción.', m);    
+    }    
 
-    let { title, channel, duration: songDuration, thumbnail, DownloadLink } = jsonDL;  
+    let { title, download, image: songImage, duration_ms: songDuration } = jsonDL.result;    
 
-    let HS = `  
-❀ *Spotify Play*  
+    let HS = `    
+❀ *Spotify Play*    
 
-- 🎵 *Título:* ${title}  
-- 🎤 *Artista:* ${channel}  
-- ⏳ *Duración:* ${songDuration}  
-- 🔗 *Spotify Link:* ${externalUrl}  
-- 📥 *Descargar:* [Click aquí](${DownloadLink})  
-    `.trim();  
+- 🎵 *Título:* ${title}    
+- 🎤 *Artista:* ${artists}    
+- ⏳ *Duración:* ${(songDuration / 1000).toFixed(0)}s    
+- 🔗 *Spotify Link:* ${link}    
+- 📥 *Descargar:* [Click aquí](${download})    
+    `.trim();    
 
-    await conn.sendFile(m.chat, thumbnail, 'spotify.jpg', HS, m);  
-    await conn.sendFile(m.chat, DownloadLink, `${title}.mp3`, null, m);  
+    // Enviar imagen con el texto    
+    await conn.sendFile(m.chat, songImage, 'spotify.jpg', HS, m);    
 
-  } catch (error) {  
-    console.error(error);  
-    conn.reply(m.chat, '❀ Ocurrió un error al procesar la solicitud.', m);  
-  }  
-};  
+    // Enviar el audio en MP3    
+    await conn.sendFile(m.chat, download, `${title}.mp3`, null, m, false, { mimetype: 'audio/mp3' });    
 
-handler.command = /^(spotify)$/i;  
-handler.tags = ['descargas']
-handler.help = ['spotify <txt>']
-handler.grouo = true
+  } catch (error) {    
+    console.error(error);    
+    conn.reply(m.chat, '❀ Ocurrió un error al procesar la solicitud.', m);    
+  }    
+};    
+
+handler.command = /^(spotify)$/i;    
+handler.tags = ['descargas'];  
+handler.help = ['spotify <texto>'];  
+handler.group = true;    
 
 export default handler;
