@@ -66,7 +66,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     } catch (backupError) {
         console.error("Error en la segunda API:", backupError.message);
         await m.react('❌');
-        await conn.reply(m.chat, `*[❗𝐈𝐍𝐅𝐎❗] No se pudo obtener el video con ninguna API.*`, m);
+        await conn.reply(m.chat, `*[❗𝐈𝐍𝐅𝐎❗] No se pudo obtener el video intente con /yt4doc*`, m);
     }
 }
 };
