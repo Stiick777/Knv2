@@ -1,5 +1,3 @@
-
-
 import { delay } from "@whiskeysockets/baileys";
 
 const handler = async (m, { args, usedPrefix, command, conn }) => {
@@ -8,24 +6,37 @@ const handler = async (m, { args, usedPrefix, command, conn }) => {
 
 *📌 𝙴𝙹𝙴𝙼𝙿𝙻𝙾:*
 *${usedPrefix + command} 100*`.trim();
-  if (!args[0] || isNaN(args[0]) || parseInt(args[0]) <= 0) throw fa;
-  
+
+  if (!args[0] || isNaN(args[0]) || parseInt(args[0]) <= 0) {
+    await conn.sendMessage(m.chat, { text: fa }, { quoted: m });
+    return;
+  }
+
   const apuesta = parseInt(args[0]);
   const users = global.db.data.users[m.sender];
   const time = users.lastslot + 10000;
-  if (new Date() - users.lastslot < 10000) throw `*⏳ 𝙴𝚂𝙿𝙴𝚁𝙴 ${msToTime(time - new Date())} 𝙿𝙰𝚁𝙰 𝚅𝙾𝙻𝚅𝙴𝚁 𝙰 𝙰𝙿𝙾𝚂𝚃𝙰𝚁*`;
-  if (apuesta < 100) throw '*[❗] 𝙴𝙻 𝙼𝙸𝙽𝙸𝙼𝙾 𝙿𝙰𝚁𝙰 𝙰𝙿𝙾𝚂𝚃𝙰𝚁 𝙴𝚂 𝙳𝙴 𝟷00 𝚇𝙿*';
+
+  if (new Date() - users.lastslot < 10000) {
+    await conn.sendMessage(m.chat, { text: `*⏳ 𝙴𝚂𝙿𝙴𝚁𝙴 ${msToTime(time - new Date())} 𝙿𝙰𝚁𝙰 𝚅𝙾𝙻𝚅𝙴𝚁 𝙰 𝙰𝙿𝙾𝚂𝚃𝙰𝚁*` }, { quoted: m });
+    return;
+  }
+
+  if (apuesta < 100) {
+    await conn.sendMessage(m.chat, { text: '*[❗] 𝙴𝙻 𝙼𝙸𝙽𝙸𝙼𝙾 𝙿𝙰𝚁𝙰 𝙰𝙿𝙾𝚂𝚃𝙰𝚁 𝙴𝚂 𝙳𝙴 𝟷00 𝚇𝙿*' }, { quoted: m });
+    return;
+  }
+
   if (users.exp < apuesta) {
-    throw `*[❗] 𝚃𝚄 𝚇𝙿 𝙽𝙾 𝙴𝚂 𝚂𝚄𝙵𝙸𝙲𝙸𝙴𝙽𝚃𝙴 𝙿𝙰𝚁𝙰 𝙰𝙿𝙾𝚂𝚃𝙰𝚁 𝙴𝚂𝙰 𝙲𝙰𝙽𝚃𝙸𝙳𝙰𝙳, 𝙹𝚄𝙴𝙶𝙰 𝙾𝚃𝚁𝙾𝚂 𝙹𝚄𝙴𝙶𝙾𝚂 𝙾 𝙸𝙽𝚃𝙴𝚁𝙰𝙲𝚃𝚄𝙰 𝙲𝙾𝙽 𝙴𝙻 𝙱𝙾𝚃 𝙿𝙰𝚁𝙰 𝙶𝙰𝙽𝙰𝚁 𝙼𝙰𝚂 𝚇𝙿*`;
+    await conn.sendMessage(m.chat, { text: `*[❗] 𝚃𝚄 𝚇𝙿 𝙽𝙾 𝙴𝚂 𝚂𝚄𝙵𝙸𝙲𝙸𝙴𝙽𝚃𝙴 𝙿𝙰𝚁𝙰 𝙰𝙿𝙾𝚂𝚃𝙰𝚁 𝙴𝚂𝙰 𝙲𝙰𝙽𝚃𝙸𝙳𝙰𝙳, 𝙹𝚄𝙴𝙶𝙰 𝙾𝚃𝚁𝙾𝚂 𝙹𝚄𝙴𝙶𝙾𝚂 𝙾 𝙸𝙽𝚃𝙴𝚁𝙰𝙲𝚃𝚄𝙰 𝙲𝙾𝙽 𝙴𝙻 𝙱𝙾𝚃 𝙿𝙰𝚁𝙰 𝙶𝙰𝙽𝙰𝚁 𝙼𝙰𝚂 𝚇𝙿*` }, { quoted: m });
+    return;
   }
 
   const emojis = ['❤️‍🔥', '🔥', '💥'];
-  const getRandomEmojis = () => {
-    const x = Array.from({ length: 3 }, () => emojis[Math.floor(Math.random() * emojis.length)]);
-    const y = Array.from({ length: 3 }, () => emojis[Math.floor(Math.random() * emojis.length)]);
-    const z = Array.from({ length: 3 }, () => emojis[Math.floor(Math.random() * emojis.length)]);
-    return { x, y, z };
-  };
+  const getRandomEmojis = () => ({
+    x: Array.from({ length: 3 }, () => emojis[Math.floor(Math.random() * emojis.length)]),
+    y: Array.from({ length: 3 }, () => emojis[Math.floor(Math.random() * emojis.length)]),
+    z: Array.from({ length: 3 }, () => emojis[Math.floor(Math.random() * emojis.length)]),
+  });
 
   const initialText = '🎰 | *SLOTS* \n────────\n';
   let { key } = await conn.sendMessage(m.chat, { text: initialText }, { quoted: m });
@@ -79,14 +90,11 @@ handler.command = ['slot'];
 export default handler;
 
 function msToTime(duration) {
-  const milliseconds = parseInt((duration % 1000) / 100);
   let seconds = Math.floor((duration / 1000) % 60);
   let minutes = Math.floor((duration / (1000 * 60)) % 60);
-  let hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
 
-  hours = (hours < 10) ? '0' + hours : hours;
   minutes = (minutes < 10) ? '0' + minutes : minutes;
   seconds = (seconds < 10) ? '0' + seconds : seconds;
 
   return minutes + ' m ' + seconds + ' s ';
-}
+      }
