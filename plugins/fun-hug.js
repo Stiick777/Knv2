@@ -24,7 +24,13 @@ let handler = async (m, { conn }) => {
         'https://telegra.ph/file/6a3aa01fabb95e3558eec.mp4',
         'https://telegra.ph/file/5866f0929bf0c8fe6a909.mp4',
         'https://telegra.ph/file/436624e53c5f041bfd597.mp4',
-        'https://telegra.ph/file/3eeadd9d69653803b33c6.mp4'
+        'https://telegra.ph/file/3eeadd9d69653803b33c6.mp4',
+        "https://telegra.ph/file/4d80ab3a945a8446f0b15.mp4",
+        "https://telegra.ph/file/ef3a13555dfa425fcf8fd.mp4",
+        "https://telegra.ph/file/582e5049e4070dd99a995.mp4",
+        "https://telegra.ph/file/ab57cf916c5169f63faee.mp4",
+        "https://telegra.ph/file/fce96960010f6d7fc1670.mp4",
+        "https://telegra.ph/file/33332f613e1ed024be870.mp4"
     ];
 
     const video = videos[Math.floor(Math.random() * videos.length)];
