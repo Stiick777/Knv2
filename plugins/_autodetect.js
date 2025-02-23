@@ -88,7 +88,7 @@ await this.sendMessage(m.chat, { text: `❎ ${usuario} *Ha modificado la descrip
 await this.sendMessage(m.chat, { text: `🍁 *Ahora ${m.messageStubParameters[0] == 'on' ? 'solo admins' : 'todos'} pueden editar la información del grupo*`, mentions: [m.sender] }, { quoted: fkontak, ephemeralExpiration: 24*60*100, disappearingMessagesInChat: 24*60*100})
 
 } else if (chat.detect && m.messageStubType == 26) {
-await this.sendMessage(m.chat, { text: `🌥️ *El grupo ha sido ${m.messageStubParameters[0] == 'on' ? 'cerrado' : 'abierto'}*\n\n${m.messageStubParameters[0] == 'on' ? 'solo admins' : 'todos'} pueden enviar mensajes`, mentions: [m.sender] }, { quoted: fkontak, ephemeralExpiration: 24*60*100, disappearingMessagesInChat: 24*60*100})
+await this.sendMessage(m.chat, { text: `🌥️ *El grupo ha sido ${m.messageStubParameters[0] == 'on' ? 'cerrado' : 'abierto'} por ${usuario}*\n\n${m.messageStubParameters[0] == 'on' ? 'solo admins' : 'todos'} pueden enviar mensajes`, mentions: [m.sender] }, { quoted: fkontak, ephemeralExpiration: 24*60*100, disappearingMessagesInChat: 24*60*100})
 
 } else if (chat.detect && m.messageStubType == 29) {
 let txt1 = `🍁 *Nuevo admin*\n\n`
