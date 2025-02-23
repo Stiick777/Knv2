@@ -7,14 +7,12 @@ let handler = async (m, { conn }) => {
         who = m.chat;
     }
 
-    if (!who) throw 'Etiqueta o menciona a alguien.';
-
     let name = await conn.getName(who);
     let name2 = await conn.getName(m.sender);
 
     await conn.sendMessage(m.chat, { react: { text: '😱', key: m.key } });
 
-    let str = `${name2} está asustado(a) de ${who === m.sender ? 'sí mismo' : name} 😨👀`.trim();
+    let str = `${name2} está asustad@ de ${who === m.sender ? 'sí mism@' : name} 😨👀`.trim();
 
     let videos = [
         'https://telegra.ph/file/9c1e963fa4d8269fb17a7.mp4',
