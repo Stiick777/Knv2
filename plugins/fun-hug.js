@@ -46,6 +46,4 @@ handler.tags = ['fun'];
 handler.command = ['hug', 'abrazar'];
 handler.group = true;
 
-export default handler;handler.group = true;
-
 export default handler;
