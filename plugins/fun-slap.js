@@ -2,19 +2,17 @@ let handler = async (m, { conn }) => {
     let who;
 
     if (m.isGroup) {
-        who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : m.sender;
+        who = m.mentionedJid[0] || (m.quoted ? m.quoted.sender : m.sender);
     } else {
         who = m.chat;
     }
-
-    if (!who) throw 'Etiqueta o menciona a alguien.';
 
     let name = await conn.getName(who);
     let name2 = await conn.getName(m.sender);
 
     await conn.sendMessage(m.chat, { react: { text: '👊🏻', key: m.key } });
 
-    let str = `${name2} le dio una bofetada a ${name} 🖐😵`.trim();
+    let str = `${name2} le dio una bofetada a ${who === m.sender ? 'sí mismo' : name} 🖐😵`.trim();
 
     let videos = [
         'https://telegra.ph/file/3ba192c3806b097632d3f.mp4',
@@ -35,7 +33,7 @@ let handler = async (m, { conn }) => {
             video: { url: video },
             gifPlayback: true,
             caption: str,
-            mentions: [m.sender, who]
+            mentions: who === m.sender ? [m.sender] : [m.sender, who]
         }, { quoted: m });
     } catch (e) {
         await conn.reply(m.chat, '⚠️ *¡Ocurrió un error al enviar el video!*', m);
