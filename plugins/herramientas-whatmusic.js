@@ -38,6 +38,8 @@ let handler = async (m, { conn }) => {
 𝐀𝐋𝐁𝐔𝐌: ${album ? album.name : 'Desconocido'}
 𝐆𝐄𝐍𝐄𝐑𝐎: ${genres ? genres.map(v => v.name).join(', ') : 'No encontrado'}
 𝐅𝐄𝐂𝐇𝐀 𝐃𝐄 𝐋𝐀𝐍𝐙𝐀𝐌𝐈𝐄𝐍𝐓𝐎: ${release_date || 'Desconocida'}
+    
+ > Provided by *KanBot*     
       `.trim()
 
       m.reply(txt)
