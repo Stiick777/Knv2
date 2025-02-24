@@ -40,7 +40,7 @@ let handler = async (m, { conn, args }) => {
       await conn.sendFile(m.chat, icon, name + '.jpg', textoDorratz, m);
       await conn.sendMessage(m.chat, { document: { url: URL }, mimetype: 'application/vnd.android.package-archive', fileName: name + '.apk', caption: '' }, { quoted: m });
     } catch (error) {
-      conn.reply(m.chat, '[❗] No se pudo encontrar ni descargar la aplicación solicitada. Intenta de nuevo mas tarde.', m, rcanal);
+      conn.reply(m.chat, '[❗] No se pudo encontrar ni descargar la aplicación solicitada. Intenta de nuevo mas tarde.', m, );
       console.error('Error en la descarga de APK:', error.message);
     }
   }
