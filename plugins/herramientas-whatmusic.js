@@ -28,7 +28,7 @@ let handler = async (m, { conn }) => {
 
       let { code, msg } = res.status
       if (code !== 0) {
-        return m.reply(`❌ Error: ${msg}`)
+        return m.reply(`❌ Error *Use /whatm2*: ${msg}`)
       }
 
       let { title, artists, album, genres, release_date } = res.metadata.music[0]
@@ -45,7 +45,7 @@ let handler = async (m, { conn }) => {
       m.reply('᥀·࣭࣪̇˖⛔◗ 𝙊𝙘𝙪𝙧𝙧𝙞𝙤 𝙪𝙣 𝙚𝙧𝙧𝙤𝙧 𝙞𝙣𝙚𝙨𝙥𝙚𝙧𝙖𝙙𝙤, 𝙞𝙣𝙩𝙚𝙣𝙩𝙖𝙡𝙤 𝙙𝙚 𝙣𝙪𝙚𝙫𝙤, 𝙧𝙚𝙨𝙥𝙤𝙣𝙙𝙚 𝙖 𝙪𝙣 𝙖𝙪𝙙𝙞𝙤 𝙤 𝙫𝙞𝙙𝙚𝙤.')
     }
   } catch (e) {
-    m.reply(`⚠️ Error inesperado: ${e.message}`)
+    m.reply(`⚠️ Error inesperado *use /whatm2*: ${e.message}`)
   }
 }
 
