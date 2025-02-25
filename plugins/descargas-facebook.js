@@ -11,12 +11,12 @@ const handler = async (m, { args, conn }) => {
   }
 
   try {
-    await m.react(rwait);
+    await m.react('🕛');
     let res = await fetch(`https://api.agungny.my.id/api/facebook?url=${encodeURIComponent(args[0])}`);
     let json = await res.json();
 
     if (!json.status || !json.media || json.media.length === 0) {
-      await m.react(error);
+      await m.react('⚠️');
       return conn.reply(m.chat, '⚠️ *No se encontraron resultados.*', m);
     }
 
@@ -27,14 +27,14 @@ const handler = async (m, { args, conn }) => {
       { video: { url: video }, caption: '🎈 *Tu video de Facebook by _*Kanbot*_.*', fileName: 'fb.mp4', mimetype: 'video/mp4' },
       { quoted: m }
     );
-    await m.react(done);
+    await m.react('✅');
   } catch (err) {
-    await m.react(error);
+    await m.react('❌');
     return conn.reply(m.chat, '❎ *Error al obtener datos. Verifica el enlace.*', m);
   }
 };
 
-handler.help = ['facebook', 'fb'];
+handler.help = [ 'fb'];
 handler.tags = ['descargas'];
 handler.command = ['facebook', 'fb'];
 handler.group = true;
