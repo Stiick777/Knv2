@@ -1,40 +1,57 @@
+import fetch from 'node-fetch';
 
-const handler = async (m, { args, conn }) => {
+const handler = async (m, { conn, args }) => {
   if (!args[0]) {
     return conn.reply(m.chat, '🎈 *Ingresa un link de Facebook*', m);
   }
 
-  // Verificación válida del enlace de Facebook
   const facebookRegex = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.watch)\/.+$/;
   if (!facebookRegex.test(args[0])) {
     return conn.reply(m.chat, '❌ *El enlace proporcionado no es válido. Asegúrate de ingresar un enlace correcto de Facebook.*', m);
   }
 
   try {
-    await m.react('🕛');
-    let res = await fetch(`https://api.agungny.my.id/api/facebook?url=${encodeURIComponent(args[0])}`);
-    let json = await res.json();
+    await m.react('⏳'); // Reacciona indicando que está procesando
+
+    // Llamar a la API de Facebook
+    const response = await fetch(`https://api.agungny.my.id/api/facebook?url=${encodeURIComponent(args[0])}`);
+    const json = await response.json();
 
     if (!json.status || !json.media || json.media.length === 0) {
       await m.react('⚠️');
-      return conn.reply(m.chat, '⚠️ *No se encontraron resultados.*', m);
+      return conn.reply(m.chat, '⚠️ *No se encontraron enlaces de descarga. Verifica el enlace.*', m);
     }
 
-    let video = json.media[0]; // Toma la primera URL del array
+    // Seleccionar el primer enlace disponible
+    const videoUrl = json.media[0];
 
+    if (!videoUrl) {
+      await m.react('🚩');
+      return conn.reply(m.chat, '🚩 *No se pudo obtener un enlace válido del video.*', m);
+    }
+
+    await m.react('✅'); // Indica éxito en la descarga
+
+    // Enviar el video
     await conn.sendMessage(
       m.chat,
-      { video: { url: video }, caption: '🎈 *Tu video de Facebook by _*Kanbot*_.*', fileName: 'fb.mp4', mimetype: 'video/mp4' },
+      {
+        video: { url: videoUrl },
+        caption: '🎈 *Aquí está tu video de Facebook _KanBot_.*',
+        fileName: 'facebook_video.mp4',
+        mimetype: 'video/mp4'
+      },
       { quoted: m }
     );
-    await m.react('✅');
-  } catch (err) {
+
+  } catch (error) {
+    console.error('Error descargando el video de Facebook:', error);
     await m.react('❌');
-    return conn.reply(m.chat, '❎ *Error al obtener datos. Verifica el enlace.*', m);
+    return conn.reply(m.chat, '❌ *Ocurrió un error al obtener el video. Intenta nuevamente más tarde.*', m);
   }
 };
 
-handler.help = [ 'fb'];
+handler.help = ['facebook', 'fb'];
 handler.tags = ['descargas'];
 handler.command = ['facebook', 'fb'];
 handler.group = true;
