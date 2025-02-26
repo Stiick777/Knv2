@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 
 const handler = async (m, { conn, args }) => {
   if (!args[0]) {
-    return conn.reply(m.chat, '🎈 *Ingresa un link de Facebook*', m);
+    return conn.reply(m.chat, '🎈 *Ingresa un link de Facebook.*', m);
   }
 
   const facebookRegex = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.watch)\/.+$/;
@@ -11,33 +11,32 @@ const handler = async (m, { conn, args }) => {
   }
 
   try {
-    await m.react('⏳'); // Reacciona indicando que está procesando
+    await m.react('⏳'); // Indicar que se está procesando
 
-    // Llamar a la API de Facebook
-    const response = await fetch(`https://api.agungny.my.id/api/facebook?url=${encodeURIComponent(args[0])}`);
+    // Llamar a la API de descarga
+    const response = await fetch(`https://mahiru-shiina.vercel.app/download/facebook?url=${encodeURIComponent(args[0])}`);
     const json = await response.json();
 
-    if (!json.status || !json.media || json.media.length === 0) {
+    if (!json.status || !json.data?.download) {
       await m.react('⚠️');
-      return conn.reply(m.chat, '⚠️ *No se encontraron enlaces de descarga. Verifica el enlace.*', m);
+      return conn.reply(m.chat, '⚠️ *No se pudo obtener el video. Verifica el enlace o intenta más tarde.*', m);
     }
 
-    // Seleccionar el primer enlace disponible
-    const videoUrl = json.media[0];
+    const videoUrl = json.data.download;
 
     if (!videoUrl) {
       await m.react('🚩');
-      return conn.reply(m.chat, '🚩 *No se pudo obtener un enlace válido del video.*', m);
+      return conn.reply(m.chat, '🚩 *No se pudo extraer un enlace de descarga válido.*', m);
     }
 
-    await m.react('✅'); // Indica éxito en la descarga
+    await m.react('✅'); // Indicar que la descarga fue exitosa
 
     // Enviar el video
     await conn.sendMessage(
       m.chat,
       {
         video: { url: videoUrl },
-        caption: '🎈 *Aquí está tu video de Facebook _KanBot_.*',
+        caption: `🎥 *Título:* ${json.data.title}\n🌍 *Plataforma:* ${json.data.platform}\n🎈 *KanBot*`,
         fileName: 'facebook_video.mp4',
         mimetype: 'video/mp4'
       },
