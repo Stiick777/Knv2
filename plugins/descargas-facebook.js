@@ -29,7 +29,7 @@ const handler = async (m, { conn, args }) => {
       return conn.reply(m.chat, '🚩 *No se pudo extraer un enlace de descarga válido.*', m);
     }
 
-    await m.react('✅'); // Indicar que la descarga fue exitosa
+    
 
     // Enviar el video
     await conn.sendMessage(
@@ -42,6 +42,7 @@ const handler = async (m, { conn, args }) => {
       },
       { quoted: m }
     );
+await m.react('✅'); // Indicar que la descarga fue exitosa
 
   } catch (error) {
     console.error('Error descargando el video de Facebook:', error);
