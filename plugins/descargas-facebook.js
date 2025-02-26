@@ -1,53 +1,48 @@
-import fetch from 'node-fetch';
-
-const handler = async (m, { conn, args }) => {
-  if (!args[0]) {
-    return conn.reply(m.chat, '🎈 *Ingresa un link de Facebook.*', m);
+const handler = async (m, { conn, args }) => { 
+  if (!args[0]) { 
+    return conn.reply(m.chat, '🎈 *Ingresa un link de Facebook*', m);
   }
 
+  // Verificación válida del enlace de Facebook
   const facebookRegex = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.watch)\/.+$/;
-  if (!facebookRegex.test(args[0])) {
+  if (!facebookRegex.test(args[0])) { 
     return conn.reply(m.chat, '❌ *El enlace proporcionado no es válido. Asegúrate de ingresar un enlace correcto de Facebook.*', m);
   }
 
+  let res;
   try {
-    await m.react('⏳'); // Indicar que se está procesando
-
-    // Llamar a la API de descarga
-    const response = await fetch(`https://mahiru-shiina.vercel.app/download/facebook?url=${encodeURIComponent(args[0])}`);
-    const json = await response.json();
-
-    if (!json.status || !json.data?.download) {
-      await m.react('⚠️');
-      return conn.reply(m.chat, '⚠️ *No se pudo obtener el video. Verifica el enlace o intenta más tarde.*', m);
-    }
-
-    const videoUrl = json.data.download;
-
-    if (!videoUrl) {
-      await m.react('🚩');
-      return conn.reply(m.chat, '🚩 *No se pudo extraer un enlace de descarga válido.*', m);
-    }
-
-    
-
-    // Enviar el video
-    await conn.sendMessage(
-      m.chat,
-      {
-        video: { url: videoUrl },
-        caption: `🎥 *Título:* ${json.data.title}\n🌍 *Plataforma:* ${json.data.platform}\n🎈 *KanBot*`,
-        fileName: 'facebook_video.mp4',
-        mimetype: 'video/mp4'
-      },
-      { quoted: m }
-    );
-await m.react('✅'); // Indicar que la descarga fue exitosa
-
-  } catch (error) {
-    console.error('Error descargando el video de Facebook:', error);
+    await m.react('⏳'); // Reacción de espera
+    const response = await fetch(`https://api.dorratz.com/fbvideo?url=${encodeURIComponent(args[0])}`);
+    res = await response.json();
+  } catch (err) {
     await m.react('❌');
-    return conn.reply(m.chat, '❌ *Ocurrió un error al obtener el video. Intenta nuevamente más tarde.*', m);
+    return conn.reply(m.chat, '❎ *Error al obtener datos. Verifica el enlace.*', m);
+  }
+
+  if (!res || res.length === 0) { 
+    return conn.reply(m.chat, '⚠️ *No se encontraron resultados.*', m);
+  }
+
+  // Buscar la calidad mínima 360p (SD)
+  const data = res.find((i) => i.resolution === '360p (SD)');
+
+  if (!data) { 
+    return conn.reply(m.chat, '🚩 *No se encontró una resolución adecuada.*', m);
+  }
+
+  let video = data.url;
+  try {
+    await m.react('📤'); // Reacción de envío
+    await conn.sendMessage(m.chat, { 
+      video: { url: video }, 
+      caption: '🎈 *Tu video de Facebook by KanBot.*', 
+      fileName: 'facebook_video.mp4', 
+      mimetype: 'video/mp4' 
+    }, { quoted: m });
+    await m.react('✅'); // Reacción de éxito
+  } catch (err) {
+    await m.react('❌');
+    return conn.reply(m.chat, '❌ *Error al enviar el video.*', m);
   }
 };
 
