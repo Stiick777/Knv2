@@ -8,11 +8,11 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
     try {
         await m.react('💭');
 
-        const response = await fetch(`https://restapi.apibotwa.biz.id/api/chatgpt?message=${encodeURIComponent(text)}`);
+        const response = await fetch(`https://mahiru-shiina.vercel.app/ai/chatgpt4?text=${encodeURIComponent(text)}`);
         const data = await response.json();
 
-        if (data.status === 200 && data.data?.response) {
-            await conn.reply(m.chat, `*Hola!👋 soy KanBot Provided By Stiiven*:\n${data.data.response}`, m);
+        if (data.status && data.answer) {
+            await conn.reply(m.chat, `*Hola!👋 soy KanBot Provided By Stiiven*:\n${data.answer}`, m);
         } else {
             await m.react('❌');
             await conn.reply(m.chat, '❌ Error: No se obtuvo una respuesta válida.', m);
