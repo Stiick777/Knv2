@@ -15,7 +15,7 @@ if (command == 'play7' || command == 'playdoc') {
       m.chat, 
       `🧿 *Ingrese un nombre de una canción de YouTube*\n\nEjemplo: !${command} falling - Daniel Trevor`,  
       m, 
-      
+      rcanal
     );
   
   await m.react('🕛');
@@ -77,7 +77,7 @@ ${yt_play[0].author.url}
 }
 
 if (command == 'play8' || command == 'playdoc2') {
-    if (!text) return conn.reply(m.chat, `🧿 *Ingrese un nombre de una canción de YouTube*\n\nEjemplo: !${command} falling - Daniel Trevor`, m,);
+    if (!text) return conn.reply(m.chat, `🧿 *Ingrese un nombre de una canción de YouTube*\n\nEjemplo: !${command} falling - Daniel Trevor`, m, rcanal);
     await m.react('🕛');
     const yt_play = await search(args.join(' '));
     const texto1 = `
@@ -106,39 +106,40 @@ ${yt_play[0].author.url}
 *𝙴𝚗𝚟𝚒𝚊𝚗𝚍𝚘 𝚜𝚞 Video 𝙿𝚘𝚛 𝙵𝚊𝚟𝚘𝚛 𝙴𝚜𝚙𝚎𝚛𝚎*`.trim();
 
     await conn.sendMessage(m.chat, { text: texto1 }, { quoted: m });
+    
     try {
-        const apiUrl = `https://api.vreden.web.id/api/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
-        const apiResponse = await fetch(apiUrl);
-        const vredenData = await apiResponse.json();
+    const apiUrl = `https://api.agungny.my.id/api/youtube-videov2?url=${encodeURIComponent(yt_play[0].url)}`;
+    const apiResponse = await fetch(apiUrl);
+    const agungData = await apiResponse.json();
 
-        if (!vredenData.result?.status) {
-            await m.react('❌');
-            return; // Detener si el estado no es exitoso
-        }
-
-        const downloadUrl = vredenData.result.download.url; // Enlace directo de descarga
-        const fileName = vredenData.result.download.filename; // Nombre del archivo
-
-        await conn.sendMessage(
-            m.chat,
-            {
-                document: { url: downloadUrl },
-                fileName: fileName,
-                caption: `🌚 *_Provided by KanBot_* 🌝`,
-                mimetype: 'video/mp4'
-            },
-            { quoted: m }
-        );
-
-        await m.react('✅');
-    } catch (e) {
-        console.error('Error al procesar la solicitud:', e);
-        await m.react('❌'); // Reaccionar con error
+    if (!agungData.status || !agungData.result?.url) {
+        await m.react('❌');
+        return; // Detener si no hay URL de descarga
     }
+
+    const downloadUrl = agungData.result.url; // Enlace directo de descarga
+    const fileName = `${agungData.result.title}.mp4`; // Nombre del archivo con título del video
+
+    await conn.sendMessage(
+        m.chat,
+        {
+            document: { url: downloadUrl },
+            fileName: fileName,
+            caption: `🌚 *_Provided by KanBot_* 🌝`,
+            mimetype: 'video/mp4'
+        },
+        { quoted: m }
+    );
+
+    await m.react('✅');
+} catch (e) {
+    console.error('Error al procesar la solicitud:', e);
+    await m.react('❌'); // Reaccionar con error
+}
 }
 
 }
-handler.help = ['play7', 'play8'];
+handler.help = ['play7', 'play8', 'playdoc2', 'playdoc'];
 handler.tags = ['descargas'];
 handler.command = ['play7', 'playdoc', 'playdoc2' , 'play8']
 handler.group = true;

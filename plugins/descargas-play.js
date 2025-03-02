@@ -115,19 +115,19 @@ if (command == 'play2') {
 
 
 try {
-    await m.react('🕓'); // Reaccionar con un ícono de reloj mientras procesa
+    await m.react('🕓'); // Reacciona con un ícono de reloj mientras procesa
 
-    // Primera API
-    const apiUrl1 = `https://api.agungny.my.id/api/youtube-video?url=${encodeURIComponent(yt_play[0].url)}`;
-    let apiResponse = await fetch(apiUrl1);
+    // Nueva API
+    const apiUrl = `https://api.agungny.my.id/api/youtube-videov2?url=${encodeURIComponent(yt_play[0].url)}`;
+    let apiResponse = await fetch(apiUrl);
     let response = await apiResponse.json();
 
     // Verificar si la API devolvió un resultado válido
-    if (response.status && response.result && response.result.downloadUrl) {
-        const { downloadUrl, title } = response.result;
+    if (response.status === "true" && response.result && response.result.url) {
+        const { url, title } = response.result;
 
         await conn.sendMessage(m.chat, {
-            video: { url: downloadUrl },
+            video: { url },
             caption: `🎥 *${title}*\n😎 Su video by ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`,
             mimetype: 'video/mp4',
         }, { quoted: m });
@@ -135,38 +135,11 @@ try {
         return await m.react('✅'); // Reaccionar con éxito
     }
 
-    throw new Error("Primera API falló, intentando con la segunda...");
+    throw new Error("API falló o no retornó datos válidos");
 } catch (error) {
-    console.warn("Error en la primera API:", error.message);
-
-    try {
-        await m.react('🕓'); // Reaccionar de nuevo mientras procesa la segunda API
-
-        // Segunda API (Respaldo)
-        const apiUrl2 = `https://apidl.asepharyana.cloud/api/downloader/ytmp4?url=${encodeURIComponent(yt_play[0].url)}&quality=360`;
-        let apiResponse2 = await fetch(apiUrl2);
-        let response2 = await apiResponse2.json();
-
-        // Verificar si la API de respaldo devuelve un resultado válido
-        if (response2.url && response2.filename) {
-            const { url: downloadUrl, filename } = response2;
-
-            await conn.sendMessage(m.chat, {
-                video: { url: downloadUrl },
-                caption: `🎥 *${filename}*\n😎 Su video by ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`,
-                mimetype: 'video/mp4',
-            }, { quoted: m });
-
-            return await m.react('✅'); // Reaccionar con éxito
-        }
-
-        throw new Error("Segunda API también falló.");
-    } catch (backupError) {
-        console.error("Error en la segunda API:", backupError.message);
-        await m.react('❌'); // Reaccionar con un ícono de error si ambas fallan
-        await conn.sendMessage(m.chat, 'No se pudo procesar el video con ninguna API. Intenta con otro enlace.', { quoted: m });
-    }
+    console.warn("Error en la API:", error.message);
 }
+
 
 }
 

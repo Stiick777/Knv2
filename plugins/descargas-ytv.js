@@ -15,17 +15,16 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         return conn.reply(m.chat, `*[❗𝐈𝐍𝐅𝐎❗] Asegúrese de que sea un enlace de YouTube.*`, m, );
     }
 
-
-    try {
+try { 
     await m.react('🕛'); // Indicar que está procesando
 
-    // Primera API
-    let apiResponse = await fetch(`https://api.agungny.my.id/api/youtube-video?url=${encodeURIComponent(youtubeLink)}`);
+
+    let apiResponse = await fetch(`https://api.agungny.my.id/api/youtube-videov2?url=${encodeURIComponent(youtubeLink)}`);
     let data = await apiResponse.json();
 
-    if (data.status && data.result && data.result.downloadUrl) {
+    if (data.status && data.result && data.result.url) {
         const videoTitle = data.result.title;
-        const videoUrl = data.result.downloadUrl;
+        const videoUrl = data.result.url;
 
         await conn.sendMessage(m.chat, {
             video: { url: videoUrl },
@@ -37,37 +36,10 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         return await m.react('✅'); // Confirmar éxito
     }
 
-    throw new Error("Primera API falló, intentando con la segunda...");
-} catch (error) {
-    console.warn("Error en la primera API:", error.message);
+    throw new Error("La API no devolvió datos válidos");
 
-    try {
-        await m.react('🕛'); // Indicar que está procesando la segunda API
-
-        // Segunda API (Respaldo)
-        let apiResponse2 = await fetch(`https://apidl.asepharyana.cloud/api/downloader/ytmp4?url=${encodeURIComponent(youtubeLink)}&quality=360`);
-        let data2 = await apiResponse2.json();
-
-        if (data2.url && data2.filename) {
-            const videoTitle = data2.filename;
-            const videoUrl = data2.url;
-
-            await conn.sendMessage(m.chat, {
-                video: { url: videoUrl },
-                fileName: videoTitle,
-                mimetype: 'video/mp4',
-                caption: `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${videoTitle}`,
-            }, { quoted: m });
-
-            return await m.react('✅'); // Confirmar éxito
-        }
-
-        throw new Error("Segunda API también falló.");
-    } catch (backupError) {
-        console.error("Error en la segunda API:", backupError.message);
-        await m.react('❌');
-        await conn.reply(m.chat, `*[❗𝐈𝐍𝐅𝐎❗] No se pudo obtener el video intente con /yt4doc*`, m);
-    }
+} catch (error) { 
+    console.warn("Error en la descarga del video:", error.message); 
 }
 };
 
