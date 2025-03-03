@@ -5,7 +5,7 @@ let handler = async (m, { conn, text }) => {
     let url = await conn.profilePictureUrl(number, 'image').catch(_ => 'https://telegra.ph/file/981dd23869e6d71325dfe.jpg');
 
     await m.react('🕓');
-    await conn.sendFile(m.chat, url, 'thumbnail.jpg', '', m, null, rcanal);
+    await conn.sendFile(m.chat, url, 'thumbnail.jpg', '', m, null, );
     await m.react('✅');
 };
 
