@@ -34,30 +34,6 @@ if (command == 'play') {
 
   await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-   try {
-    await m.react('🕓'); // Indicador de proceso
-
-    // Primera API
-    let primaryApiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
-    let primaryApiResponse = await fetch(primaryApiUrl);
-    let primaryResponseData = await primaryApiResponse.json();
-
-    if (primaryResponseData.status === "tunnel" && primaryResponseData.url) {
-        await conn.sendMessage(m.chat, {
-            audio: { url: primaryResponseData.url },
-            mimetype: 'audio/mpeg',
-            fileName: primaryResponseData.filename || `${primaryResponseData.title}.mp3`,
-            ptt: false,
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-        return;
-    }
-
-    throw new Error('Fallo en la primera API');
-} catch (error) {
-    console.error('Error con la primera API:', error.message);
-
     try {
         await m.react('🕓'); // Reintento con la segunda API
 
@@ -84,7 +60,7 @@ if (command == 'play') {
         await m.react('❌'); // Error final
         await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace con ambas APIs.', { quoted: m });
     }
-}
+
 
 }
 
