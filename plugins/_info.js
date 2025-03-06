@@ -26,17 +26,17 @@ function dhms(ms) {
 
 const message = users.map((v, index) => 
 `╭─⬣「 \`𝐒𝐔𝐁-𝐁𝐎𝐓 # ${index + 1}\`」⬣
-│🎈 \`*𝚃𝙰𝙶:*\` @${v.user.jid.replace(/[^0-9]/g, '')}
-│🔥 \`*𝙻𝙸𝙽𝙺:*\` https://wa.me/${v.user.jid.replace(/[^0-9]/g, '')}
-│📍 \`*𝙽𝙾𝙼𝙱𝚁𝙴:*\` ${v.user.name || '𝚂𝚄𝙱-𝙱𝙾𝗧'}
-│⏳ \`*𝚁𝚄𝙽𝚃𝙸𝙼𝙴*\` ${v.uptime ? dhms(Date.now() - v.uptime) : "Desconocido"}
+│🎈 \`𝚃𝙰𝙶:\` @${v.user.jid.replace(/[^0-9]/g, '')}
+│🔥 \`𝙻𝙸𝙽𝙺:\` https://wa.me/${v.user.jid.replace(/[^0-9]/g, '')}
+│📍 \`𝙽𝙾𝙼𝙱𝚁𝙴:\` ${v.user.name || '𝚂𝚄𝙱-𝙱𝙾𝗧'}
+│⏳ \`𝚁𝚄𝙽𝚃𝙸𝙼𝙴\` ${v.uptime ? dhms(Date.now() - v.uptime) : "Desconocido"}
 ╰──────────────────⬣`).join('\n\n');
 
-const replyMessage = message.length === 0 ? '🚫 *No hay Sub-Bots activos :(.*' : message;
+const replyMessage = message.length === 0 ? '🚫 *No hay Sub-Bots activos :(*' : message;
 const totalUsers = users.length;
 
 const responseMessage = 
-`╭━〔 \`𝗦𝗨𝗕𝗦 - 𝗞𝗔𝗡𝗕𝗢𝗧\` 〕⬣
+`╭━〔 \`𝗦𝗨𝗕𝗦 - 𝗞𝗔𝗡𝗕𝗢𝗧  ̷V̷̷2̷\` 〕⬣
 ┃ ⚡ *Total de Sub-Bots:* ${totalUsers || '0'}
 ╰━━━━━━━━━━━━━━━━⬣
 
