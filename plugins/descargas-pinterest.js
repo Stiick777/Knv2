@@ -30,11 +30,11 @@ let handler = async (_0x10bd40, {
 
   let foundProhibitedWord = prohibited.find(word => _0x27db11.toLowerCase().includes(word));
   if (foundProhibitedWord) {
-    return _0x9c7141.reply(_0x10bd40.chat, `🚩 *No daré resultado a tu solicitud por pajin* - Palabra prohibida: ${foundProhibitedWord}`, _0x10bd40);
+    return _0x9c7141.reply(_0x10bd40.chat, `🙄 *No daré resultado a tu solicitud por pajin* - Palabra prohibida: ${foundProhibitedWord}`, _0x10bd40);
   }
 
   if (!_0x27db11) {
-    return _0x9c7141.reply(_0x10bd40.chat, "🍟 *¿Que quieres buscar en pinterest?*", _0x10bd40, rcanal);
+    return _0x9c7141.reply(_0x10bd40.chat, "⚠️ *¿Que quieres buscar en pinterest?*", _0x10bd40, );
   }
     await _0x10bd40.react(rwait);
 
@@ -119,5 +119,5 @@ let handler = async (_0x10bd40, {
 handler.help = ["pinterest"];
 handler.tags = ["buscador"];
 handler.group = true;
-handler.command = ['pinterest'];
+handler.command = ['pinterest','pin'];
 export default handler;
