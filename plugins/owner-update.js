@@ -39,7 +39,7 @@ var handler = async (m, { conn, text }) => {
   }
 }
 
-handler.help = ['update', 'actualizar']
+handler.help = ['update']
 handler.tags = ['owner']
 handler.command = ['update', 'actualizar', 'up']
 handler.rowner = true
