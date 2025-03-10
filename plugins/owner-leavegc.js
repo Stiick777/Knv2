@@ -1,6 +1,6 @@
 let handler = async (m, { conn, text, command, isOwner, isGroup }) => {
 
-if (!isGroup) return m.reply('⚠️ comando solo en grupo');
+if (!isGroup && !text) return m.reply('⚠️ comando solo en grupo o con ID');
     
     let id = text && text.endsWith('@g.us') ? text : m.chat; // Si se proporciona un ID de grupo, usarlo; si no, usar el chat actual
 
@@ -32,6 +32,7 @@ if (!isGroup) return m.reply('⚠️ comando solo en grupo');
 };
 
 handler.command = ['salir', 'leavegc', 'salirdelgrupo', 'leave'];
+handler.group = false;
 handler.rowner = true;
 
 export default handler;
