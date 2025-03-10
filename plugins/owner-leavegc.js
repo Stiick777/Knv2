@@ -32,6 +32,7 @@ let handler = async (m, { conn, text, command, isOwner }) => {
 
 handler.command = ['salir', 'leavegc', 'salirdelgrupo', 'leave'];
 handler.group = true;
+handler.private = true
 handler.rowner = true;
 
 export default handler;
