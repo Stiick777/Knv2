@@ -34,7 +34,6 @@ if (command == 'play') {
 
   await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-import axios from 'axios';
 
 try {  
     await m.react('🕓'); // Indicador de procesamiento  
