@@ -34,7 +34,8 @@ if (command == 'play') {
 
   await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-   try {
+
+try {
     await m.react('🕓'); // Indicador de proceso
 
     // API principal
@@ -46,21 +47,31 @@ if (command == 'play') {
         throw new Error('Fallo en la API');
     }
 
+    let fileName = `${responseData.data.title}.mp3`;
+    let filePath = join('tmp', fileName);
+
+    // Descargar el archivo
+    let audioResponse = await fetch(responseData.data.dl);
+    let buffer = await audioResponse.buffer();
+    fs.writeFileSync(filePath, buffer);
+
     // Enviar el audio al chat
     await conn.sendMessage(m.chat, {
-        audio: { url: responseData.data.dl },
+        audio: { url: filePath },
         mimetype: 'audio/mpeg',
-        fileName: `${responseData.data.title}.mp3`,
+        fileName: fileName,
         ptt: false,
     }, { quoted: m });
 
     await m.react('✅'); // Éxito
+
+    // Opcional: Eliminar el archivo después de enviarlo
+    setTimeout(() => fs.unlinkSync(filePath), 60000); // Borra el archivo después de 1 minuto
 } catch (error) {
     console.error('Error con la API:', error.message);
     await m.react('❌'); // Error final
     await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });
 }
-
 }
 
 if (command == 'play2') {
