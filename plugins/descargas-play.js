@@ -4,7 +4,6 @@ import yts from 'yt-search'
 import ytdl from 'ytdl-core'
 import axios from 'axios'
 import fs from 'fs'
-import path from 'path';
 import { execSync } from 'child_process'
 const LimitAud = 725 * 1024 * 1024; //700MB
 const LimitVid = 425 * 1024 * 1024; //425MB
@@ -37,57 +36,50 @@ if (command == 'play') {
 
 
 
+try {
+    await m.react('🕓'); // Indicar que el proceso ha comenzado  
 
-try {    
-    await m.react('🕓'); // Indicar que el proceso ha comenzado    
+    // API única de Agung ny  
+    let apiUrl = `https://api.agungny.my.id/api/youtube-audiov2?url=${encodeURIComponent(yt_play[0].url)}`;
+    let { data } = await axios.get(apiUrl);
 
-    // API única de Agung ny    
-    let apiUrl = `https://api.agungny.my.id/api/youtube-audiov2?url=${encodeURIComponent(yt_play[0].url)}`;    
-    let apiResponse = await fetch(apiUrl);    
-    let responseData = await apiResponse.json();    
+    if (!data.status || !data.result || !data.result.url) {
+        throw new Error('Fallo en la API');
+    }
 
-    if (!responseData.status || !responseData.result || !responseData.result.url) {    
-        throw new Error('Fallo en la API');    
-    }    
+    let audioPath = './temp_audio.mp3';
+    let writer = fs.createWriteStream(audioPath);
 
-    let audioUrl = responseData.result.url;
-    let audioPath = path.join(__dirname, 'audio.mp3');
-    let convertedPath = path.join(__dirname, 'converted_audio.mp3');
-
-    // Descargar el audio
-    let audioStream = await fetch(audioUrl);
-    let fileStream = fs.createWriteStream(audioPath);
-    await new Promise((resolve, reject) => {
-        audioStream.body.pipe(fileStream);
-        audioStream.body.on('error', reject);
-        fileStream.on('finish', resolve);
+    let audioResponse = await axios({
+        url: data.result.url,
+        method: 'GET',
+        responseType: 'stream',
     });
 
-    // Convertir el audio con ffmpeg
-    await new Promise((resolve, reject) => {
-        exec(`ffmpeg -i "${audioPath}" -b:a 128k "${convertedPath}"`, (error) => {
-            if (error) return reject(error);
-            resolve();
-        });
+    audioResponse.data.pipe(writer);
+
+    writer.on('finish', async () => {
+        await conn.sendMessage(m.chat, {
+            audio: fs.readFileSync(audioPath),
+            mimetype: 'audio/mpeg',
+            fileName: `${data.result.title}.mp3`,
+            ptt: false,
+        }, { quoted: m });
+
+        fs.unlinkSync(audioPath); // Eliminar el archivo después de enviarlo
+        await m.react('✅'); // Indicar éxito  
     });
 
-    // Enviar el audio convertido al chat    
-    await conn.sendMessage(m.chat, {    
-        audio: { url: convertedPath },    
-        mimetype: 'audio/mpeg',    
-        fileName: `${responseData.result.title}.mp3`,    
-        ptt: false,    
-    }, { quoted: m });    
+    writer.on('error', async (error) => {
+        console.error('Error al guardar el audio:', error.message);
+        await m.react('❌');
+        await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el audio.', { quoted: m });
+    });
 
-    // Eliminar archivos temporales
-    fs.unlinkSync(audioPath);
-    fs.unlinkSync(convertedPath);
-
-    await m.react('✅'); // Indicar éxito    
-} catch (error) {    
-    console.error('Error con la API:', error.message);    
-    await m.react('❌'); // Indicar error    
-    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });    
+} catch (error) {
+    console.error('Error con la API:', error.message);
+    await m.react('❌');
+    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });
 }
 }
 
