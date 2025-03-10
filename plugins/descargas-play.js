@@ -10,56 +10,57 @@ const LimitVid = 425 * 1024 * 1024; //425MB
 const handler = async (m, {conn, command, args, text, usedPrefix}) => {
 
 if (command == 'play') {
-  if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, );
-  await m.react('🕓');
+  if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m);
+  
+  await m.react('🕓'); // Indicar que el proceso ha comenzado
+  
+  try {
+    // Realizar la búsqueda con la API de Agatz
+    let apiUrl = `https://api.agatz.xyz/api/ytplay?message=${encodeURIComponent(text)}`;
+    let apiResponse = await fetch(apiUrl);
+    let responseData = await apiResponse.json();
+    
+    // Verificar si la API devolvió datos válidos
+    if (!responseData.data || !responseData.data.audio || !responseData.data.audio.url) {
+      throw new Error('No se encontró el audio.');
+    }
 
-  const yt_play = await search(args.join(' '));
-  const texto1 = `
+    let info = responseData.data.info;
+    let audio = responseData.data.audio;
+    
+    // Formatear el mensaje con la información del video
+    let texto1 = `
 𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊𝚜
 ===========================
 
-> *𝚃𝚒𝚝𝚞𝚕𝚘* :  ${yt_play[0].title}
-
-> *𝙲𝚛𝚎𝚊𝚍𝚘* :  ${yt_play[0].ago}
-
-> *𝙳𝚞𝚛𝚊𝚌𝚒𝚘𝚗* :  ${secondString(yt_play[0].duration.seconds)}
+> *𝚃𝚒𝚝𝚞𝚕𝚘* :  ${info.title}
+> *𝙲𝚛𝚎𝚊𝚍𝚘𝚛* :  ${info.author.name}
+> *𝙳𝚞𝚛𝚊𝚌𝚒ó𝚗* :  ${info.duration}
+> *𝙵𝚎𝚌𝚑𝚊 𝚍𝚎 𝚜𝚞𝚋𝚒𝚍𝚊* :  ${info.uploaded}
 
 *🚀 𝙎𝙀 𝙀𝙎𝙏𝘼 𝘿𝙀𝙎𝘼𝙍𝙂𝘼𝙉𝘿𝙊 𝙎𝙐 𝘼𝙐𝘿𝙄𝙊, 𝙀𝙎𝙋𝙀𝙍𝙀 𝙐𝙉 𝙈𝙊𝙈𝙀𝙉𝙏𝙊*
 
 ===========================
 ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
-> *Provided by Stiiven
+> *Provided by Stiiven*
+    `.trim();
+    
+    // Enviar la miniatura del video con la información
+    await conn.sendFile(m.chat, info.thumbnail, 'thumbnail.jpg', texto1, m);
 
-`.trim();
+    // Enviar el audio como mensaje de voz
+    await conn.sendMessage(m.chat, {
+      audio: { url: audio.url },
+      mimetype: 'audio/mpeg',
+      ptt: true // Esto lo envía como nota de voz
+    }, { quoted: m });
 
-  await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
-
-try {    
-    await m.react('🕓'); // Indicar que el proceso ha comenzado    
-
-    // API única de Agung ny    
-    let apiUrl = `https://api.agungny.my.id/api/youtube-audiov2?url=${encodeURIComponent(yt_play[0].url)}`;    
-    let apiResponse = await fetch(apiUrl);    
-    let responseData = await apiResponse.json();    
-
-    if (!responseData.status || !responseData.result || !responseData.result.url) {    
-        throw new Error('Fallo en la API');    
-    }    
-
-    // Enviar el audio como documento    
-    await conn.sendMessage(m.chat, {    
-        document: { url: responseData.result.url },    
-        mimetype: 'audio/mpeg',    
-        fileName: `${responseData.result.title}.mp3`,    
-    }, { quoted: m });    
-
-    await m.react('✅'); // Indicar éxito    
-} catch (error) {    
-    console.error('Error con la API:', error.message);    
-    await m.react('❌'); // Indicar error    
-    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });    
-}
-
+    await m.react('✅'); // Indicar éxito
+  } catch (error) {
+    console.error('Error con la API:', error.message);
+    await m.react('❌'); // Indicar error
+    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar la búsqueda.', { quoted: m });
+  }
 }
 
 if (command == 'play2') {
