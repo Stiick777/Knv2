@@ -4,6 +4,7 @@ import yts from 'yt-search'
 import ytdl from 'ytdl-core'
 import axios from 'axios'
 import fs from 'fs'
+import path from 'path';
 import { execSync } from 'child_process'
 const LimitAud = 725 * 1024 * 1024; //700MB
 const LimitVid = 425 * 1024 * 1024; //425MB
@@ -35,6 +36,8 @@ if (command == 'play') {
   await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
 
+
+
 try {    
     await m.react('🕓'); // Indicar que el proceso ha comenzado    
 
@@ -47,13 +50,38 @@ try {
         throw new Error('Fallo en la API');    
     }    
 
-    // Enviar el audio al chat    
+    let audioUrl = responseData.result.url;
+    let audioPath = path.join(__dirname, 'audio.mp3');
+    let convertedPath = path.join(__dirname, 'converted_audio.mp3');
+
+    // Descargar el audio
+    let audioStream = await fetch(audioUrl);
+    let fileStream = fs.createWriteStream(audioPath);
+    await new Promise((resolve, reject) => {
+        audioStream.body.pipe(fileStream);
+        audioStream.body.on('error', reject);
+        fileStream.on('finish', resolve);
+    });
+
+    // Convertir el audio con ffmpeg
+    await new Promise((resolve, reject) => {
+        exec(`ffmpeg -i "${audioPath}" -b:a 128k "${convertedPath}"`, (error) => {
+            if (error) return reject(error);
+            resolve();
+        });
+    });
+
+    // Enviar el audio convertido al chat    
     await conn.sendMessage(m.chat, {    
-        audio: { url: responseData.result.url },    
+        audio: { url: convertedPath },    
         mimetype: 'audio/mpeg',    
         fileName: `${responseData.result.title}.mp3`,    
         ptt: false,    
     }, { quoted: m });    
+
+    // Eliminar archivos temporales
+    fs.unlinkSync(audioPath);
+    fs.unlinkSync(convertedPath);
 
     await m.react('✅'); // Indicar éxito    
 } catch (error) {    
