@@ -49,7 +49,7 @@ try {
 
     // Ruta del archivo de destino
     let fileName = `${responseData.data.title.replace(/[^a-zA-Z0-9]/g, '_')}.mp3`;
-    let filePath = path.join('../tmp', fileName);
+    let filePath = path.join('./tmp', fileName);
 
     // Descargar el archivo
     let audioResponse = await fetch(responseData.data.dl);
