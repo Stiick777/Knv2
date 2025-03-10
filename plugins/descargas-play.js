@@ -34,38 +34,25 @@ if (command == 'play') {
 
   await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-
 try {
     await m.react('🕓'); // Indicador de proceso
 
     // API principal
-    let apiUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
+    let apiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
     let apiResponse = await fetch(apiUrl);
     let responseData = await apiResponse.json();
 
-    if (!responseData.status || !responseData.data || !responseData.data.dl) {
+    if (!responseData.url) {
         throw new Error('Fallo en la API');
     }
 
-    // Ruta del archivo de destino
-    let fileName = `${responseData.data.title.replace(/[^a-zA-Z0-9]/g, '_')}.mp3`;
-    let filePath = path.join('./tmp', fileName);
-
-    // Descargar el archivo
-    let audioResponse = await fetch(responseData.data.dl);
-    let audioBuffer = await audioResponse.buffer();
-    fs.writeFileSync(filePath, audioBuffer);
-
     // Enviar el audio al chat
     await conn.sendMessage(m.chat, {
-        audio: { url: filePath },
+        audio: { url: responseData.url },
         mimetype: 'audio/mpeg',
-        fileName: fileName,
+        fileName: responseData.filename || `${responseData.title}.mp3`,
         ptt: false,
     }, { quoted: m });
-
-    // Eliminar el archivo después de enviarlo
-    fs.unlinkSync(filePath);
 
     await m.react('✅'); // Éxito
 } catch (error) {
@@ -73,6 +60,7 @@ try {
     await m.react('❌'); // Error final
     await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });
 }
+
 }
 
 if (command == 'play2') {
