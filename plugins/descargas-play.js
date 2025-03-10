@@ -34,33 +34,32 @@ if (command == 'play') {
 
   await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-    try {
-        await m.react('🕓'); // Reintento con la segunda API
+   try {
+    await m.react('🕓'); // Indicador de proceso
 
-        // Segunda API
-        let fallbackApiUrl = `https://api.agungny.my.id/api/youtube-audio?url=${encodeURIComponent(yt_play[0].url)}`;
-        let fallbackApiResponse = await fetch(fallbackApiUrl);
-        let fallbackResponseData = await fallbackApiResponse.json();
+    // API principal
+    let apiUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
+    let apiResponse = await fetch(apiUrl);
+    let responseData = await apiResponse.json();
 
-        if (!fallbackResponseData.status || !fallbackResponseData.result || !fallbackResponseData.result.downloadUrl) {
-            throw new Error('Fallo en la segunda API');
-        }
-
-        // Enviar el audio al chat
-        await conn.sendMessage(m.chat, {
-            audio: { url: fallbackResponseData.result.downloadUrl },
-            mimetype: 'audio/mpeg',
-            fileName: `${fallbackResponseData.result.title}.mp3`,
-            ptt: false,
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } catch (error2) {
-        console.error('Error con la segunda API:', error2.message);
-        await m.react('❌'); // Error final
-        await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace con ambas APIs.', { quoted: m });
+    if (!responseData.status || !responseData.data || !responseData.data.dl) {
+        throw new Error('Fallo en la API');
     }
 
+    // Enviar el audio al chat
+    await conn.sendMessage(m.chat, {
+        audio: { url: responseData.data.dl },
+        mimetype: 'audio/mpeg',
+        fileName: `${responseData.data.title}.mp3`,
+        ptt: false,
+    }, { quoted: m });
+
+    await m.react('✅'); // Éxito
+} catch (error) {
+    console.error('Error con la API:', error.message);
+    await m.react('❌'); // Error final
+    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });
+}
 
 }
 
