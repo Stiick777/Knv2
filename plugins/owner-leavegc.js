@@ -1,4 +1,7 @@
-let handler = async (m, { conn, text, command, isOwner }) => {
+let handler = async (m, { conn, text, command, isOwner, isGroup }) => {
+
+if (!isGroup) return m.reply('⚠️ comando solo en grupo');
+    
     let id = text && text.endsWith('@g.us') ? text : m.chat; // Si se proporciona un ID de grupo, usarlo; si no, usar el chat actual
 
     try {
