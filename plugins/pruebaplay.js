@@ -1,4 +1,4 @@
-import { ytdltxt } from 'savetubedl';
+import { ytdlaudtxt } from 'savetubedl';
 
 async function handler(m, { text }) {  
     if (!text) {  
@@ -9,7 +9,7 @@ async function handler(m, { text }) {
 
     try {  
         // Buscar video en YouTube  
-        const videoInfo = await ytdltxt(text, '480');  
+        const videoInfo = await ytdlaudtxt(text, '480');  
 
         // Verificar información en consola antes de enviarla  
         console.log('🔹 Video Info:', videoInfo);  
