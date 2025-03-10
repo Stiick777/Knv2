@@ -42,8 +42,8 @@ try {
     let apiResponse = await fetch(apiUrl);
     let responseData = await apiResponse.json();
 
-    if (!responseData.url) {
-        throw new Error('Fallo en la API');
+    if (!responseData.url || responseData.quality !== "128kbps") {
+        throw new Error('Fallo en la API o calidad no disponible');
     }
 
     // Enviar el audio al chat
