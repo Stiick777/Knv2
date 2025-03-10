@@ -11,14 +11,21 @@ async function handler(m, { text }) {
         // Buscar video en YouTube  
         const videoInfo = await ytdlaudtxt(text, '480');  
 
-        // Verificar información en consola antes de enviarla  
+        // Mostrar en consola  
         console.log('🔹 Video Info:', videoInfo);  
+
+        // Enviar la respuesta al chat  
+        await m.reply(`🔹 *Video Info:*  
+\`\`\`json
+${JSON.stringify(videoInfo, null, 2)}
+\`\`\``);  
 
         await m.react('✅'); // Indicar éxito  
 
     } catch (error) {  
         console.error('❌ Error en la búsqueda:', error.message);  
         await m.react('❌');  
+        await m.reply('*Ocurrió un error al buscar el video.*');  
     }  
 }
 
