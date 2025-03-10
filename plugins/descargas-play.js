@@ -46,12 +46,11 @@ try {
         throw new Error('Fallo en la API');    
     }    
 
-    // Enviar el audio al chat    
+    // Enviar el audio como documento    
     await conn.sendMessage(m.chat, {    
-        audio: { url: responseData.result.url },    
+        document: { url: responseData.result.url },    
         mimetype: 'audio/mpeg',    
         fileName: `${responseData.result.title}.mp3`,    
-        ptt: true,    
     }, { quoted: m });    
 
     await m.react('✅'); // Indicar éxito    
