@@ -47,13 +47,14 @@ try {
         throw new Error('Fallo en la API');
     }
 
-    let fileName = `${responseData.data.title}.mp3`;
-    let filePath = join('tmp', fileName);
+    // Ruta del archivo de destino
+    let fileName = `${responseData.data.title.replace(/[^a-zA-Z0-9]/g, '_')}.mp3`;
+    let filePath = path.join('../tmp', fileName);
 
     // Descargar el archivo
     let audioResponse = await fetch(responseData.data.dl);
-    let buffer = await audioResponse.buffer();
-    fs.writeFileSync(filePath, buffer);
+    let audioBuffer = await audioResponse.buffer();
+    fs.writeFileSync(filePath, audioBuffer);
 
     // Enviar el audio al chat
     await conn.sendMessage(m.chat, {
@@ -63,10 +64,10 @@ try {
         ptt: false,
     }, { quoted: m });
 
-    await m.react('✅'); // Éxito
+    // Eliminar el archivo después de enviarlo
+    fs.unlinkSync(filePath);
 
-    // Opcional: Eliminar el archivo después de enviarlo
-    setTimeout(() => fs.unlinkSync(filePath), 60000); // Borra el archivo después de 1 minuto
+    await m.react('✅'); // Éxito
 } catch (error) {
     console.error('Error con la API:', error.message);
     await m.react('❌'); // Error final
