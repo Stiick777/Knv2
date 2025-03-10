@@ -34,41 +34,47 @@ if (command == 'play') {
 
   await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
+import axios from 'axios';
+
 try {  
     await m.react('🕓'); // Indicador de procesamiento  
 
     let apiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
-    console.log('URL solicitada:', apiUrl); // Verifica la URL generada  
+    console.log('URL solicitada:', apiUrl);  
 
-    let response = await fetch(apiUrl, {
-        method: 'GET',
+    let response = await axios.get(apiUrl, {
         headers: {
-            "User-Agent": "Mozilla/5.0",
-            "Referer": "https://google.com"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Referer": "https://google.com",
+            "Accept": "application/json"
+        },
+        timeout: 10000, // Tiempo máximo de espera (10s)
+        validateStatus: function (status) {
+            return status < 500; // Solo lanza error si el estado es 500 o más
         }
     });
 
-    if (!response.ok) {
-        throw new Error(`Error en la API: ${response.status} ${response.statusText}`);
+    if (response.status === 404) {
+        throw new Error('API devolvió 404: No se encontró el recurso');
     }
 
-    let data = await response.json();  
-    if (!data.url) {  
-        throw new Error('No se pudo obtener el enlace de descarga');  
-    }  
+    let data = response.data;
+    if (!data.url) {
+        throw new Error('No se pudo obtener el enlace de descarga');
+    }
 
-    await conn.sendMessage(m.chat, {  
-        audio: { url: data.url },  
-        mimetype: 'audio/mpeg',  
-        fileName: data.filename || `${data.title}.mp3`,  
-        ptt: false,  
-    }, { quoted: m });  
+    await conn.sendMessage(m.chat, {
+        audio: { url: data.url },
+        mimetype: 'audio/mpeg',
+        fileName: data.filename || `${data.title}.mp3`,
+        ptt: false
+    }, { quoted: m });
 
     await m.react('✅'); // Éxito  
-} catch (error) {  
-    console.error('Error con la API:', error.message);  
-    await m.react('❌');  
-    await conn.sendMessage(m.chat, `Ocurrió un error: ${error.message}`, { quoted: m });  
+} catch (error) {
+    console.error('Error con la API:', error.message);
+    await m.react('❌');
+    await conn.sendMessage(m.chat, `Ocurrió un error: ${error.message}`, { quoted: m });
 }
 }
 
