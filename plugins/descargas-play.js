@@ -34,53 +34,33 @@ if (command == 'play') {
 
   await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
+try {    
+    await m.react('🕓'); // Indicar que el proceso ha comenzado    
 
+    // API única de Agung ny    
+    let apiUrl = `https://api.agungny.my.id/api/youtube-audiov2?url=${encodeURIComponent(yt_play[0].url)}`;    
+    let apiResponse = await fetch(apiUrl);    
+    let responseData = await apiResponse.json();    
 
-try {
-    await m.react('🕓'); // Indicar que el proceso ha comenzado  
+    if (!responseData.status || !responseData.result || !responseData.result.url) {    
+        throw new Error('Fallo en la API');    
+    }    
 
-    // API única de Agung ny  
-    let apiUrl = `https://api.agungny.my.id/api/youtube-audiov2?url=${encodeURIComponent(yt_play[0].url)}`;
-    let { data } = await axios.get(apiUrl);
+    // Enviar el audio al chat    
+    await conn.sendMessage(m.chat, {    
+        audio: { url: responseData.result.url },    
+        mimetype: 'audio/mpeg',    
+        fileName: `${responseData.result.title}.mp3`,    
+        ptt: true,    
+    }, { quoted: m });    
 
-    if (!data.status || !data.result || !data.result.url) {
-        throw new Error('Fallo en la API');
-    }
-
-    let audioPath = './temp_audio.mp3';
-    let writer = fs.createWriteStream(audioPath);
-
-    let audioResponse = await axios({
-        url: data.result.url,
-        method: 'GET',
-        responseType: 'stream',
-    });
-
-    audioResponse.data.pipe(writer);
-
-    writer.on('finish', async () => {
-        await conn.sendMessage(m.chat, {
-            audio: fs.readFileSync(audioPath),
-            mimetype: 'audio/mpeg',
-            fileName: `${data.result.title}.mp3`,
-            ptt: false,
-        }, { quoted: m });
-
-        fs.unlinkSync(audioPath); // Eliminar el archivo después de enviarlo
-        await m.react('✅'); // Indicar éxito  
-    });
-
-    writer.on('error', async (error) => {
-        console.error('Error al guardar el audio:', error.message);
-        await m.react('❌');
-        await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el audio.', { quoted: m });
-    });
-
-} catch (error) {
-    console.error('Error con la API:', error.message);
-    await m.react('❌');
-    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });
+    await m.react('✅'); // Indicar éxito    
+} catch (error) {    
+    console.error('Error con la API:', error.message);    
+    await m.react('❌'); // Indicar error    
+    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });    
 }
+
 }
 
 if (command == 'play2') {
