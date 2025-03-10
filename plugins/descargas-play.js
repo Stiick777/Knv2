@@ -37,15 +37,26 @@ if (command == 'play') {
 try {  
     await m.react('🕓'); // Indicador de procesamiento  
 
-    let apiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;  
-    let response = await fetch(apiUrl);  
-    let data = await response.json();  
+    let apiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
+    console.log('URL solicitada:', apiUrl); // Verifica la URL generada  
 
+    let response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+            "User-Agent": "Mozilla/5.0",
+            "Referer": "https://google.com"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error en la API: ${response.status} ${response.statusText}`);
+    }
+
+    let data = await response.json();  
     if (!data.url) {  
         throw new Error('No se pudo obtener el enlace de descarga');  
     }  
 
-    // Enviar el audio al chat  
     await conn.sendMessage(m.chat, {  
         audio: { url: data.url },  
         mimetype: 'audio/mpeg',  
@@ -56,8 +67,8 @@ try {
     await m.react('✅'); // Éxito  
 } catch (error) {  
     console.error('Error con la API:', error.message);  
-    await m.react('❌'); // Error final  
-    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar el enlace.', { quoted: m });  
+    await m.react('❌');  
+    await conn.sendMessage(m.chat, `Ocurrió un error: ${error.message}`, { quoted: m });  
 }
 }
 
