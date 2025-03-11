@@ -27,7 +27,6 @@ if (command == 'play') {
 
     let info = responseData.data.info;
     let audio = responseData.data.audio;
-    let audioTitle = `${audio.title}.mp3`; // Agregar extensión .mp3
     
     // Formatear el mensaje con la información del video
     let texto1 = `
@@ -49,12 +48,10 @@ if (command == 'play') {
     // Enviar la miniatura del video con la información
     await conn.sendFile(m.chat, info.thumbnail, 'thumbnail.jpg', texto1, m);
 
-    // Enviar el audio como mensaje de voz con nombre correcto
+    // Enviar el audio como archivo normal
     await conn.sendMessage(m.chat, {
       audio: { url: audio.url },
-      mimetype: 'audio/mpeg',
-      fileName: audioTitle,
-      ptt: true // Esto lo envía como nota de voz
+      mimetype: 'audio/mpeg'
     }, { quoted: m });
 
     await m.react('✅'); // Indicar éxito
