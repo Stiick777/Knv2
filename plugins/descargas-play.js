@@ -9,6 +9,7 @@ const LimitAud = 725 * 1024 * 1024; //700MB
 const LimitVid = 425 * 1024 * 1024; //425MB
 const handler = async (m, {conn, command, args, text, usedPrefix}) => {
 
+
 if (command == 'play') {
   if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m);
   
@@ -17,18 +18,21 @@ if (command == 'play') {
   try {
     // Realizar la búsqueda con la API de Agatz
     let apiUrl = `https://api.agatz.xyz/api/ytplay?message=${encodeURIComponent(text)}`;
-    let apiResponse = await fetch(apiUrl);
-    let responseData = await apiResponse.json();
-    
-    // Verificar si la API devolvió datos válidos
+    let { data: responseData } = await axios.get(apiUrl);
+
     if (!responseData.data || !responseData.data.audio || !responseData.data.audio.url) {
       throw new Error('No se encontró el audio.');
     }
 
     let info = responseData.data.info;
     let audio = responseData.data.audio;
-    
-    // Formatear el mensaje con la información del video
+    let audioPath = `./${audio.title}.mp3`;
+
+    // Descargar el audio
+    const audioResponse = await axios.get(audio.url, { responseType: 'arraybuffer' });
+    fs.writeFileSync(audioPath, audioResponse.data);
+
+    // Enviar mensaje con la información
     let texto1 = `
 𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊𝚜
 ===========================
@@ -44,15 +48,17 @@ if (command == 'play') {
 ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
 > *Provided by Stiiven*
     `.trim();
-    
-    // Enviar la miniatura del video con la información
+
     await conn.sendFile(m.chat, info.thumbnail, 'thumbnail.jpg', texto1, m);
 
-    // Enviar el audio como archivo normal
+    // Enviar el audio desde el archivo descargado
     await conn.sendMessage(m.chat, {
-      audio: { url: audio.url },
+      audio: fs.readFileSync(audioPath),
       mimetype: 'audio/mpeg'
     }, { quoted: m });
+
+    // Eliminar el archivo después de enviarlo
+    fs.unlinkSync(audioPath);
 
     await m.react('✅'); // Indicar éxito
   } catch (error) {
@@ -61,7 +67,6 @@ if (command == 'play') {
     await conn.sendMessage(m.chat, 'Ocurrió un error al procesar la búsqueda.', { quoted: m });
   }
 }
-
 if (command == 'play2') {
     if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, );
     
