@@ -16,7 +16,7 @@ if (command == 'play') {
   await m.react('🕓'); // Indicar que el proceso ha comenzado
   
   try {
-    // Realizar la búsqueda con la API de Agatz
+    // Buscar el audio en la API de Agatz
     let apiUrl = `https://api.agatz.xyz/api/ytplay?message=${encodeURIComponent(text)}`;
     let { data: responseData } = await axios.get(apiUrl);
 
@@ -26,13 +26,22 @@ if (command == 'play') {
 
     let info = responseData.data.info;
     let audio = responseData.data.audio;
-    let audioPath = `./${audio.title}.mp3`;
+    let originalPath = `./temp_audio.mp3`;
+    let convertedPath = `./converted_audio.mp3`;
 
     // Descargar el audio
     const audioResponse = await axios.get(audio.url, { responseType: 'arraybuffer' });
-    fs.writeFileSync(audioPath, audioResponse.data);
+    fs.writeFileSync(originalPath, audioResponse.data);
 
-    // Enviar mensaje con la información
+    // Convertir el audio a un formato compatible con WhatsApp (64kbps, 44100Hz)
+    await new Promise((resolve, reject) => {
+      exec(`ffmpeg -i ${originalPath} -ar 44100 -ab 64k -y ${convertedPath}`, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    // Enviar mensaje con información
     let texto1 = `
 𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊𝚜
 ===========================
@@ -42,7 +51,7 @@ if (command == 'play') {
 > *𝙳𝚞𝚛𝚊𝚌𝚒ó𝚗* :  ${info.duration}
 > *𝙵𝚎𝚌𝚑𝚊 𝚍𝚎 𝚜𝚞𝚋𝚒𝚍𝚊* :  ${info.uploaded}
 
-*🚀 𝙎𝙀 𝙀𝙎𝙏𝘼 𝘿𝙀𝙎𝘼𝙍𝙂𝘼𝙉𝘿𝙊 𝙎𝙐 𝘼𝙐𝘿𝙄𝙊, 𝙀𝙎𝙋𝙀𝙍𝙀 𝙐𝙉 𝙈𝙊𝙈𝙀𝙉𝙏𝙊*
+*🚀 𝙎𝙴 𝙴𝚂𝚃𝙰 𝙳𝙴𝚂𝙰𝚁𝙶𝙰𝙽𝘿𝙾 𝙎𝚄 𝘼𝚄𝘿𝙸𝙾, 𝙴𝚂𝙿𝙴𝚁𝙴 𝚄𝙽 𝙼𝙾𝙼𝙴𝙽𝚃𝙾*
 
 ===========================
 ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
@@ -51,14 +60,15 @@ if (command == 'play') {
 
     await conn.sendFile(m.chat, info.thumbnail, 'thumbnail.jpg', texto1, m);
 
-    // Enviar el audio desde el archivo descargado
+    // Enviar el audio convertido
     await conn.sendMessage(m.chat, {
-      audio: fs.readFileSync(audioPath),
+      audio: fs.readFileSync(convertedPath),
       mimetype: 'audio/mpeg'
     }, { quoted: m });
 
-    // Eliminar el archivo después de enviarlo
-    fs.unlinkSync(audioPath);
+    // Eliminar archivos temporales
+    fs.unlinkSync(originalPath);
+    fs.unlinkSync(convertedPath);
 
     await m.react('✅'); // Indicar éxito
   } catch (error) {
@@ -67,6 +77,7 @@ if (command == 'play') {
     await conn.sendMessage(m.chat, 'Ocurrió un error al procesar la búsqueda.', { quoted: m });
   }
 }
+
 if (command == 'play2') {
     if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, );
     
