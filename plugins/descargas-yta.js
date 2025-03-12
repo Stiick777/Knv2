@@ -1,4 +1,7 @@
 import fetch from 'node-fetch';
+import axios from 'axios';
+import fs from 'fs';
+import { exec } from 'child_process';
 
 const handler = async (m, { args, conn }) => {
   if (!args[0]) 
@@ -13,36 +16,56 @@ if (!youtubeRegex.test(youtubeLink)) {
   return m.reply('*[❗𝐄𝐑𝐑𝐎𝐑❗] 𝙀𝙇 𝙀𝙉𝙇𝘼𝘾𝙀 𝙋𝙍𝙊𝙋𝙊𝙍𝘾𝙄𝙊𝙉𝘼𝘿𝙊 𝙉𝙊 𝙀𝙎 𝙑𝘼́𝙇𝙄𝘿𝙊. 𝘼𝙎𝙀𝙂𝙐́𝙍𝘼𝙏𝙀 𝘿𝙀 𝙄𝙉𝙂𝙍𝙀𝙎𝘼𝙍 𝙐𝙉 𝙀𝙉𝙇𝘼𝘾𝙀 𝘾𝙊𝙍𝙍𝙀𝘾𝙏𝙊 𝘿𝙀 𝙔𝙊𝙐𝙏𝙐𝘽𝙀.*');
 }
 
-    try {
-        await m.react('🕓'); // Reintento con la segunda API
+   
 
-        // Segunda API
-        const fallbackApiUrl = `https://api.agungny.my.id/api/youtube-audio?url=${encodeURIComponent(youtubeLink)}`;
-        const fallbackResponse = await fetch(fallbackApiUrl, { method: 'GET' });
+try {  
+    await m.react('🕓'); // Reacciona mientras procesa  
 
-        if (fallbackResponse.ok) {
-            const fallbackResult = await fallbackResponse.json();
+    // URL de la API para obtener el audio  
+    const apiUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(youtubeLinkl)}`;  
+    let apiResponse = await fetch(apiUrl);  
+    let response = await apiResponse.json();  
 
-            if (fallbackResult.status && fallbackResult.result?.downloadUrl) {
-                await conn.sendMessage(m.chat, {
-                    audio: { url: fallbackResult.result.downloadUrl },
-                    mimetype: 'audio/mpeg',
-                    fileName: `${fallbackResult.result.title}.mp3`,
-                    ptt: false,
-                }, { quoted: m });
+    // Verificar si la API devolvió un resultado válido  
+    if (response.status === true && response.data?.dl) {  
+        const { dl, title } = response.data;  
 
-                await m.react('✅'); // Éxito
-                return;
-            }
-        }
+        let originalPath = './temp_audio.mp3';
+        let convertedPath = './converted_audio.mp3';
 
-        throw new Error('Fallo en la segunda API');
-    } catch (error2) {
-        console.error('Error con la segunda API:', error2.message);
-        await m.react('❌'); // Error final
-        await conn.sendMessage(m.chat, '*[❗𝐄𝐑𝐑𝐎𝐑❗] No se pudo procesar el audio con ninguna de las APIs. Inténtalo más tarde.*', { quoted: m });
-    }
+        // Descargar el audio  
+        const audioResponse = await axios.get(dl, { responseType: 'arraybuffer' });
+        fs.writeFileSync(originalPath, audioResponse.data);
 
+        // Convertir el audio a un formato compatible con WhatsApp (64kbps, 44100Hz)
+        await new Promise((resolve, reject) => {
+            exec(`ffmpeg -i ${originalPath} -ar 44100 -ab 64k -y ${convertedPath}`, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        // Enviar el audio convertido  
+        await conn.sendMessage(m.chat, {  
+            audio: fs.readFileSync(convertedPath),  
+            mimetype: 'audio/mpeg',  
+            ptt: false, // Enviar como audio normal  
+            fileName: `${title}.mp3`,  
+        }, { quoted: m });
+
+        // Eliminar archivos temporales  
+        fs.unlinkSync(originalPath);
+        fs.unlinkSync(convertedPath);
+
+        return await m.react('✅'); // Éxito  
+    }  
+
+    throw new Error("API falló o no retornó datos válidos");  
+} catch (error) {  
+    console.error("Error en la API:", error.message);  
+    await m.react('❌'); // Indicar error  
+    await conn.sendMessage(m.chat, '*[❗𝐄𝐑𝐑𝐎𝐑❗] No se pudo procesar el audio. Inténtalo más tarde.*', { quoted: m });  
+}
 };
 
 handler.help = ['yta'];
