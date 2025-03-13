@@ -1,5 +1,5 @@
 let handler = async (m, { conn, text, command, isOwner, isGroup }) => {
-    if (!isOwner) return m.reply('🚩 Solo el propietario del bot puede usar este comando.');
+    
 
     let id;
     if (text && text.endsWith('@g.us')) {
@@ -17,7 +17,7 @@ let handler = async (m, { conn, text, command, isOwner, isGroup }) => {
         let chat = global.db.data.chats[id];
         if (chat) chat.welcome = false;
 
-        await conn.reply(id, `🚩 *KanBot* abandona el grupo. ¡Fue genial estar aquí! Chau 👋`);
+        await conn.reply(id, `😮‍💨 *KanBot* abandona el grupo. ¡Fue genial estar aquí! Adios chol@s 😹`);
         await conn.groupLeave(id);
 
         await new Promise(resolve => setTimeout(resolve, 2000));
