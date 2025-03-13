@@ -1,10 +1,14 @@
 let handler = async (m, { conn, text, command, isOwner, isGroup }) => {
-    // Si está en un chat privado y no se proporciona un ID de grupo, rechazar el comando
-    if (!isGroup && (!text || !text.endsWith('@g.us'))) return m.reply('❌ Este comando solo funciona en grupos o debes proporcionar un ID válido.');
+    if (!isOwner) return m.reply('🚩 Solo el propietario del bot puede usar este comando.');
 
-    let id = text && text.endsWith('@g.us') ? text : m.chat; // Si hay un ID, usarlo; si no, usar el grupo actual
-
-    
+    let id;
+    if (text && text.endsWith('@g.us')) {
+        id = text; // Si se proporciona un ID de grupo válido en privado, lo usa
+    } else if (isGroup) {
+        id = m.chat; // Si se usa en un grupo sin argumentos, toma el ID del grupo actual
+    } else {
+        return m.reply('❌ Este comando solo funciona en grupos o debes proporcionar un ID válido.');
+    }
 
     try {
         let groupMetadata = await conn.groupMetadata(id).catch(() => null);
@@ -33,7 +37,6 @@ let handler = async (m, { conn, text, command, isOwner, isGroup }) => {
 };
 
 handler.command = ['salir', 'leavegc', 'salirdelgrupo', 'leave'];
-handler.group = true; // Permitir en grupos
 handler.rowner = true; // Solo el owner del bot puede usarlo
 
 export default handler;
