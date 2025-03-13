@@ -27,22 +27,23 @@ let handler = async (message, { conn, text }) => {
     }
   }
 
-  try {
+ try {
     // Reacción de espera ⌛️
     await conn.sendMessage(message.chat, {
       react: { text: "⌛", key: message.key }
     });
 
-    let results = [];
-    let { data } = await axios.get(`https://api.vreden.my.id/api/search/tiktok?query=${encodeURIComponent(text)}`);
-    
+    let { data } = await axios.get(`https://api.agungny.my.id/api/tiktok-search?q=${encodeURIComponent(text)}`);
+
     if (!data.result || !data.result.videos.length) {
       return conn.reply(message.chat, "❌ No se encontraron resultados.", message);
     }
 
     let searchResults = data.result.videos;
-    shuffleArray(searchResults);
-    let topResults = searchResults.slice(0, 7);
+    shuffleArray(searchResults); // Mezcla los resultados aleatoriamente
+    let topResults = searchResults.slice(0, 7); // Tomamos los 7 primeros
+
+    let results = [];
 
     for (let result of topResults) {
       results.push({
