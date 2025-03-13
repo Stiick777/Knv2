@@ -45,19 +45,20 @@ let handler = async (message, { conn, text }) => {
 
     let results = [];
 
-    for (let result of topResults) {
-      results.push({
-        body: proto.Message.InteractiveMessage.Body.fromObject({ text: null }),
-        footer: proto.Message.InteractiveMessage.Footer.fromObject({ text: "By ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰" }),
-        header: proto.Message.InteractiveMessage.Header.fromObject({
-          title: result.title || "Sin título",
-          hasMediaAttachment: true,
-          videoMessage: await createVideoMessage(result.play)
-        }),
-        nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({ buttons: [] })
-      });
-    }
+   const BASE_URL = "https://api.agungny.my.id"; // URL base de la API
 
+for (let result of topResults) {
+  results.push({
+    body: proto.Message.InteractiveMessage.Body.fromObject({ text: null }),
+    footer: proto.Message.InteractiveMessage.Footer.fromObject({ text: "By ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰" }),
+    header: proto.Message.InteractiveMessage.Header.fromObject({
+      title: result.title || "Sin título",
+      hasMediaAttachment: true,
+      videoMessage: await createVideoMessage(`${BASE_URL}${result.play}`) // Agregar BASE_URL
+    }),
+    nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({ buttons: [] })
+  });
+}
     const messageContent = generateWAMessageFromContent(message.chat, {
       viewOnceMessage: {
         message: {
