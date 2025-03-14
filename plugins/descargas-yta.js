@@ -17,55 +17,54 @@ if (!youtubeRegex.test(youtubeLink)) {
 }
 
    
+        try {
+            await m.react('🕓'); // Reaccionar mientras procesa
 
-try {  
-    await m.react('🕓'); // Reacciona mientras procesa  
+            // URL de la API para obtener el audio
+            const apiUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(youtubeLink)}`;
+            let apiResponse = await fetch(apiUrl);
+            let response = await apiResponse.json();
 
-    // URL de la API para obtener el audio  
-    const apiUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(youtubeLinkl)}`;  
-    let apiResponse = await fetch(apiUrl);  
-    let response = await apiResponse.json();  
+            // Verificar si la API devolvió un resultado válido
+            if (response.status === true && response.data && response.data.dl) {
+                const { dl, title } = response.data;
 
-    // Verificar si la API devolvió un resultado válido  
-    if (response.status === true && response.data?.dl) {  
-        const { dl, title } = response.data;  
+                let originalPath = './temp_audio.mp3';
+                let convertedPath = './converted_audio.mp3';
 
-        let originalPath = './temp_audio.mp3';
-        let convertedPath = './converted_audio.mp3';
+                // Descargar el audio
+                const audioResponse = await axios.get(dl, { responseType: 'arraybuffer' });
+                fs.writeFileSync(originalPath, audioResponse.data);
 
-        // Descargar el audio  
-        const audioResponse = await axios.get(dl, { responseType: 'arraybuffer' });
-        fs.writeFileSync(originalPath, audioResponse.data);
+                // Convertir el audio a un formato compatible con WhatsApp (64kbps, 44100Hz)
+                await new Promise((resolve, reject) => {
+                    exec(`ffmpeg -i ${originalPath} -ar 44100 -ab 64k -y ${convertedPath}`, (err) => {
+                        if (err) reject(err);
+                        else resolve();
+                    });
+                });
 
-        // Convertir el audio a un formato compatible con WhatsApp (64kbps, 44100Hz)
-        await new Promise((resolve, reject) => {
-            exec(`ffmpeg -i ${originalPath} -ar 44100 -ab 64k -y ${convertedPath}`, (err) => {
-                if (err) reject(err);
-                else resolve();
-            });
-        });
+                // Enviar el audio convertido
+                await conn.sendMessage(m.chat, {
+                    audio: fs.readFileSync(convertedPath),
+                    mimetype: 'audio/mp4',
+                    ptt: false, // Enviar como audio normal
+                    fileName: `${title}.mp3`,
+                }, { quoted: m });
 
-        // Enviar el audio convertido  
-        await conn.sendMessage(m.chat, {  
-            audio: fs.readFileSync(convertedPath),  
-            mimetype: 'audio/mpeg',  
-            ptt: false, // Enviar como audio normal  
-            fileName: `${title}.mp3`,  
-        }, { quoted: m });
+                // Eliminar archivos temporales
+                fs.unlinkSync(originalPath);
+                fs.unlinkSync(convertedPath);
 
-        // Eliminar archivos temporales  
-        fs.unlinkSync(originalPath);
-        fs.unlinkSync(convertedPath);
+                return await m.react('✅'); // Reacción de éxito
+            }
 
-        return await m.react('✅'); // Éxito  
-    }  
+            throw new Error("API falló o no retornó datos válidos");
+        } catch (error) {
+            console.warn("Error en la API:", error.message);
+            await m.reply("❌ Error al procesar la solicitud. Inténtalo mas tarde.");
+        }
 
-    throw new Error("API falló o no retornó datos válidos");  
-} catch (error) {  
-    console.error("Error en la API:", error.message);  
-    await m.react('❌'); // Indicar error  
-    await conn.sendMessage(m.chat, '*[❗𝐄𝐑𝐑𝐎𝐑❗] No se pudo procesar el audio. Inténtalo más tarde.*', { quoted: m });  
-}
 };
 
 handler.help = ['yta'];
