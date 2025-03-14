@@ -1,10 +1,15 @@
 import fetch from 'node-fetch';
+import fs from 'fs';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
+
+const streamPipeline = promisify(pipeline);
 
 const handler = async (m, { text, conn }) => {
   if (!text) return m.reply('⚠️ Ingresa el nombre de la película que deseas buscar.');
 
   try {
-    // Buscar la película en la API
+    // Paso 1: Buscar la película en la API
     const searchUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/search?text=${encodeURIComponent(text)}`;
     const searchResponse = await fetch(searchUrl);
     const searchData = await searchResponse.json();
@@ -16,7 +21,7 @@ const handler = async (m, { text, conn }) => {
     const movie = searchData.result.data[0]; // Primer resultado
     const movieUrl = movie.link;
 
-    // Obtener los links de descarga de la película
+    // Paso 2: Obtener los links de descarga de la película
     const detailsUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/movie?url=${encodeURIComponent(movieUrl)}`;
     const detailsResponse = await fetch(detailsUrl);
     const detailsData = await detailsResponse.json();
@@ -35,13 +40,21 @@ const handler = async (m, { text, conn }) => {
     const { title, year, imdbRate, image } = detailsData.result.data;
 
     // Mensaje con información de la película
-    const message = `🎬 *${title}*\n📆 Año: ${year}\n⭐ IMDB: ${imdbRate}\n🔗 [Ver detalles](${movieUrl})\n\n📥 *Enviando película en calidad SD 480p...*`;
+    const message = `🎬 *${title}*\n📆 Año: ${year}\n⭐ IMDB: ${imdbRate}\n🔗 [Ver detalles](${movieUrl})\n\n📥 *Descargando en calidad SD 480p...*`;
 
     await m.reply(message);
 
-    // Enviar el documento de video usando el link de descarga
+    // Paso 3: Descargar el archivo
+    const filePath = `/tmp/${title.replace(/[^a-zA-Z0-9]/g, '_')}.mp4`;
+    const response = await fetch(sdLink.link);
+
+    if (!response.ok) throw new Error(`Error al descargar: ${response.statusText}`);
+
+    await streamPipeline(response.body, fs.createWriteStream(filePath));
+
+    // Paso 4: Enviar el archivo en WhatsApp
     const docMessage = {
-      document: { url: sdLink.link }, // Enviar como documento con URL directa
+      document: fs.readFileSync(filePath),
       mimetype: 'video/mp4',
       fileName: `${title}.mp4`,
       caption: `🎬 *${title}*\n📥 Calidad: SD 480p (${sdLink.size})`,
@@ -50,6 +63,8 @@ const handler = async (m, { text, conn }) => {
 
     await conn.sendMessage(m.chat, docMessage, { quoted: m });
 
+    // Eliminar archivo después de enviarlo
+    fs.unlinkSync(filePath);
   } catch (error) {
     console.error(error);
     m.reply('❌ Ocurrió un error al procesar la solicitud.');
