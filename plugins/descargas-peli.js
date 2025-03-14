@@ -1,9 +1,4 @@
 import fetch from 'node-fetch';
-import fs from 'fs';
-import { pipeline } from 'stream';
-import { promisify } from 'util';
-
-const streamPipeline = promisify(pipeline);
 
 const handler = async (m, { text, conn }) => {
   if (!text) return m.reply('⚠️ Ingresa el nombre de la película que deseas buscar.');
@@ -30,48 +25,23 @@ const handler = async (m, { text, conn }) => {
       return m.reply('❌ No se encontraron enlaces de descarga para esta película.');
     }
 
-    // Buscar el link de calidad SD 480p
-    const sdLink = detailsData.result.data.dl_links.find(link => link.quality === 'SD 480p');
+    // Filtrar solo los enlaces de ddl.sinhalasub.net en calidad SD 480p
+    const sdLink = detailsData.result.data.dl_links.find(link =>
+      link.quality === 'SD 480p' && link.link.includes('ddl.sinhalasub.net')
+    );
 
     if (!sdLink) {
-      return m.reply('❌ No se encontró un enlace en calidad SD 480p.');
+      return m.reply('❌ No se encontró un enlace válido en calidad SD 480p desde ddl.sinhalasub.net.');
     }
 
     const { title, year, imdbRate, image } = detailsData.result.data;
-    
+
     // Verificar el enlace de descarga
     m.reply(`🔍 Verificando el enlace de descarga...\n🔗 ${sdLink.link}`);
 
-    const headResponse = await fetch(sdLink.link, { method: 'HEAD' });
-
-    if (!headResponse.ok) {
-      return m.reply('❌ El enlace de descarga no es válido o no está disponible.');
-    }
-
-    const contentLength = headResponse.headers.get('content-length');
-    if (contentLength) {
-      const sizeMB = (parseInt(contentLength) / (1024 * 1024)).toFixed(2);
-      if (Math.abs(sizeMB - parseFloat(sdLink.size)) > 50) { // Tolerancia de 50 MB
-        return m.reply(`⚠️ Advertencia: El tamaño del archivo (${sizeMB} MB) no coincide con el esperado (${sdLink.size}).`);
-      }
-    }
-
-    // Mensaje con información de la película
-    const message = `🎬 *${title}*\n📆 Año: ${year}\n⭐ IMDB: ${imdbRate}\n🔗 [Ver detalles](${movieUrl})\n\n📥 *Descargando en calidad SD 480p...*`;
-
-    await m.reply(message);
-
-    // Paso 3: Descargar el archivo
-    const filePath = `/tmp/${title.replace(/[^a-zA-Z0-9]/g, '_')}.mp4`;
-    const response = await fetch(sdLink.link);
-
-    if (!response.ok) throw new Error(`Error al descargar: ${response.statusText}`);
-
-    await streamPipeline(response.body, fs.createWriteStream(filePath));
-
-    // Paso 4: Enviar el archivo en WhatsApp
+    // Enviar el archivo directamente desde la URL sin descargarlo localmente
     const docMessage = {
-      document: fs.readFileSync(filePath),
+      document: { url: sdLink.link },
       mimetype: 'video/mp4',
       fileName: `${title}.mp4`,
       caption: `🎬 *${title}*\n📥 Calidad: SD 480p (${sdLink.size})`,
@@ -80,8 +50,6 @@ const handler = async (m, { text, conn }) => {
 
     await conn.sendMessage(m.chat, docMessage, { quoted: m });
 
-    // Eliminar archivo después de enviarlo
-    fs.unlinkSync(filePath);
   } catch (error) {
     console.error(error);
     m.reply('❌ Ocurrió un error al procesar la solicitud.');
