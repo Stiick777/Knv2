@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import downloadMovie from './downloadMovie.js'; // Importar el módulo
 
 const handler = async (m, { conn, text }) => {
@@ -14,9 +15,7 @@ const handler = async (m, { conn, text }) => {
 
     const movie = data.result.data[0]; // Primer resultado
 
-    await conn.sendMessage(m.chat, { 
-      text: `🎬 *${movie.title}*\n📆 Año: ${movie.year}\n⭐ IMDB: ${movie.imdb}\n🔗 [Ver película](${movie.link})`
-    }, { quoted: m });
+    await conn.sendMessage(m.chat, { text: `🎬 *${movie.title}*\n📆 Año: ${movie.year}\n⭐ IMDB: ${movie.imdb}\n🔗 [Ver película](${movie.link})` }, { quoted: m });
 
     // Llamar a la función para descargar la película
     await downloadMovie(conn, m, movie.link);
