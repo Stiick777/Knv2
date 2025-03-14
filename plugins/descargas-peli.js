@@ -1,7 +1,7 @@
 import downloadMovie from './downloadMovie.js'; // Importar el módulo
 
-const handler = async (m, { text }) => {
-  if (!text) return m.reply('⚠️ Ingresa el nombre de la película que deseas buscar.');
+const handler = async (m, { conn, text }) => {
+  if (!text) return conn.sendMessage(m.chat, { text: '⚠️ Ingresa el nombre de la película que deseas buscar.' }, { quoted: m });
 
   try {
     const url = `https://www.dark-yasiya-api.site/movie/sinhalasub/search?text=${encodeURIComponent(text)}`;
@@ -9,19 +9,21 @@ const handler = async (m, { text }) => {
     const data = await response.json();
 
     if (!data.status || !data.result?.data?.length) {
-      return m.reply('❌ No se encontraron resultados.');
+      return conn.sendMessage(m.chat, { text: '❌ No se encontraron resultados.' }, { quoted: m });
     }
 
     const movie = data.result.data[0]; // Primer resultado
 
-    await m.reply(`🎬 *${movie.title}*\n📆 Año: ${movie.year}\n⭐ IMDB: ${movie.imdb}\n🔗 [Ver película](${movie.link})`);
+    await conn.sendMessage(m.chat, { 
+      text: `🎬 *${movie.title}*\n📆 Año: ${movie.year}\n⭐ IMDB: ${movie.imdb}\n🔗 [Ver película](${movie.link})`
+    }, { quoted: m });
 
     // Llamar a la función para descargar la película
-    await downloadMovie(m, movie.link);
+    await downloadMovie(conn, m, movie.link);
 
   } catch (error) {
     console.error(error);
-    m.reply('❌ Ocurrió un error al buscar la película.');
+    conn.sendMessage(m.chat, { text: '❌ Ocurrió un error al buscar la película.' }, { quoted: m });
   }
 };
 
