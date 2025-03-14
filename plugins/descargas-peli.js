@@ -1,43 +1,54 @@
 import fetch from 'node-fetch';
 
 const handler = async (m, { text, conn }) => {
-  if (!text) return m.reply('⚠️ Ingresa el nombre de la película.');
+  if (!text) return m.reply('⚠️ Ingresa el nombre de la película que deseas buscar.');
 
   try {
-    // Paso 1: Buscar la película
+    // Buscar la película en la API
     const searchUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/search?text=${encodeURIComponent(text)}`;
     const searchResponse = await fetch(searchUrl);
     const searchData = await searchResponse.json();
 
     if (!searchData.status || !searchData.result?.data?.length) {
-      return m.reply('❌ No se encontraron resultados.');
+      return m.reply('❌ No se encontraron resultados para esa película.');
     }
 
     const movie = searchData.result.data[0]; // Primer resultado
     const movieUrl = movie.link;
 
-    // Paso 2: Obtener los detalles de la película
+    // Obtener los links de descarga de la película
     const detailsUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/movie?url=${encodeURIComponent(movieUrl)}`;
     const detailsResponse = await fetch(detailsUrl);
     const detailsData = await detailsResponse.json();
 
     if (!detailsData.status || !detailsData.result?.data?.dl_links?.length) {
-      return m.reply('❌ No se encontraron enlaces de descarga.');
+      return m.reply('❌ No se encontraron enlaces de descarga para esta película.');
     }
 
-    // Buscar el link en calidad SD 480p
+    // Buscar el link de calidad SD 480p
     const sdLink = detailsData.result.data.dl_links.find(link => link.quality === 'SD 480p');
 
     if (!sdLink) {
       return m.reply('❌ No se encontró un enlace en calidad SD 480p.');
     }
 
-    // Enviar la película como documento
-    await conn.sendMessage(m.chat, {
-      document: { url: sdLink.link },
+    const { title, year, imdbRate, image } = detailsData.result.data;
+
+    // Mensaje con información de la película
+    const message = `🎬 *${title}*\n📆 Año: ${year}\n⭐ IMDB: ${imdbRate}\n🔗 [Ver detalles](${movieUrl})\n\n📥 *Enviando película en calidad SD 480p...*`;
+
+    await m.reply(message);
+
+    // Enviar el documento de video usando el link de descarga
+    const docMessage = {
+      document: { url: sdLink.link }, // Enviar como documento con URL directa
       mimetype: 'video/mp4',
-      fileName: `Pelicula.mp4`
-    }, { quoted: m });
+      fileName: `${title}.mp4`,
+      caption: `🎬 *${title}*\n📥 Calidad: SD 480p (${sdLink.size})`,
+      thumbnail: await fetch(image).then(res => res.buffer()),
+    };
+
+    await conn.sendMessage(m.chat, docMessage, { quoted: m });
 
   } catch (error) {
     console.error(error);
