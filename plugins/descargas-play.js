@@ -83,7 +83,7 @@ if (command === 'play') {
             throw new Error("API falló o no retornó datos válidos");
         } catch (error) {
             console.warn("Error en la API:", error.message);
-            await m.reply("❌ Error al procesar la solicitud. Inténtalo de nuevo.");
+            await m.reply("❌ Error al procesar la solicitud. Inténtalo con /ply.");
         }
     }
 
