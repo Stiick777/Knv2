@@ -1,46 +1,27 @@
-import fetch from 'node-fetch';
+import downloadMovie from './downloadMovie.js'; // Importar el módulo
 
-const handler = async (m, { text, conn }) => {
+const handler = async (m, { text }) => {
   if (!text) return m.reply('⚠️ Ingresa el nombre de la película que deseas buscar.');
 
   try {
-    // 1️⃣ Buscar la película en la API
-    const searchUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/search?text=${encodeURIComponent(text)}`;
-    const searchResponse = await fetch(searchUrl);
-    const searchData = await searchResponse.json();
+    const url = `https://www.dark-yasiya-api.site/movie/sinhalasub/search?text=${encodeURIComponent(text)}`;
+    const response = await fetch(url);
+    const data = await response.json();
 
-    if (!searchData.status || !searchData.result?.data?.length) {
-      return m.reply('❌ No se encontraron resultados para esa película.');
+    if (!data.status || !data.result?.data?.length) {
+      return m.reply('❌ No se encontraron resultados.');
     }
 
-    const movie = searchData.result.data[0]; // Tomar el primer resultado
+    const movie = data.result.data[0]; // Primer resultado
 
-    // 2️⃣ Obtener detalles de la película
-    const detailsUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/movie?url=${encodeURIComponent(movie.link)}`;
-    const detailsResponse = await fetch(detailsUrl);
-    const detailsData = await detailsResponse.json();
+    await m.reply(`🎬 *${movie.title}*\n📆 Año: ${movie.year}\n⭐ IMDB: ${movie.imdb}\n🔗 [Ver película](${movie.link})`);
 
-    if (!detailsData.status || !detailsData.result?.data) {
-      return m.reply('❌ No se pudieron obtener detalles de la película.');
-    }
-
-    const movieDetails = detailsData.result.data;
-
-    // 3️⃣ Buscar el enlace de descarga en calidad SD 480p
-    const downloadLink = movieDetails.dl_links.find(link => link.quality === 'SD 480p' && link.link.includes('ddl.sinhalasub.net'));
-
-    if (!downloadLink) {
-      return m.reply('❌ No se encontró un enlace de descarga en calidad SD 480p.');
-    }
-
-    // 4️⃣ Enviar la película como documento
-    const caption = `🎬 *${movieDetails.title}*\n📆 Fecha: ${movieDetails.date}\n🌍 País: ${movieDetails.country}\n⏳ Duración: ${movieDetails.runtime}\n⭐ IMDB: ${movieDetails.imdbRate}/10\n📥 Descarga en SD 480p (${downloadLink.size}): ${downloadLink.link}`;
-    
-    await conn.sendMessage(m.chat, { document: { url: downloadLink.link }, mimetype: 'video/mp4', fileName: `${movieDetails.title}.mp4`, caption }, { quoted: m });
+    // Llamar a la función para descargar la película
+    await downloadMovie(m, movie.link);
 
   } catch (error) {
     console.error(error);
-    m.reply('❌ Ocurrió un error al procesar la solicitud.');
+    m.reply('❌ Ocurrió un error al buscar la película.');
   }
 };
 
