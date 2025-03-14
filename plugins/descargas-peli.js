@@ -38,6 +38,23 @@ const handler = async (m, { text, conn }) => {
     }
 
     const { title, year, imdbRate, image } = detailsData.result.data;
+    
+    // Verificar el enlace de descarga
+    m.reply(`🔍 Verificando el enlace de descarga...\n🔗 ${sdLink.link}`);
+
+    const headResponse = await fetch(sdLink.link, { method: 'HEAD' });
+
+    if (!headResponse.ok) {
+      return m.reply('❌ El enlace de descarga no es válido o no está disponible.');
+    }
+
+    const contentLength = headResponse.headers.get('content-length');
+    if (contentLength) {
+      const sizeMB = (parseInt(contentLength) / (1024 * 1024)).toFixed(2);
+      if (Math.abs(sizeMB - parseFloat(sdLink.size)) > 50) { // Tolerancia de 50 MB
+        return m.reply(`⚠️ Advertencia: El tamaño del archivo (${sizeMB} MB) no coincide con el esperado (${sdLink.size}).`);
+      }
+    }
 
     // Mensaje con información de la película
     const message = `🎬 *${title}*\n📆 Año: ${year}\n⭐ IMDB: ${imdbRate}\n🔗 [Ver detalles](${movieUrl})\n\n📥 *Descargando en calidad SD 480p...*`;
