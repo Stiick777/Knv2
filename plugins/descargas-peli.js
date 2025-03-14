@@ -1,54 +1,52 @@
 import fetch from 'node-fetch';
 
-const handler = async (m, { conn, args }) => {
-    if (!args.length) return conn.reply(m.chat, '⚠️ Ingresa el nombre de la película. Ejemplo: .pelis Deadpool', m);
-
-    let query = encodeURIComponent(args.join(' '));
-    let searchUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/search?text=${query}`;
+const handler = async (m, { text, conn }) => {
+    if (!text) return m.reply('⚠️ Por favor, ingresa el nombre de la película.');
 
     try {
-        // Buscar la película
-        let searchRes = await fetch(searchUrl);
-        let searchData = await searchRes.json();
+        // 1. Buscar la película en la API
+        let searchUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/search?text=${encodeURIComponent(text)}`;
+        let searchResponse = await fetch(searchUrl);
+        let searchData = await searchResponse.json();
 
-        if (!searchData.status || !searchData.result?.data.length) {
-            return conn.reply(m.chat, '❌ No se encontró la película.', m);
+        if (!searchData.status || !searchData.result.data.length) {
+            return m.reply('❌ No se encontraron resultados para la película.');
         }
 
-        let movie = searchData.result.data[0]; // Primer resultado
-        let movieUrl = movie.link;
+        let firstMovie = searchData.result.data[0]; // Primer resultado
 
-        // Obtener los enlaces de descarga
-        let movieApiUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/movie?url=${movieUrl}`;
-        let movieRes = await fetch(movieApiUrl);
-        let movieData = await movieRes.json();
+        // 2. Obtener detalles de la película
+        let movieUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/movie?url=${encodeURIComponent(firstMovie.link)}`;
+        let movieResponse = await fetch(movieUrl);
+        let movieData = await movieResponse.json();
 
-        if (!movieData.status || !movieData.result?.data.dl_links) {
-            return conn.reply(m.chat, '❌ No se pudo obtener los enlaces de descarga.', m);
+        if (!movieData.status || !movieData.result.data.dl_links) {
+            return m.reply('❌ No se pudo obtener el enlace de descarga.');
         }
 
-        // Filtrar la calidad SD 480p
-        let downloadLink = movieData.result.data.dl_links.find(dl => dl.quality === 'SD 480p');
-        if (!downloadLink) return conn.reply(m.chat, '❌ No hay versión en SD 480p disponible.', m);
+        // 3. Buscar el enlace SD 480p
+        let sdLink = movieData.result.data.dl_links.find(link => link.quality === 'SD 480p');
+        if (!sdLink) {
+            return m.reply('❌ No se encontró un enlace en calidad SD 480p.');
+        }
 
-        let caption = `🎬 *${movie.title}*\n📆 Año: ${movie.year}\n⭐ ${movie.imdb}\n📎 [Ver en la web](${movie.link})\n📥 [Descargar SD 480p](${downloadLink.link})`;
+        // 4. Enviar la información y la película
+        let message = `🎬 *${firstMovie.title}*\n📅 Año: ${firstMovie.year}\n⭐ IMDB: ${firstMovie.imdb}\n📥 *Descargando...*`;
+        await conn.sendMessage(m.chat, { text: message }, { quoted: m });
 
-        // Enviar la imagen de la película con información
-        await conn.sendMessage(m.chat, {
-            image: { url: movie.image },
-            caption
-        });
-
-        // Enviar la película como documento
-        await conn.sendMessage(m.chat, {
-            document: { url: downloadLink.link },
-            mimetype: 'video/mp4',
-            fileName: `${movie.title} (SD 480p).mp4`
-        });
-
+        await conn.sendMessage(
+            m.chat,
+            {
+                document: { url: sdLink.link },
+                mimetype: 'video/mp4',
+                fileName: `${firstMovie.title} (SD 480p).mp4`,
+                caption: `🎬 *${firstMovie.title}*\n📅 Año: ${firstMovie.year}\n⭐ IMDB: ${firstMovie.imdb}\n✅ Descargado en SD 480p.`
+            },
+            { quoted: m }
+        );
     } catch (error) {
         console.error(error);
-        conn.reply(m.chat, '❌ Ocurrió un error al buscar la película.', m);
+        return m.reply('❌ Ocurrió un error al procesar la solicitud.');
     }
 };
 
