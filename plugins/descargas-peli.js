@@ -4,7 +4,7 @@ const handler = async (m, { text, conn }) => {
   if (!text) return m.reply('⚠️ Ingresa el nombre de la película que deseas buscar.');
 
   try {
-    // Paso 1: Buscar la película en la API
+    // 1️⃣ Buscar la película en la API
     const searchUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/search?text=${encodeURIComponent(text)}`;
     const searchResponse = await fetch(searchUrl);
     const searchData = await searchResponse.json();
@@ -13,42 +13,30 @@ const handler = async (m, { text, conn }) => {
       return m.reply('❌ No se encontraron resultados para esa película.');
     }
 
-    const movie = searchData.result.data[0]; // Primer resultado
-    const movieUrl = movie.link;
+    const movie = searchData.result.data[0]; // Tomar el primer resultado
 
-    // Paso 2: Obtener los links de descarga de la película
-    const detailsUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/movie?url=${encodeURIComponent(movieUrl)}`;
+    // 2️⃣ Obtener detalles de la película
+    const detailsUrl = `https://www.dark-yasiya-api.site/movie/sinhalasub/movie?url=${encodeURIComponent(movie.link)}`;
     const detailsResponse = await fetch(detailsUrl);
     const detailsData = await detailsResponse.json();
 
-    if (!detailsData.status || !detailsData.result?.data?.dl_links?.length) {
-      return m.reply('❌ No se encontraron enlaces de descarga para esta película.');
+    if (!detailsData.status || !detailsData.result?.data) {
+      return m.reply('❌ No se pudieron obtener detalles de la película.');
     }
 
-    // Filtrar solo los enlaces de ddl.sinhalasub.net en calidad SD 480p
-    const sdLink = detailsData.result.data.dl_links.find(link =>
-      link.quality === 'SD 480p' && link.link.includes('ddl.sinhalasub.net')
-    );
+    const movieDetails = detailsData.result.data;
 
-    if (!sdLink) {
-      return m.reply('❌ No se encontró un enlace válido en calidad SD 480p desde ddl.sinhalasub.net.');
+    // 3️⃣ Buscar el enlace de descarga en calidad SD 480p
+    const downloadLink = movieDetails.dl_links.find(link => link.quality === 'SD 480p' && link.link.includes('ddl.sinhalasub.net'));
+
+    if (!downloadLink) {
+      return m.reply('❌ No se encontró un enlace de descarga en calidad SD 480p.');
     }
 
-    const { title, year, imdbRate, image } = detailsData.result.data;
-
-    // Verificar el enlace de descarga
-    m.reply(`🔍 Verificando el enlace de descarga...\n🔗 ${sdLink.link}`);
-
-    // Enviar el archivo directamente desde la URL sin descargarlo localmente
-    const docMessage = {
-      document: { url: sdLink.link },
-      mimetype: 'video/mp4',
-      fileName: `${title}.mp4`,
-      caption: `🎬 *${title}*\n📥 Calidad: SD 480p (${sdLink.size})`,
-      thumbnail: await fetch(image).then(res => res.buffer()),
-    };
-
-    await conn.sendMessage(m.chat, docMessage, { quoted: m });
+    // 4️⃣ Enviar la película como documento
+    const caption = `🎬 *${movieDetails.title}*\n📆 Fecha: ${movieDetails.date}\n🌍 País: ${movieDetails.country}\n⏳ Duración: ${movieDetails.runtime}\n⭐ IMDB: ${movieDetails.imdbRate}/10\n📥 Descarga en SD 480p (${downloadLink.size}): ${downloadLink.link}`;
+    
+    await conn.sendMessage(m.chat, { document: { url: downloadLink.link }, mimetype: 'video/mp4', fileName: `${movieDetails.title}.mp4`, caption }, { quoted: m });
 
   } catch (error) {
     console.error(error);
