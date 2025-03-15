@@ -28,7 +28,7 @@ const handler = async (m, { conn, text }) => {
 
     // 🔎 Buscar el enlace de calidad SD 480p con el dominio correcto
     const sdLink = movieData.result.data.dl_links.find(link => 
-      link.quality === "SD 480p" && link.link.includes("https://ddl.sinhalasub.net/AgADvB7001")
+      link.quality === "SD 480p" && link.link.includes("https://ddl.sinhalasub.net")
     );
 
     if (!sdLink) {
@@ -38,7 +38,7 @@ const handler = async (m, { conn, text }) => {
     // 📩 Enviar detalles de la película antes de la descarga
     await conn.sendMessage(m.chat, { 
       image: { url: movieData.result.data.image }, 
-      caption: `🎬 *${movieData.result.data.title}*\n📆 Año: ${movieData.result.data.date}\n🌍 País: ${movieData.result.data.country}\n⭐ IMDB: ${movieData.result.data.imdbRate} (${movieData.result.data.imdbVoteCount} votos)\n📥 Calidad: SD 480p\n🎞️ Categoría: ${movieData.result.data.category.join(', ')}\n🎭 Director: ${movieData.result.data.director}\n📄 Sinopsis: ${movieData.result.data.description}`
+      caption: `𐔌 . ⋮ 𝑷𝒆𝒍𝒊𝒔 𝑲𝒂𝒏𝑩𝒐𝒕 .ᐟ ֹ ₊ ꒱\n\n🎬 *${movieData.result.data.title}*\n📆 *Año:* ${movieData.result.data.date}\n🌍 *País:* ${movieData.result.data.country}\n📥 *Calidad:* SD 480p\n🎞️ Categoría: ${movieData.result.data.category.join(', ')}\n🎭 *Director:* ${movieData.result.data.director}\n\nׂ╰┈➤𝙀𝙣𝙫𝙞𝙖𝙣𝙙𝙤 𝙨𝙪 𝙥𝙚𝙡𝙞, 𝙥𝙤𝙧 𝙛𝙖𝙫𝙤𝙧 𝙚𝙨𝙥𝙚𝙧𝙚....`
     }, { quoted: m });
 
     // 📁 Enviar la película como documento
@@ -46,7 +46,7 @@ const handler = async (m, { conn, text }) => {
       document: { url: sdLink.link },
       mimetype: 'video/mp4',
       fileName: `${movieData.result.data.title}.mp4`,
-      caption: `🎬 *${movieData.result.data.title}*\n📥 Descarga en calidad SD 480p`,
+      caption: `🎬 *${movieData.result.data.title}*\n📥 *calidad 480p*`,
     }, { quoted: m });
 
   } catch (error) {
@@ -55,5 +55,9 @@ const handler = async (m, { conn, text }) => {
   }
 };
 
+handler.tags = ['descargas']
+handler.help = ['pelis <txt>']
 handler.command = ['pelis'];
+handler.group = true
+
 export default handler;
