@@ -12,7 +12,7 @@ const handler = async (m, { conn, args }) => {
     return conn.reply(m.chat, '💡 Te faltó el texto!', m);
   }
 
-  if (text.length > 40) return conn.reply(m.chat, '⚠️ El texto no puede tener más de 40 caracteres.', m);
+  if (text.length > 10) return conn.reply(m.chat, '⚠️ El texto no puede tener más de 10 caracteres.', m);
 
   try {
     const apiUrl = `https://api.agungny.my.id/api/bratv1?q=${encodeURIComponent(text)}`;
@@ -33,7 +33,8 @@ const handler = async (m, { conn, args }) => {
   }
 };
 
-handler.help = ['brat'];
+handler.help = ['brat <txt>'];
 handler.tags = ['sticker'];
-handler.command = ['brat'];
+handler.command = ['brat', 'brt', 'sb'];
+handler.group = true
 export default handler;
