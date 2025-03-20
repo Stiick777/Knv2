@@ -1,4 +1,4 @@
-/*import yts from 'yt-search';
+import yts from 'yt-search';
 
 const handler = async (m, { text, conn, command, usedPrefix }) => {
     if (!text) return conn.reply(m.chat, `🏳 *Escriba el título de algún vídeo de YouTube*\n\nEjemplo: ${usedPrefix + command} heyser`, m);
@@ -25,7 +25,7 @@ handler.group = true;
 
 export default handler;
 
-*/
+/*
 
 let handler = async (m, { conn, usedPrefix, text, args, command }) => {        
     if (!text) throw `✳️ Ejemplo: *${usedPrefix + command}* Lil Peep hate my life`;        
@@ -66,3 +66,4 @@ handler.disabled = false
 handler.group = true        
         
 export default handler;
+*/
