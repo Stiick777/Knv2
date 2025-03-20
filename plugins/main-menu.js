@@ -165,8 +165,11 @@ const pp = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://telegr
 
 await m.react('🚀') 
 
-await conn.sendFile(m.chat, imagen3, 'yaemori.jpg', text.trim(), fkontak, null)
-
+//await conn.sendFile(m.chat, imagen3, 'yaemori.jpg', text.trim(), fkontak, null)
+conn.sendButton(m.chat, text.trim(), `▢ 𝙺𝚊𝚗𝙱𝚘𝚝 ┃ ⱽ²\nʙʏ ꜱᴛɪɪᴠᴇɴ`, img, [
+      ['⏍ Info', `${_p}status`],
+      ['⌬ Grupos', `${_p}ofcc`]
+    ], m, )
 
     
   } catch (e) {
