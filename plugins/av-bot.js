@@ -3,7 +3,7 @@ let handler = async (m, { conn}) => {
 
 let name = conn.getName(m.sender)
 
-conn.sendButton(m.chat, `Hola! *${name}*\n`,  null, [
+conn.sendButton(m.chat, `Hola! *${name}*\n`, channel, null, [
       ['⦙☰ Menu', '/mkan'],
       ['⧳ Estado', '/status'],
       [`⌬ Grupos`, '/ofcc']
