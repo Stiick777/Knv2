@@ -3,7 +3,7 @@ let handler = async (m, { conn}) => {
 
 let name = conn.getName(m.sender)
 
-conn.sendButton(m.chat, `Hola! *${name}*\n`, mssg.ig, null, [
+conn.sendButton(m.chat, `Hola! *${name}*\n`, KanBot, null, [
       ['⦙☰ Menu', '/mkan'],
       ['⧳ Estado', '/status'],
       [`⌬ Grupos`, '/ofcc']
