@@ -159,14 +159,14 @@ const pp = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://telegr
   global.vid = rlink
   const response = await fetch(vid)
   const gif = await response.buffer()
-  const img = imagen3
+  //const img = imagen3
 
-
+let img = 'https://tinyurl.com/2739bvjc'
 
 await m.react('🚀') 
 
 //await conn.sendFile(m.chat, imagen3, 'yaemori.jpg', text.trim(), fkontak, null)
-conn.sendButton(m.chat, text.trim(), `▢ 𝙺𝚊𝚗𝙱𝚘𝚝 ┃ ⱽ²\nʙʏ ꜱᴛɪɪᴠᴇɴ`, img, [
+conn.sendButton(m.chat, text.trim(), `▢ ʙʏ ꜱᴛɪɪᴠᴇɴ`, img, [
       ['⏍ Info', `${_p}status`],
       ['⌬ Grupos', `${_p}ofcc`]
     ], m, )
