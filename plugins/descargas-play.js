@@ -1,4 +1,4 @@
-/*import { youtubedl, youtubedlv2 } from '@bochilteam/scraper'
+import { youtubedl, youtubedlv2 } from '@bochilteam/scraper'
 import fetch from 'node-fetch'
 import yts from 'yt-search'
 import ytdl from 'ytdl-core'
@@ -242,7 +242,8 @@ if (data.status === 'ok') {
     throw new Error("No se pudo obtener la descarga desde 9Convert");
   }
 }
-*/
+
+/*
 import yts from 'yt-search';
 import fetch from 'node-fetch';
 let limit = 320;
@@ -281,3 +282,4 @@ handler.disabled = false;
 handler.group = true;
 
 export default handler;
+*/
