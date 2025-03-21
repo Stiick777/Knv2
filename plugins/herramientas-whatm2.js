@@ -11,10 +11,10 @@ let handler = async (m, { conn }) => {
 
         if (/audio|video/.test(mime)) {
             if ((q.msg || q).seconds > 20) {
-                return m.reply('⚠️ El archivo es demasiado grande. Envíe un clip de 10 a 20 segundos para obtener resultados.')
+                return m.reply('⚠️ El archivo es demasiado grande. Envíe un clip de 10 a 20 segundos para obtener resultados.', m, rcanal)
             }
 
-            await conn.reply(m.chat, '⏳ Procesando el audio/video, por favor espera...', m)
+            await conn.reply(m.chat, '⏳ Procesando el audio/video, por favor espera...', m, rcanal)
 
             let media = await q.download()
             let filePath = `./tmp/${m.sender}.mp3`
@@ -53,7 +53,7 @@ let handler = async (m, { conn }) => {
 
             m.reply(txt)
         } else {
-            m.reply('⚠️ Responde a un audio o video para identificar la canción.')
+            m.reply('⚠️ Responde a un audio o video para identificar la canción.', m, rcanal)
         }
     } catch (e) {
         m.reply(`⚠️ Error inesperado: ${e.message}`)
