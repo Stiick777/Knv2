@@ -6,7 +6,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     return conn.reply(
       m.chat,
       `*☁️ Ingrese un enlace de video de TikTok.*\n\n*💌 Ejemplo:* _${usedPrefix + command} https://vt.tiktok.com/ZS29uaYEv/_`,
-      m
+      m, rcanal
     );
   }
 
@@ -15,7 +15,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     return conn.reply(
       m.chat,
       `*☁️ Ingrese un enlace válido de TikTok.*\n\n*💌 Ejemplo:* _${usedPrefix + command} https://vt.tiktok.com/ZS29uaYEv/_`,
-      m
+      m, rcanal
     );
   }
 
@@ -27,7 +27,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
     if (!result.status) {
       m.react('❌');
-      return conn.reply(m.chat, `*🚩 Error al descargar el contenido. Por favor, intenta nuevamente más tarde.*`, m);
+      return conn.reply(m.chat, `*🚩 Error al descargar el contenido. Por favor, intenta nuevamente más tarde.*`, m, rcanal);
     }
 
     const { title, duration, region, author, data } = result;
@@ -52,7 +52,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
       if (!videoUrl) {
         m.react('❌');
-        return conn.reply(m.chat, `*🚩 No se encontró un video válido para descargar.*`, m);
+        return conn.reply(m.chat, `*🚩 No se encontró un video válido para descargar.*`, m, rcanal);
       }
 
       await conn.sendMessage(
@@ -71,7 +71,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     return conn.reply(
       m.chat,
       `*🌟 Ocurrió un error al procesar tu solicitud. Por favor, inténtalo de nuevo más tarde.*`,
-      m
+      m, rcanal
     );
   }
 };
