@@ -1,6 +1,6 @@
 let handler = async (m, { conn, args }) => {
   if (!args[0]) {
-    return conn.reply(m.chat, '[ 🌟 ] Ingresa el nombre de la aplicación que quieres descargar. Ejemplo:\nClash Royale', m);
+    return conn.reply(m.chat, '[ 🌟 ] Ingresa el nombre de la aplicación que quieres descargar. Ejemplo:\nClash Royale', m, rcanal);
   }
 
 try {
@@ -50,7 +50,7 @@ try {
       await m.react('✅')  
     } catch (error) {
         await m.react('❌')  
-      conn.reply(m.chat, '[❗] No se pudo encontrar ni descargar la aplicación solicitada. Intenta de nuevo mas tarde.', m, );
+      conn.reply(m.chat, '[❗] No se pudo encontrar ni descargar la aplicación solicitada. Intenta de nuevo mas tarde.', m, rcanal);
       console.error('Error en la descarga de APK:', error.message);
     }
   }
