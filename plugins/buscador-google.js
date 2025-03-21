@@ -3,7 +3,7 @@ import axios from 'axios';
 let handler = async (m, { conn, args }) => {
     const text = args.join(' ');
     if (!text) {
-        return conn.reply(m.chat, '🍁 Ingresa lo que deseas buscar en Google.', m);
+        return conn.reply(m.chat, '🍁 Ingresa lo que deseas buscar en Google.', m, rcanal);
     }
 
     try {
