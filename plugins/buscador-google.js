@@ -21,12 +21,12 @@ let handler = async (m, { conn, args }) => {
             conn.reply(m.chat, responseText, m);
             await m.react('✅');
         } else {
-            conn.reply(m.chat, '🔥 No se encontraron resultados.', m);
+            conn.reply(m.chat, '🔥 No se encontraron resultados.', m, rcanal);
         }
     } catch (error) {
         await m.react('❌');
         console.error('Error al buscar en la API:', error);
-        conn.reply(m.chat, '❌ Error al realizar la búsqueda. Inténtalo de nuevo más tarde.', m);
+        conn.reply(m.chat, '❌ Error al realizar la búsqueda. Inténtalo de nuevo más tarde.', m, rcanal);
     }
 };
 
