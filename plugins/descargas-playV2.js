@@ -8,7 +8,7 @@ import { exec } from 'child_process';
 
 const handler = async (m, { conn, command, args, text }) => {
 if (command == 'ply') {
-  if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m);
+  if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
   
   await m.react('🕓'); // Indicar que el proceso ha comenzado
   
@@ -71,7 +71,7 @@ if (command == 'ply') {
   } catch (error) {
     console.error('Error con la API:', error.message);
     await m.react('❌'); // Indicar error
-    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar la búsqueda.', { quoted: m });
+    await conn.sendMessage(m.chat, 'Ocurrió un error al procesar la búsqueda :(', { quoted: m });
   }
 }
 };
