@@ -72,7 +72,7 @@ ${yt_play[0].author.url}
   } catch (e) {
     await m.react('❌');
     console.error(e);
-    conn.reply(m.chat, `❌ *Error al obtener el audio. Intente nuevamente más tarde.*`, m);
+    conn.reply(m.chat, `❌ *Error al obtener el audio. Intente nuevamente más tarde.*`, m, rcanal);
   }
 }
 
