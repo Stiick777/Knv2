@@ -9,7 +9,7 @@ const {
 
 let handler = async (message, { conn, text, usedPrefix, command }) => {
   if (!text) {
-    return conn.reply(message.chat, "❕️ *¿QUÉ BÚSQUEDA DESEA REALIZAR EN TIKTOK?*", message);
+    return conn.reply(message.chat, "❕️ *¿QUÉ BÚSQUEDA DESEA REALIZAR EN TIKTOK?*", message, rcanal);
   }
 
   async function createVideoMessage(url) {
@@ -90,7 +90,7 @@ await conn.sendMessage(message.chat, {
       react: { text: "❌️", key: message.key }
     });
     console.error(error);
-    conn.reply(message.chat, `❌️ *OCURRIÓ UN ERROR:* ${error.message}`, message);
+    conn.reply(message.chat, `❌️ *OCURRIÓ UN ERROR:* ${error.message}`, message, rcanal);
   }
 };
 
