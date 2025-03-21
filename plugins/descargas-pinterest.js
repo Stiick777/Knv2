@@ -1,5 +1,5 @@
 const handler = async (m, { conn, text, usedPrefix, command }) => {
-    if (!text) return conn.reply(m.chat, `*💡 Uso Correcto: ${usedPrefix + command} gatos*`, m);
+    if (!text) return conn.reply(m.chat, `*💡 Uso Correcto: ${usedPrefix + command} gatos*`, m, rcanal);
 
     // Lista de palabras prohibidas
     const prohibited = [
@@ -23,7 +23,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     // Verificación de palabras prohibidas
     const foundProhibitedWord = prohibited.find(word => text.toLowerCase().includes(word));
     if (foundProhibitedWord) {
-        return conn.reply(m.chat, `⚠️ *No daré resultado a tu solicitud por pajin* - Palabra prohibida: ${foundProhibitedWord}`, m);
+        return conn.reply(m.chat, `⚠️ *No daré resultado a tu solicitud por pajin* - Palabra prohibida: ${foundProhibitedWord}`, m, rcanal);
     }
 
     // Respuesta mientras se descarga la imagen
@@ -50,7 +50,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     } catch (e) {
         console.error(e);
-        await conn.reply(m.chat, `❌ Error al buscar imágenes. Inténtalo de nuevo.`, m);
+        await conn.reply(m.chat, `❌ Error al buscar imágenes. Inténtalo de nuevo.`, m, rcanal);
     }
 };
 
