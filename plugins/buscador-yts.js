@@ -1,12 +1,12 @@
 import yts from 'yt-search';
 
 const handler = async (m, { text, conn, command, usedPrefix }) => {
-    if (!text) return conn.reply(m.chat, `🏳 *Escriba el título de algún vídeo de YouTube*\n\nEjemplo: ${usedPrefix + command} heyser`, m);
+    if (!text) return conn.reply(m.chat, `🏳 *Escriba el título de algún vídeo de YouTube*\n\nEjemplo: ${usedPrefix + command} heyser`, m, rcanal);
 
     let results = await yts(text);
     let videos = results.videos.slice(0, 6); // Máximo 4 videos para el carrusel
 
-    if (!videos.length) return conn.reply(m.chat, '⚠️ No se encontraron resultados.', m);
+    if (!videos.length) return conn.reply(m.chat, '⚠️ No se encontraron resultados.', m, rcanal);
 
 let messages = videos.map(video => [
     video.title,
