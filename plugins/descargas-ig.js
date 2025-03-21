@@ -2,13 +2,13 @@ import { igdl } from "ruhend-scraper";
 
 let handler = async (m, { args, conn }) => { 
   if (!args[0]) {
-    return conn.reply(m.chat, '🎈 *Ingresa un link de Instagram*', m,);
+    return conn.reply(m.chat, '🎈 *Ingresa un link de Instagram*', m, rcanal);
   }
 
   // Verificación válida del enlace de Instagram
   const instagramRegex = /^(https?:\/\/)?(www\.)?(instagram\.com|instagr\.am)\/.+$/;
   if (!instagramRegex.test(args[0])) {
-    return conn.reply(m.chat, '💡 *El enlace proporcionado no es válido. Asegúrate de ingresar un enlace correcto de Instagram.*', m, );
+    return conn.reply(m.chat, '💡 *El enlace proporcionado no es válido. Asegúrate de ingresar un enlace correcto de Instagram.*', m, rcanal);
   }
 
   try {
@@ -24,7 +24,7 @@ let handler = async (m, { args, conn }) => {
     }
   } catch {
     await m.react(error);
-    conn.reply(m.chat, '❌ Ocurrió un error.', m,);
+    conn.reply(m.chat, '❌ Ocurrió un error.', m, rcanal);
   }
 };
 
