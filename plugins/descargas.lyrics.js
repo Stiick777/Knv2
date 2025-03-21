@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
     if (!text) {
-        return conn.reply(m.chat, `*Ingrese el título de una canción y el artista 🎶*\n\n> *Ejemplo :*\n> _${usedPrefix + command} quisiera - gamberroz_`, m);
+        return conn.reply(m.chat, `*Ingrese el título de una canción y el artista 🎶*\n\n> *Ejemplo :*\n> _${usedPrefix + command} quisiera - gamberroz_`, m, rcanal);
     }
 
     try {
@@ -39,7 +39,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
 
         // Responder con un mensaje de error
-        await conn.reply(m.chat, '*Ocurrió un error al buscar la letra. Inténtalo nuevamente.*', m);
+        await conn.reply(m.chat, '*Ocurrió un error al buscar la letra. Inténtalo nuevamente :(*', m, rcanal);
     }
 };
 
