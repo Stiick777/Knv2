@@ -4,12 +4,12 @@ import { sticker } from '../lib/sticker.js';
 let handler = async (m, { conn, text, args, usedPrefix, command }) => {
 	
     if (!args[0]) {
-        conn.reply(m.chat, `📌 Ejemplo de uso: ${usedPrefix + command} 😎+🤑`, m);
+        conn.reply(m.chat, `📌 Ejemplo de uso: ${usedPrefix + command} 😎+🤑`, m, rcanal);
         return;
     }
 
     if (!text.includes('+')) {
-        conn.reply(m.chat, `✳️ Debes separar los emojis con un *+* \n\n📌 Ejemplo: \n*${usedPrefix + command}* 😎+🤑`, m);
+        conn.reply(m.chat, `✳️ Debes separar los emojis con un *+* \n\n📌 Ejemplo: \n*${usedPrefix + command}* 😎+🤑`, m, rcanal);
         return;
     }
 
@@ -25,6 +25,6 @@ let handler = async (m, { conn, text, args, usedPrefix, command }) => {
 handler.help = ['emojimix <emoji+emoji>'];
 handler.tags = ['sticker'];
 handler.command = ['emojimix'];
-handler.diamond = true;
+handler.group = true;
 
 export default handler;
