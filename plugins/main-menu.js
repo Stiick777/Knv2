@@ -71,7 +71,7 @@ header: '╭──〔 `%category` 〕─ ',
       minute: 'numeric',
       second: 'numeric'
     })
-    let _uptime = process.uptime() * 1000
+    /*let _uptime = process.uptime() * 1000
     let _muptime
     if (process.send) {
       process.send('uptime')
@@ -81,7 +81,12 @@ header: '╭──〔 `%category` 〕─ ',
       }) * 1000
     }
     let muptime = clockString(_muptime)
-    let uptime = clockString(_uptime)
+    let uptime = clockString(_uptime)*/
+    let _uptime = process.uptime() * 1000;
+let _muptime = process.uptime() * 1000; // Usamos el mismo valor
+
+let muptime = clockString(_muptime);
+let uptime = clockString(_uptime);
     let totalreg = Object.keys(global.db.data.users).length
     let rtotalreg = Object.values(global.db.data.users).filter(user => user.registered == true).length
     let help = Object.values(global.plugins).filter(plugin => !plugin.disabled).map(plugin => {
