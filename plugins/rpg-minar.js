@@ -10,7 +10,7 @@ let handler = async (m, { conn }) => {
     
     let time = user.lastmiming + 600000
     if (new Date - user.lastmiming < 600000) {
-        return conn.reply(m.chat, `*⏰ Debes esperar ${msToTime(time - new Date())} para volver a minar*`, m)
+        return conn.reply(m.chat, `*⏰ Debes esperar ${msToTime(time - new Date())} para volver a minar*`, m, rcanal)
     }
 
     let info = `⛏️ *Te has adentrado en lo profundo de las cuevas*
