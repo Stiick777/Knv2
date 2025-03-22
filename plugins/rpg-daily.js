@@ -8,7 +8,7 @@ var handler = async (m, { conn, isPrems }) => {
   
   let time = global.db.data.users[m.sender].lastclaim + 86400000; // 24 Horas
   if (new Date - global.db.data.users[m.sender].lastclaim < 86400000) 
-    return conn.reply(m.chat, `🕚 *Vuelve en ${msToTime(time - new Date())}*`, m);
+    return conn.reply(m.chat, `🕚 *Vuelve en ${msToTime(time - new Date())}*`, m, rcanal);
 
   global.db.data.users[m.sender].exp += isPrems ? exppremium : exp;
   global.db.data.users[m.sender].estrellas += estrellas; // Se suman estrellas
@@ -17,7 +17,7 @@ var handler = async (m, { conn, isPrems }) => {
 
 📜 Recursos:
 ✨ *XP:* +${isPrems ? exppremium : exp} ⚡
-⭐ *Estrellas:* +${estrellas} 🌟`, m);
+⭐ *Estrellas:* +${estrellas} 🌟`, m, rcanal);
 
   global.db.data.users[m.sender].lastclaim = new Date * 1;
 };
