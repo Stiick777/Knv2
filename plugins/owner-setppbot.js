@@ -66,8 +66,9 @@ let handler = async (_0x55976e, {
             }]
         }), _0x55976e[_0x2359c0(0x1b8)](_0x2359c0(0x1c7));
     } catch {
-        return m.reply('🚩 Responde a una *Imagen.*')
+    return _0x55976e.reply('🚩 Responde a una *Imagen.*');
     }
+    
 };
 handler.command = ['setppbot']
 handler.tags = ['owner']
