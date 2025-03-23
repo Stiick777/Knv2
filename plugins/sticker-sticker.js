@@ -45,12 +45,9 @@ handler.command = ['s', 'sticker', 'stiker']
 
 export default handler
 */
-import { writeFile } from 'fs/promises'
-import ffmpeg from 'fluent-ffmpeg'
-import ffmpegPath from '@ffmpeg-installer/ffmpeg'
-import webp from 'webp-converter'
 
-ffmpeg.setFfmpegPath(ffmpegPath.path)
+import { exec } from 'child_process'
+import fs from 'fs'
 
 let handler = async (m, { conn }) => {
     try {
@@ -58,52 +55,40 @@ let handler = async (m, { conn }) => {
         let mime = (q.msg || q).mimetype || q.mediaType || ''
 
         if (!/image|video/g.test(mime)) {
-            return conn.reply(m.chat, '⚠️ *_Debes responder con una imagen o video._*', m)
+            return conn.reply(m.chat, '⚠️ *_Envía una imagen o video para convertir en sticker._*', m)
         }
 
-        let img = await q.download?.()
-        if (!img) {
-            return conn.reply(m.chat, '⚠️ *_No se pudo descargar el archivo._*', m)
-        }
+        let media = await q.download()
+        if (!media) return conn.reply(m.chat, '⚠️ *_No se pudo descargar el archivo._*', m)
 
-        await m.reply('✨ *Convirtiendo a sticker...*')
+        let inputPath = `temp/input.${mime.includes('video') ? 'mp4' : 'jpg'}`
+        let outputPath = `temp/sticker.webp`
 
-        let outputFile = `./temp/sticker_${Date.now()}.webp`
-        
-        if (/image/g.test(mime)) {
-            // Convertir imagen a webp
-            await writeFile('./temp/input.png', img)
-            webp.cwebp('./temp/input.png', outputFile, '-q 80')
-        } else {
-            // Convertir video a webp con ffmpeg
-            await writeFile('./temp/input.mp4', img)
-            await new Promise((resolve, reject) => {
-                ffmpeg('./temp/input.mp4')
-                    .output(outputFile)
-                    .outputOptions([
-                        '-vcodec libwebp',
-                        '-vf scale=512:512:force_original_aspect_ratio=decrease',
-                        '-qscale 80',
-                        '-preset default',
-                        '-loop 0',
-                        '-an',
-                        '-vsync 0'
-                    ])
-                    .on('end', resolve)
-                    .on('error', reject)
-                    .run()
-            })
-        }
+        fs.writeFileSync(inputPath, media)
 
-        await conn.sendFile(m.chat, outputFile, 'sticker.webp', '', m, true)
+        // **Comando para convertir a sticker**
+        let command = mime.includes('video')
+            ? `ffmpeg -i ${inputPath} -vf "scale=512:512:force_original_aspect_ratio=decrease" -c:v libwebp -q:v 50 -preset default -loop 0 -an -vsync 0 -s 512:512 ${outputPath}`
+            : `ffmpeg -i ${inputPath} -vf "scale=512:512:force_original_aspect_ratio=decrease" -c:v libwebp -q:v 50 ${outputPath}`
+
+        exec(command, async (err) => {
+            if (err) {
+                console.error(err)
+                return conn.reply(m.chat, '⚠️ *_Error al convertir la imagen/video a sticker._*', m)
+            }
+
+            await conn.sendFile(m.chat, outputPath, 'sticker.webp', '', m, true)
+            fs.unlinkSync(inputPath)
+            fs.unlinkSync(outputPath)
+        })
     } catch (e) {
         console.error(e)
-        conn.reply(m.chat, '⚠️ *_Error al crear el sticker._*', m)
+        conn.reply(m.chat, '⚠️ *_Ocurrió un error inesperado._*', m)
     }
 }
 
-handler.help = ['sticker <img|video>']
+handler.help = ['s']
 handler.tags = ['sticker']
-handler.command = ['s', 'sticker', 'stiker']
+handler.command = ['s', 'sticker']
 
 export default handler
