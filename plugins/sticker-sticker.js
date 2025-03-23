@@ -61,8 +61,8 @@ let handler = async (m, { conn }) => {
         let media = await q.download()
         if (!media) return conn.reply(m.chat, '⚠️ *_No se pudo descargar el archivo._*', m)
 
-        let inputPath = `temp/input.${mime.includes('video') ? 'mp4' : 'jpg'}`
-        let outputPath = `temp/sticker.webp`
+        let inputPath = `../tmp/input.${mime.includes('video') ? 'mp4' : 'jpg'}`
+        let outputPath = `../tmp/sticker.webp`
 
         fs.writeFileSync(inputPath, media)
 
