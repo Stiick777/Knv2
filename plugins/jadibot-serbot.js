@@ -17,7 +17,7 @@ return
 }
 let parentw = args[0] && args[0] == "plz" ? conn : await global.conn
 if (!(args[0] && args[0] == 'plz' || (await global.conn).user.jid == conn.user.jid)) {
-return conn.reply(m.chat, `「💭」Solo puedes usar este comando en el bot principal.\n\n• Wa.me/${global.conn.user.jid.split`@`[0]}?text=${usedPrefix + command}`, m,)
+return conn.reply(m.chat, `「💭」Solo puedes usar este comando en el bot principal.\n\n• Wa.me/${global.conn.user.jid.split`@`[0]}?text=${usedPrefix + command}`, m, rcanal)
 }
 async function serbot() {
 let serbotFolder = crypto.randomBytes(10).toString('hex').slice(0, 8)
@@ -74,7 +74,7 @@ return console.log(await creloadHandler(true).catch(console.error))
 delete global.conns[i]
 global.conns.splice(i, 1)
 if (code !== DisconnectReason.connectionClosed) {
-await parentw.reply(conn.user.jid, "⚠️ Conexión perdida con el servidor.", m)
+await parentw.reply(conn.user.jid, "⚠️ Conexión perdida con el servidor.", m, rcanal)
 }
 }
 if (global.db.data == null) {
@@ -84,7 +84,7 @@ if (connection == "open") {
 conn.isInit = true;
  conn.startTime = Date.now();
 global.conns.push(conn)
-await parentw.reply(m.chat, args[0] ? '🐢 Conectado con éxito al WhatsApp.' : '⚡ Vinculaste un Sub-Bot con éxito\nEsto puede ser temporal *PENDIENTE DEL CANAL PARA CUALQUIER NOVEDAD.*', m, )
+await parentw.reply(m.chat, args[0] ? '🐢 Conectado con éxito al WhatsApp.' : '⚡ Vinculaste un Sub-Bot con éxito\nEsto puede ser temporal *PENDIENTE DEL CANAL PARA CUALQUIER NOVEDAD.*', m, rcanal)
 await sleep(5000)
 if (args[0]) {
 return
