@@ -122,4 +122,4 @@ async function start(file) {
   // console.log(p)
 }
 
-start('start.js')
+start('main.js')
