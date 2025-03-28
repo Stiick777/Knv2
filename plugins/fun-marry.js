@@ -121,7 +121,7 @@ if (global.db.data.marry[who]?.status === 'married') {
     let nameRecipient = await conn.getName(who); // Nombre del destinatario
 
     // Enviar imagen con la propuesta
-    const imageUrl = 'https://qu.ax/PUKkD.jpg';
+    const imageUrl = 'https://files.catbox.moe/1jahf1.jpg';
     await conn.sendFile(
         m.chat, 
         imageUrl, 
