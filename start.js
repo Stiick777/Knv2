@@ -438,7 +438,7 @@ console.log(chalk.bold.cyanBright(`\n╭» ⚪ MeguminJadiBot ⚪\n│→ ARCHIV
 console.log(chalk.bold.red(`\n╭» 🔴 MeguminJadiBot 🔴\n│→ OCURRIÓ UN ERROR\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― 🗑️♻️\n` + err))
 }}
 function purgeOldFiles() {
-const directories = ['./MeguminSession/', './MeguminJadiBot/']
+const directories = ['./MeguminSession/', './KanBotsitos/']
 directories.forEach(dir => {
 readdirSync(dir, (err, files) => {
 if (err) throw err
