@@ -8,7 +8,7 @@ let handler = async (m, { conn }) => {
   let mime = (q.msg || q).mimetype || '';
   if (!mime) return conn.reply(m.chat, `📍 Por favor, responde a un archivo válido (imagen, video.).`, m, rcanal);
   
-  await m.react(rwait);
+  await m.react('🕛');
   
   try {
     let media = await q.download();
@@ -23,9 +23,9 @@ let handler = async (m, { conn }) => {
     
     await conn.sendFile(m.chat, media, 'thumbnail.jpg', txt, m, fkontak);
     
-    await m.react(done);
+    await m.react('✅');
   } catch {
-    await m.react(error);
+    await m.react('❌');
   }
 };
 
