@@ -11,6 +11,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   try {   
     let res = await fetch('https://api.simsimi.vn/v1/simtalk', {  
+      
       method: 'POST',  
       headers: {  
         'Content-Type': 'application/x-www-form-urlencoded'  
@@ -22,7 +23,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       }).toString()  
     });  
 
-    let json = await res.json();  
+    let json = await res.json(); 
+    console.log(json);
     m.reply(json.message.replace(/simsimi/gi, ''), null, rcanal);  
 
   } catch (e) {  
