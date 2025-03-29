@@ -13,8 +13,11 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     })  
     let json = await res.json()
     
+    console.log('Respuesta de la API:', json)
+
     m.reply(json.message.replace(/simsimi|sim simi/gi, ''))
-  } catch {  
+  } catch (error) {  
+    console.log('Posible error:', error)
     m.reply('❎ Intenta de nuevo más tarde. La API de SimSimi no responde.')  
   }  
 }
