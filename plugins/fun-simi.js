@@ -1,41 +1,26 @@
-import fetch from 'node-fetch'  
-let handler = async (m, { conn, text, usedPrefix, command }) => {  
+import fetch from 'node-fetch'
 
-  let lang = 'es'; // Siempre usar español  
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+  let lang = 'es'  
+  if (!text) return m.reply('✳️ Debes escribir algo para que responda.')
 
-  if (!text) {  
-    return m.reply(`✳️ No has ingresado ningún texto.`);  
-  }  
-
-  m.react('🗣️');   
-
+  m.react('🗣️')   
   try {   
     let res = await fetch('https://api.simsimi.vn/v1/simtalk', {  
-      
       method: 'POST',  
-      headers: {  
-        'Content-Type': 'application/x-www-form-urlencoded'  
-      },  
-      body: new URLSearchParams({  
-        text: text,  
-        lc: lang,  
-        key: '' // Asegúrate de que la API no requiere clave o agrégala aquí  
-      }).toString()  
-    });  
-
-    let json = await res.json(); 
-    console.log(json);
-    m.reply(json.message.replace(/simsimi/gi, ''), null, rcanal);  
-
-  } catch (e) {  
-    console.error(e);  
-    m.reply(`❎ Error al conectar con la API. Intenta más tarde.`);  
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
+      body: `text=${encodeURIComponent(text)}&lc=${lang}&key=`  
+    })  
+    let json = await res.json()
+    
+    m.reply(json.message.replace(/simsimi|sim simi/gi, ''))
+  } catch {  
+    m.reply('❎ Intenta de nuevo más tarde. La API de SimSimi no responde.')  
   }  
+}
 
-}  
+handler.help = ['bot']  
+handler.tags = ['fun']  
+handler.command = ['bot', 'simi']   
 
-handler.help = ['bot'];  
-handler.tags = ['fun'];  
-handler.command = ['bot', 'simi'];   
-
-export default handler;
+export default handler
