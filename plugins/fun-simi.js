@@ -12,15 +12,22 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   try {   
     let res = await fetch('https://api.simsimi.vn/v1/simtalk', {  
       method: 'POST',  
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  
-      body: `text=${encodeURIComponent(text)}&lc=${lang}&key=`  
+      headers: {  
+        'Content-Type': 'application/x-www-form-urlencoded'  
+      },  
+      body: new URLSearchParams({  
+        text: text,  
+        lc: lang,  
+        key: '' // Asegúrate de que la API no requiere clave o agrégala aquí  
+      }).toString()  
     });  
 
     let json = await res.json();  
     m.reply(json.message.replace(/simsimi/gi, ''), null, rcanal);  
 
-  } catch {  
-    m.reply(`❎ Intenta de nuevo más tarde. La API de SimSimi no está disponible en este momento.`);  
+  } catch (e) {  
+    console.error(e);  
+    m.reply(`❎ Error al conectar con la API. Intenta más tarde.`);  
   }  
 
 }  
