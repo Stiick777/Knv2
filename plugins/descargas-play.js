@@ -38,7 +38,7 @@ if (command === 'play') {
 
         await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-        try {
+       /* try {
             await m.react('🕓'); // Reaccionar mientras procesa
 
             // URL de la API para obtener el audio
@@ -84,7 +84,55 @@ if (command === 'play') {
         } catch (error) {
             console.warn("Error en la API:", error.message);
             await m.reply("❌ Error al procesar la solicitud. Inténtalo con /ply");
-        }
+        }*/
+        try {
+    await m.react('🕓'); // Reaccionar mientras procesa
+
+    // URL de la API para obtener el audio
+    const apiUrl = `https://api.agungny.my.id/api/youtube-audiov2?url=${encodeURIComponent(yt_play[0].url)}`;
+    let apiResponse = await fetch(apiUrl);
+    let response = await apiResponse.json();
+
+    // Verificar si la API devolvió un resultado válido
+    if (response.status === "true" && response.result && response.result.url) {
+        const { url, title } = response.result;
+
+        let originalPath = './temp_audio.mp3';
+        let convertedPath = './converted_audio.mp3';
+
+        // Descargar el audio
+        const audioResponse = await axios.get(url, { responseType: 'arraybuffer' });
+        fs.writeFileSync(originalPath, audioResponse.data);
+
+        // Convertir el audio a un formato compatible con WhatsApp (64kbps, 44100Hz)
+        await new Promise((resolve, reject) => {
+            exec(`ffmpeg -i ${originalPath} -ar 44100 -ab 64k -y ${convertedPath}`, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        // Enviar el audio convertido
+        await conn.sendMessage(m.chat, {
+            audio: fs.readFileSync(convertedPath),
+            mimetype: 'audio/mp4',
+            ptt: false, // Enviar como audio normal
+            fileName: `${title}.mp3`,
+        }, { quoted: m });
+
+        // Eliminar archivos temporales
+        fs.unlinkSync(originalPath);
+        fs.unlinkSync(convertedPath);
+
+        return await m.react('✅'); // Reacción de éxito
+    }
+
+    throw new Error("API falló o no retornó datos válidos");
+} catch (error) {
+    console.warn("Error en la API:", error.message);
+    await m.reply("❌ Error al procesar la solicitud. Inténtalo con /ply");
+}
+
     }
 
 if (command == 'play2') {
