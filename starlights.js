@@ -48,7 +48,7 @@ const __dirname = global.__dirname(import.meta.url)
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse())
 global.prefix = new RegExp('^[' + (opts['prefix'] || '‎z/#$%.\\-').replace(/[|\\{}()[\]^$+*?.\-\^]/g, '\\$&') + ']')
 
-global.db = new Low(new JSONFile(`storage/databases/database.json`))
+global.db = new Low(new JSONFile(`src/database/database.json`))
 
 global.DATABASE = global.db 
 global.loadDatabase = async function loadDatabase() {
