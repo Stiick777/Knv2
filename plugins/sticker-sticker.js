@@ -49,6 +49,7 @@ import fs from 'fs'
 import path from 'path'
 import fetch from 'node-fetch'
 import fluent from 'fluent-ffmpeg'
+import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 import { fileTypeFromBuffer as fromBuffer } from 'file-type'
 
 let handler = async (m, { conn, args }) => {
@@ -59,24 +60,32 @@ let handler = async (m, { conn, args }) => {
   try {
     if (/image|video/g.test(mime) && q.download) {
       if (/video/.test(mime) && (q.msg || q).seconds > 11)
-        return conn.reply(m.chat, '[ ✰ ] El video no puede durar más de *10 segundos*', m, rcanal)
+        return conn.reply(m.chat, '[ ✰ ] El video no puede durar más de *10 segundos*', m)
       buffer = await q.download()
     } else if (args[0] && isUrl(args[0])) {
       const res = await fetch(args[0])
       buffer = await res.buffer()
     } else {
-      return conn.reply(m.chat,'[ ✰ ] Responde a una *imagen o video*.', m, rcanal)
+      return conn.reply(m.chat, '[ ✰ ] Responde a una *imagen o video*.', m)
     }
     await m.react('🕓')
 
-   const stickers = await toWebp(buffer, { 
-  name: global.packname, 
-  author: global.author 
-});
-    
-    await conn.sendFile(m.chat, stickers, 'sticker.webp', '', m)
+    // Convertimos a WebP
+    const webpBuffer = await toWebp(buffer)
+
+    // Añadir nombre y autor al sticker
+    const sticker = new Sticker(webpBuffer, {
+      pack: '',
+      author: global.author || 'Bot',
+      type: StickerTypes.FULL
+    })
+
+    const finalSticker = await sticker.toBuffer()
+
+    await conn.sendFile(m.chat, finalSticker, 'sticker.webp', '', m)
     await m.react('✅')
   } catch (e) {
+    console.error(e)
     await m.react('✖️')
   }
 }
@@ -88,45 +97,40 @@ handler.group = true
 
 export default handler
 
-async function toWebp(buffer, opts = {}) {    
-  const { ext } = await fromBuffer(buffer);    
-  if (!/(png|jpg|jpeg|mp4|mkv|m4p|gif|webp)/i.test(ext)) throw 'Media no compatible.';    
+async function toWebp(buffer) {
+  const { ext } = await fromBuffer(buffer)
+  if (!/(png|jpg|jpeg|mp4|mkv|m4p|gif|webp)/i.test(ext)) throw 'Media no compatible.'
 
-  const input = path.join(global.tempDir || './tmp', `${Date.now()}.${ext}`);    
-  const output = path.join(global.tempDir || './tmp', `${Date.now()}.webp`);    
-  fs.writeFileSync(input, buffer);    
+  const input = path.join(global.tempDir || './tmp', `${Date.now()}.${ext}`)
+  const output = path.join(global.tempDir || './tmp', `${Date.now()}.webp`)
+  fs.writeFileSync(input, buffer)
 
-  let aspectRatio = `scale='if(gt(iw,ih),-1,299):if(gt(iw,ih),299,-1)', crop=299:299:exact=1`;    
-
-  let options = [    
-    '-vcodec', 'libwebp',    
-    '-vf', `${aspectRatio}, fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse`,    
+  let options = [
+    '-vcodec', 'libwebp',
     '-loop', '0', '-preset', 'default', '-an', '-vsync', '0',
-    '-metadata', `title=${global.packname}`,
-    '-metadata', `author=${global.author}`
-  ];    
+    '-vf', "scale=512:512:flags=lanczos"
+  ]
 
-  return new Promise((resolve, reject) => {    
-    fluent(input)    
-      .addOutputOptions(options)    
-      .toFormat('webp')    
-      .save(output)    
-      .on('end', () => {    
-        const result = fs.readFileSync(output);    
-        fs.unlinkSync(input);    
-        fs.unlinkSync(output);    
-        resolve(result);    
-      })    
-      .on('error', (err) => {    
-        fs.unlinkSync(input);    
-        reject(err);    
-      });    
-  });    
+  return new Promise((resolve, reject) => {
+    fluent(input)
+      .addOutputOptions(options)
+      .toFormat('webp')
+      .save(output)
+      .on('end', () => {
+        const result = fs.readFileSync(output)
+        fs.unlinkSync(input)
+        fs.unlinkSync(output)
+        resolve(result)
+      })
+      .on('error', (err) => {
+        fs.unlinkSync(input)
+        reject(err)
+      })
+  })
 }
 
 function isUrl(text) {
   return text.match(
     new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)(jpe?g|gif|png)/, 'gi')
   )
-                                 }
-
+        }
