@@ -2,8 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import fetch from 'node-fetch'
 import fluent from 'fluent-ffmpeg'
+import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 import { fileTypeFromBuffer as fromBuffer } from 'file-type'
-import { exec } from 'child_process'
 
 let handler = async (m, { conn, args }) => {
   let q = m.quoted ? m.quoted : m
@@ -23,12 +23,19 @@ let handler = async (m, { conn, args }) => {
     }
     await m.react('🕓')
 
-    const stickerBuffer = await toWebp(buffer, {
-      packname: global.packname || 'Sticker Bot',
-      author: global.author || 'By Nexus-Bot'
+    // Convertimos a WebP
+    const webpBuffer = await toWebp(buffer)
+
+    // Añadir nombre y autor al sticker
+    const sticker = new Sticker(webpBuffer, {
+      pack: global.packname || 'Sticker Bot',
+      author: global.author || 'Bot',
+      type: StickerTypes.FULL
     })
 
-    await conn.sendFile(m.chat, stickerBuffer, 'sticker.webp', '', m)
+    const finalSticker = await sticker.toBuffer()
+
+    await conn.sendFile(m.chat, finalSticker, 'sticker.webp', '', m)
     await m.react('✅')
   } catch (e) {
     console.error(e)
@@ -38,44 +45,35 @@ let handler = async (m, { conn, args }) => {
 
 handler.help = ['sticker']
 handler.tags = ['sticker']
-handler.command = ['mn', 'sticker', 'stiker']
+handler.command = ['mn']
 handler.group = true
 
 export default handler
 
-async function toWebp(buffer, { packname, author }) {
+async function toWebp(buffer) {
   const { ext } = await fromBuffer(buffer)
-  if (!/(png|jpg|jpeg|mp4|gif|webp)/i.test(ext)) throw 'Media no compatible.'
+  if (!/(png|jpg|jpeg|mp4|mkv|m4p|gif|webp)/i.test(ext)) throw 'Media no compatible.'
 
   const input = path.join(global.tempDir || './tmp', `${Date.now()}.${ext}`)
   const output = path.join(global.tempDir || './tmp', `${Date.now()}.webp`)
-  const exifPath = path.join(global.tempDir || './tmp', `${Date.now()}_exif.exif`)
-
   fs.writeFileSync(input, buffer)
+
+  let options = [
+    '-vcodec', 'libwebp',
+    '-loop', '0', '-preset', 'default', '-an', '-vsync', '0',
+    '-vf', "scale=512:512:flags=lanczos"
+  ]
 
   return new Promise((resolve, reject) => {
     fluent(input)
-      .addOutputOptions([
-        '-vcodec', 'libwebp',
-        '-loop', '0', '-preset', 'default', '-an', '-vsync', '0',
-        '-vf', "scale='if(gt(iw,ih),-1,512):if(gt(iw,ih),512,-1)',format=rgba"
-      ])
+      .addOutputOptions(options)
       .toFormat('webp')
       .save(output)
-      .on('end', async () => {
-        try {
-          await createExif({ packname, author }, exifPath)
-          const finalOutput = path.join(global.tempDir || './tmp', `${Date.now()}_final.webp`)
-          exec(`webpmux -set exif ${exifPath} ${output} -o ${finalOutput}`, (err) => {
-            fs.unlinkSync(input)
-            fs.unlinkSync(output)
-            fs.unlinkSync(exifPath)
-            if (err) return reject(err)
-            resolve(fs.readFileSync(finalOutput))
-          })
-        } catch (err) {
-          reject(err)
-        }
+      .on('end', () => {
+        const result = fs.readFileSync(output)
+        fs.unlinkSync(input)
+        fs.unlinkSync(output)
+        resolve(result)
       })
       .on('error', (err) => {
         fs.unlinkSync(input)
@@ -84,19 +82,8 @@ async function toWebp(buffer, { packname, author }) {
   })
 }
 
-async function createExif({ packname, author }, exifPath) {
-  const jsonExif = {
-    "sticker-pack-id": "com.nexusbot.stickers",
-    "sticker-pack-name": packname,
-    "sticker-pack-publisher": author,
-    "emojis": ["🔥", "😎", "🤖"]
-  }
-
-  const exifData = Buffer.from([0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
-  const jsonBuffer = Buffer.from(JSON.stringify(jsonExif), 'utf-8')
-  fs.writeFileSync(exifPath, Buffer.concat([exifData, jsonBuffer]))
-}
-
 function isUrl(text) {
-  return text.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/, 'gi'))
+  return text.match(
+    new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)(jpe?g|gif|png)/, 'gi')
+  )
 }
