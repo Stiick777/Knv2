@@ -138,24 +138,24 @@ ${yt_play[0].author.url}
 }
 */
 try {
-    const apiUrl = `https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
+    const apiUrl = `https://bk9.fun/download/youtube?url=${encodeURIComponent(yt_play[0].url)}`;
     const apiResponse = await fetch(apiUrl);
-    const agatzData = await apiResponse.json();
+    const bk9Data = await apiResponse.json();
 
-    if (agatzData.status !== 200 || !agatzData.data?.success || !agatzData.data?.downloadUrl) {
+    if (!bk9Data.status || !bk9Data.BK9?.BK8?.length) {
         await m.react('❌');
         return; // Detener si no hay URL de descarga
     }
 
-    const downloadUrl = agatzData.data.downloadUrl; // Enlace directo de descarga
-    const fileName = `${agatzData.data.title}.mp4`; // Nombre del archivo con título del video
+    const { title } = bk9Data.BK9;
+    const { link: downloadUrl, quality } = bk9Data.BK9.BK8[0]; // Primer enlace disponible
 
     await conn.sendMessage(
         m.chat,
         {
             document: { url: downloadUrl },
-            fileName: fileName,
-            caption: `🌚 *_Provided by KanBot_* 🌝`,
+            fileName: `${title}.mp4`,
+            caption: `🌚 *_Provided by KanBot_* 🌝\n📌 *Calidad:* ${quality}`,
             mimetype: 'video/mp4'
         },
         { quoted: m }

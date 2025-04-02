@@ -44,18 +44,19 @@ try {
 try { 
     await m.react('🕛'); // Indicar que está procesando
 
-    let apiResponse = await fetch(`https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(youtubeLink)}`);
+    let apiResponse = await fetch(`https://bk9.fun/download/youtube?url=${encodeURIComponent(youtubeLink)}`);
     let data = await apiResponse.json();
 
-    if (data.status === 200 && data.data?.success && data.data?.downloadUrl) {
-        const videoTitle = data.data.title;
-        const videoUrl = data.data.downloadUrl;
+    if (data.status && data.BK9?.BK8?.length > 0) {
+        const videoTitle = data.BK9.title;
+        const videoUrl = data.BK9.BK8[0].link; // Primer objeto del array BK8
+        const quality = data.BK9.BK8[0].quality;
 
         await conn.sendMessage(m.chat, {
             video: { url: videoUrl },
             fileName: `${videoTitle}.mp4`,
             mimetype: 'video/mp4',
-            caption: `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${videoTitle}`,
+            caption: `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${videoTitle}\n📌 *Calidad:* ${quality}`,
         }, { quoted: m });
 
         return await m.react('✅'); // Confirmar éxito

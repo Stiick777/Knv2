@@ -45,24 +45,26 @@ try {
     let v = args[0];
 
     // Llamada a la API
-    let apiResponse = await fetch(`https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(v)}`);
+    let apiResponse = await fetch(`https://bk9.fun/download/youtube?url=${encodeURIComponent(v)}`);
     let data = await apiResponse.json();
 
-    if (data.status !== 200 || !data.data?.success || !data.data?.downloadUrl || !data.data?.title) {
+    if (!data.status || !data.BK9?.BK8?.length) {
         throw new Error('Error en la API');
     }
 
-    let { title, downloadUrl: download_url } = data.data;
+    let { title } = data.BK9;
+    let { link: download_url, quality } = data.BK9.BK8[0]; // Primer enlace disponible
 
     let txt = '`🅓🅞🅒🅢 🅥➋ - 🅚🅐🅝🅑🅞🅣`\n\n';
-    txt += `	🍁   *Título*: ${title}\n\n`;
+    txt += `🍁   *Título*: ${title}\n`;
+    txt += `🎥   *Calidad*: ${quality}\n\n`;
     txt += `> ️ *Se está enviando su video, por favor espere*`;
 
     await star.reply(m.chat, txt, m);
 
     await star.sendMessage(m.chat, {
         document: { url: download_url }, 
-        caption: `🌝 *Provided by KanBot* 🌚`,
+        caption: `🌝 *Provided by KanBot* 🌚\n📌 *Calidad:* ${quality}`,
         mimetype: 'video/mp4',
         fileName: `${title}.mp4`
     }, { quoted: m });

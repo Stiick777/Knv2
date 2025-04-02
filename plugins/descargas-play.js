@@ -191,18 +191,18 @@ if (command == 'play2') {
 try {
     await m.react('🕓'); // Reacciona con un ícono de reloj mientras procesa
 
-    // Nueva API
-    const apiUrl = `https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
+    const apiUrl = 'https://bk9.fun/download/youtube?url=https://youtube.com/watch?v=wFg-MlK_JlE';
     let apiResponse = await fetch(apiUrl);
     let response = await apiResponse.json();
 
     // Verificar si la API devolvió un resultado válido
-    if (response.status === 200 && response.data && response.data.success) {
-        const { downloadUrl, title } = response.data;
+    if (response.status && response.BK9 && response.BK9.BK8.length > 0) {
+        const { link, quality } = response.BK9.BK8[0]; // Primer objeto del array BK8
+        const title = response.BK9.title;
 
         await conn.sendMessage(m.chat, {
-            video: { url: downloadUrl },
-            caption: `🎥 *${title}*\n😎 Su video by ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`,
+            video: { url: link },
+            caption: `🎥 *${title}*\n📌 Calidad: ${quality}\n😎 Su video by ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`,
             mimetype: 'video/mp4',
         }, { quoted: m });
 
@@ -211,7 +211,7 @@ try {
 
     throw new Error("API falló o no retornó datos válidos");
 } catch (error) {
-    console.warn("Error en la API:", error.message);
+    await m.react('❌'); // Reacciona con error sin mensaje
 }
 }
 
