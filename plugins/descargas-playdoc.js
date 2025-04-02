@@ -138,6 +138,61 @@ ${yt_play[0].author.url}
 }
 */
 try {
+    const apiUrl = `https://api.siputzx.my.id/api/d/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
+    const apiResponse = await fetch(apiUrl);
+    const response = await apiResponse.json();
+
+    if (!response.status || !response.data?.dl) {
+        await m.react('❌');
+        return; // Detener si no hay URL de descarga
+    }
+
+    const { title, dl: downloadUrl } = response.data;
+
+    await conn.sendMessage(
+        m.chat,
+        {
+            document: { url: downloadUrl },
+            fileName: `${title}.mp4`,
+            caption: `🌚 *_Provided by KanBot_* 🌝\n📌 *Calidad:* 360p`,
+            mimetype: 'video/mp4'
+        },
+        { quoted: m }
+    );
+
+    await m.react('✅');
+} catch (e) {
+    console.error('Error al procesar la solicitud:', e);
+    
+    try {
+    const apiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp4?url=${encodeURIComponent(yt_play[0].url)}&quality=360`;
+    const apiResponse = await fetch(apiUrl);
+    const response = await apiResponse.json();
+
+    if (!response.url) {
+        await m.react('❌');
+        return; // Detener si no hay URL de descarga
+    }
+
+    const { title, url: downloadUrl } = response;
+
+    await conn.sendMessage(
+        m.chat,
+        {
+            document: { url: downloadUrl },
+            fileName: `${title}.mp4`,
+            caption: `🌚 *_Provided by KanBot_* 🌝\n📌 *Calidad:* 360p`,
+            mimetype: 'video/mp4'
+        },
+        { quoted: m }
+    );
+
+    await m.react('✅');
+} catch (e) {
+    console.error('Error al procesar la solicitud:', e);
+   
+    
+try {
     const apiUrl = `https://bk9.fun/download/youtube?url=${encodeURIComponent(yt_play[0].url)}`;
     const apiResponse = await fetch(apiUrl);
     const bk9Data = await apiResponse.json();
@@ -166,6 +221,9 @@ try {
     console.error('Error al procesar la solicitud:', e);
     await m.react('❌'); // Reaccionar con error
 }
+}
+}
+//
 }
 
 }
