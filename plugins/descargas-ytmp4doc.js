@@ -9,7 +9,7 @@ let handler = async (m, { conn: star, args }) => {
 
   await m.react('🕓'); // Reaccionar con reloj mientras procesa
 
-try {
+/*try {
     let v = args[0];
 
     // Llamada a la API
@@ -21,6 +21,38 @@ try {
     }
 
     let { title, url: download_url } = data.result;
+
+    let txt = '`🅓🅞🅒🅢 🅥➋ - 🅚🅐🅝🅑🅞🅣`\n\n';
+    txt += `	🍁   *Título*: ${title}\n\n`;
+    txt += `> ️ *Se está enviando su video, por favor espere*`;
+
+    await star.reply(m.chat, txt, m);
+
+    await star.sendMessage(m.chat, {
+        document: { url: download_url }, 
+        caption: `🌝 *Provided by KanBot* 🌚`,
+        mimetype: 'video/mp4',
+        fileName: `${title}.mp4`
+    }, { quoted: m });
+
+    return await m.react('✅'); // Reaccionar con éxito
+} catch (error) {
+    console.error("Error en la API:", error.message);
+    await m.react('✖️');
+    await star.reply(m.chat, '❌ _*Error al procesar el enlace. Por favor, intenta de nuevo.*_', m, rcanal);
+}*/
+try {
+    let v = args[0];
+
+    // Llamada a la API
+    let apiResponse = await fetch(`https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(v)}`);
+    let data = await apiResponse.json();
+
+    if (data.status !== 200 || !data.data?.success || !data.data?.downloadUrl || !data.data?.title) {
+        throw new Error('Error en la API');
+    }
+
+    let { title, downloadUrl: download_url } = data.data;
 
     let txt = '`🅓🅞🅒🅢 🅥➋ - 🅚🅐🅝🅑🅞🅣`\n\n';
     txt += `	🍁   *Título*: ${title}\n\n`;

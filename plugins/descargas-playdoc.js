@@ -107,7 +107,7 @@ ${yt_play[0].author.url}
 
     await conn.sendMessage(m.chat, { text: texto1 }, { quoted: m });
     
-    try {
+    /*try {
     const apiUrl = `https://api.agungny.my.id/api/youtube-videov2?url=${encodeURIComponent(yt_play[0].url)}`;
     const apiResponse = await fetch(apiUrl);
     const agungData = await apiResponse.json();
@@ -119,6 +119,36 @@ ${yt_play[0].author.url}
 
     const downloadUrl = agungData.result.url; // Enlace directo de descarga
     const fileName = `${agungData.result.title}.mp4`; // Nombre del archivo con título del video
+
+    await conn.sendMessage(
+        m.chat,
+        {
+            document: { url: downloadUrl },
+            fileName: fileName,
+            caption: `🌚 *_Provided by KanBot_* 🌝`,
+            mimetype: 'video/mp4'
+        },
+        { quoted: m }
+    );
+
+    await m.react('✅');
+} catch (e) {
+    console.error('Error al procesar la solicitud:', e);
+    await m.react('❌'); // Reaccionar con error
+}
+*/
+try {
+    const apiUrl = `https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
+    const apiResponse = await fetch(apiUrl);
+    const agatzData = await apiResponse.json();
+
+    if (agatzData.status !== 200 || !agatzData.data?.success || !agatzData.data?.downloadUrl) {
+        await m.react('❌');
+        return; // Detener si no hay URL de descarga
+    }
+
+    const downloadUrl = agatzData.data.downloadUrl; // Enlace directo de descarga
+    const fileName = `${agatzData.data.title}.mp4`; // Nombre del archivo con título del video
 
     await conn.sendMessage(
         m.chat,

@@ -14,7 +14,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     if (!youtubeRegex.test(youtubeLink)) {
         return conn.reply(m.chat, `*[❗𝐈𝐍𝐅𝐎❗] Asegúrese de que sea un enlace de YouTube.*`, m, rcanal);
     }
-
+/*
 try { 
     await m.react('🕛'); // Indicar que está procesando
 
@@ -40,6 +40,32 @@ try {
 
 } catch (error) { 
     console.warn("Error en la descarga del video:", error.message); 
+}*/
+try { 
+    await m.react('🕛'); // Indicar que está procesando
+
+    let apiResponse = await fetch(`https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(youtubeLink)}`);
+    let data = await apiResponse.json();
+
+    if (data.status === 200 && data.data?.success && data.data?.downloadUrl) {
+        const videoTitle = data.data.title;
+        const videoUrl = data.data.downloadUrl;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: videoUrl },
+            fileName: `${videoTitle}.mp4`,
+            mimetype: 'video/mp4',
+            caption: `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${videoTitle}`,
+        }, { quoted: m });
+
+        return await m.react('✅'); // Confirmar éxito
+    }
+
+    throw new Error("La API no devolvió datos válidos");
+
+} catch (error) { 
+    console.warn("Error en la descarga del video:", error.message); 
+    await m.react('❌'); // Indicar error
 }
 };
 
