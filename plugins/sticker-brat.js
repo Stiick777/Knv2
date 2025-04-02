@@ -39,6 +39,7 @@ handler.command = ['brat', 'brt', 'sb'];
 handler.group = true
 export default handler;
 */
+
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
@@ -60,7 +61,7 @@ const handler = async (m, { conn, args }) => {
   if (text.length > 40) return conn.reply(m.chat, '⚠️ El texto no puede tener más de 40 caracteres.', m);
 
   try {
-    const apiUrl = `https://api.agungny.my.id/api/bratv1?q=${encodeURIComponent(text)}`;
+    const apiUrl = `https://api.siputzx.my.id/api/m/brat?text=${encodeURIComponent(text)}&isVideo=false&delay=500`;
     const response = await axios.get(apiUrl, { responseType: 'arraybuffer' });
     if (!response.data) throw new Error('No se pudo obtener la imagen.');
 
