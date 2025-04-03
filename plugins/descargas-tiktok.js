@@ -6,7 +6,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     return conn.reply(
       m.chat,
       `*☁️ Ingrese un enlace de video de TikTok.*\n\n*💌 Ejemplo:* _${usedPrefix + command} https://vt.tiktok.com/ZS29uaYEv/_`,
-      m, rcanal
+      m
     );
   }
 
@@ -15,24 +15,24 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     return conn.reply(
       m.chat,
       `*☁️ Ingrese un enlace válido de TikTok.*\n\n*💌 Ejemplo:* _${usedPrefix + command} https://vt.tiktok.com/ZS29uaYEv/_`,
-      m, rcanal
+      m
     );
   }
 
   try {
     m.react('🕒');
-
-    const response = await axios.get(`https://api.agungny.my.id/api/tiktok?url=${args[0]}`);
+    
+    const response = await axios.get(`https://api.vreden.my.id/api/tiktok?url=${args[0]}`);
     const result = response.data.result;
 
     if (!result.status) {
       m.react('❌');
-      return conn.reply(m.chat, `*🚩 Error al descargar el contenido. Por favor, intenta nuevamente más tarde.*`, m, rcanal);
+      return conn.reply(m.chat, `*🚩 Error al descargar el contenido. Intenta nuevamente más tarde.*`, m);
     }
 
     const { title, duration, region, author, data } = result;
     const caption = `*📌 Título:* ${title || 'No disponible'}\n*⏳ Duración:* ${duration}\n*🌍 Región:* ${region}\n*👤 Autor:* ${author.nickname}\n\n📥 *Descargado con éxito by _KanBot_.*`;
-
+    
     if (data[0].type === 'photo') {
       for (const photo of data) {
         await conn.sendMessage(
@@ -47,12 +47,11 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
       m.react('✅');
     } else {
       const videoUrl = data.find((item) => item.type === 'nowatermark_hd')?.url ||
-                       data.find((item) => item.type === 'nowatermark')?.url ||
-                       data.find((item) => item.type === 'watermark')?.url;
+                       data.find((item) => item.type === 'nowatermark')?.url;
 
       if (!videoUrl) {
         m.react('❌');
-        return conn.reply(m.chat, `*🚩 No se encontró un video válido para descargar.*`, m, rcanal);
+        return conn.reply(m.chat, `*🚩 No se encontró un video válido para descargar.*`, m);
       }
 
       await conn.sendMessage(
@@ -70,8 +69,8 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     m.react('❌');
     return conn.reply(
       m.chat,
-      `*🌟 Ocurrió un error al procesar tu solicitud. Por favor, inténtalo de nuevo más tarde.*`,
-      m, rcanal
+      `*🌟 Ocurrió un error al procesar tu solicitud. Inténtalo nuevamente más tarde.*`,
+      m
     );
   }
 };
