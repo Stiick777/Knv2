@@ -141,7 +141,7 @@ if (!opts['test']) {
     }, 30 * 1000);
   }
 }
-
+/*
 function clearTmp() {
   const tmp = [join(__dirname, './tmp')];
   const filename = [];
@@ -157,6 +157,121 @@ setInterval(async () => {
   if (stopped === 'close' || !conn || !conn.user) return
   const a = await clearTmp()
 }, 180000)
+*/
+function clearTmp() {
+  const tmp = [join(__dirname, './tmp')];
+  let deletedFiles = 0;
+
+  tmp.forEach((dirname) => {
+    readdirSync(dirname).forEach((file) => {
+      const filePath = join(dirname, file);
+      const stats = statSync(filePath);
+      if (stats.isFile() && (Date.now() - stats.mtimeMs >= 1000 * 60 * 3)) {
+        unlinkSync(filePath);
+        deletedFiles++;
+      }
+    });
+  });
+
+  if (deletedFiles > 0) {
+    console.log(chalk.bold.cyanBright(`\n╭» ❍ MULTIMEDIA ❍\n│→ ${deletedFiles} ARCHIVOS DE TMP ELIMINADOS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`));
+  }
+}
+
+function purgeSession() {
+  let deletedSessions = 0;
+  const directorio = readdirSync(`./${global.authFile}`);
+  const filesFolderPreKeys = directorio.filter(file => file.startsWith('pre-key-'));
+
+  filesFolderPreKeys.forEach(files => {
+    unlinkSync(`./${global.authFile}/${files}`);
+    deletedSessions++;
+  });
+
+  if (deletedSessions > 0) {
+    console.log(chalk.bold.cyanBright(`\n╭» ❍ ${global.authFile} ❍\n│→ ${deletedSessions} SESIONES NO ESENCIALES ELIMINADAS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`));
+  }
+}
+
+function purgeSessionSB() {
+  try {
+    const listaDirectorios = readdirSync(`./${global.jadi}/`);
+    let SBprekey = [];
+
+    listaDirectorios.forEach(directorio => {
+      if (statSync(`./${global.jadi}/${directorio}`).isDirectory()) {
+        const DSBPreKeys = readdirSync(`./${global.jadi}/${directorio}`).filter(fileInDir => {
+          return fileInDir.startsWith('pre-key-');
+        });
+
+        SBprekey = [...SBprekey, ...DSBPreKeys];
+
+        DSBPreKeys.forEach(fileInDir => {
+          if (fileInDir !== 'creds.json') {
+            unlinkSync(`./${global.jadi}/${directorio}/${fileInDir}`);
+          }
+        });
+      }
+    });
+
+    if (SBprekey.length === 0) {
+      console.log(chalk.bold.green(`\n╭» ❍ ${global.jadi} ❍\n│→ NADA POR ELIMINAR\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`));
+    } else {
+      console.log(chalk.bold.cyanBright(`\n╭» ❍ ${global.jadi} ❍\n│→ ARCHIVOS NO ESENCIALES ELIMINADOS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`));
+    }
+  } catch (err) {
+    console.log(chalk.bold.red(`\n╭» ❍ ${global.jadi} ❍\n│→ ERROR AL ELIMINAR\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ✘\n` + err));
+  }
+}
+
+function purgeOldFiles() {
+  const directories = [`./${global.authFile}/`, `./${global.jadi}/`];
+  let deletedFiles = 0;
+
+  directories.forEach(dir => {
+    try {
+      const files = readdirSync(dir);
+      files.forEach(file => {
+        if (file !== 'creds.json') {
+          const filePath = join(dir, file);
+          unlinkSync(filePath);
+          deletedFiles++;
+          console.log(chalk.bold.green(`\n╭» ❍ ARCHIVO ❍\n│→ ${file} BORRADO CON ÉXITO\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`));
+        }
+      });
+    } catch (err) {
+      console.log(chalk.bold.red(`\n╭» ❍ ERROR ❍\n│→ NO SE LOGRÓ ACCEDER A ${dir}\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ✘\n` + err));
+    }
+  });
+
+  if (deletedFiles > 0) {
+    console.log(chalk.bold.cyanBright(`\n╭» ❍ ARCHIVOS ❍\n│→ ${deletedFiles} ARCHIVOS RESIDUALES ELIMINADOS\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`));
+  }
+}
+
+// Ejecutar clearTmp() cada 3 minutos
+setInterval(async () => {
+  if (stopped === 'close' || !conn || !conn.user) return;
+  clearTmp();
+}, 1000 * 60 * 3); // 3 minutos
+
+// Ejecutar purgeSession() cada 10 minutos
+setInterval(async () => {
+  if (stopped === 'close' || !conn || !conn.user) return;
+  purgeSession();
+}, 1000 * 60 * 10); // 10 minutos
+
+// Ejecutar purgeSessionSB() cada 10 minutos
+setInterval(async () => {
+  if (stopped === 'close' || !conn || !conn.user) return;
+  purgeSessionSB();
+}, 1000 * 60 * 10); // 10 minutos
+
+// Ejecutar purgeOldFiles() cada 10 minutos
+setInterval(async () => {
+  if (stopped === 'close' || !conn || !conn.user) return;
+  purgeOldFiles();
+}, 1000 * 60 * 10); // 10 minutos
 
 async function connectionUpdate(update) {
   const {connection, lastDisconnect, isNewLogin} = update;
