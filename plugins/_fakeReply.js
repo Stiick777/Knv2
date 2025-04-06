@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 
 export async function before(m, { conn }) {
-let img = await (await fetch(`https://tinyurl.com/26dnmhay`)).buffer()
+let img = await (await fetch(`https://files.catbox.moe/mt2cl8.jpg`)).buffer()
 
   const canales = [
     {
