@@ -58,7 +58,7 @@ let handler = async (m, { conn, text, args, usedPrefix, command }) => {
       const webpBuffer = await toWebp(imageBuffer);
 
       const sticker = new Sticker(webpBuffer, {
-        pack: global.packname || '',
+        pack:  '',
         author: global.author || 'Bot',
         type: StickerTypes.FULL
       });
