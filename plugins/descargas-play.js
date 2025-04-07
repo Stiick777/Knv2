@@ -89,6 +89,145 @@ if (command === 'play') {
     await m.react('🕓'); // Reaccionar mientras procesa
 
     // URL de la API para obtener el audio
+    const apiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
+    let apiResponse = await fetch(apiUrl);
+    let response = await apiResponse.json();
+
+    // Verificar si la API devolvió un resultado válido
+    if (response.url) {
+        const { url: dl, title } = response;
+
+        let originalPath = './temp_audio.mp3';
+        let convertedPath = './converted_audio.mp3';
+
+        // Descargar el audio
+        const audioResponse = await axios.get(dl, { responseType: 'arraybuffer' });
+        fs.writeFileSync(originalPath, audioResponse.data);
+
+        // Convertir el audio a un formato compatible con WhatsApp (64kbps, 44100Hz)
+        await new Promise((resolve, reject) => {
+            exec(`ffmpeg -i ${originalPath} -ar 44100 -ab 64k -y ${convertedPath}`, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        // Enviar el audio convertido
+        await conn.sendMessage(m.chat, {
+            audio: fs.readFileSync(convertedPath),
+            mimetype: 'audio/mp4',
+            ptt: false, // Enviar como audio normal
+            fileName: `${title}.mp3`,
+        }, { quoted: m });
+
+        // Eliminar archivos temporales
+        fs.unlinkSync(originalPath);
+        fs.unlinkSync(convertedPath);
+
+        return await m.react('✅'); // Reacción de éxito
+    }
+
+    throw new Error("API falló o no retornó datos válidos");
+} catch (error) {
+    console.warn("Error en la API:", error.message);
+    
+   try {
+    await m.react('🕓'); // Reaccionar mientras procesa
+
+    // URL de la API para obtener el audio
+    const apiUrl = `https://bk9.fun/download/ytmp3?url=${encodeURIComponent(yt_play[0].url)}&type=mp3`;
+    let apiResponse = await fetch(apiUrl);
+    let response = await apiResponse.json();
+
+    // Verificar si la API devolvió un resultado válido
+    if (response.status === true && response.BK9 && response.BK9.downloadUrl) {
+        const { downloadUrl: dl, title } = response.BK9;
+
+        let originalPath = './temp_audio.mp3';
+        let convertedPath = './converted_audio.mp3';
+
+        // Descargar el audio
+        const audioResponse = await axios.get(dl, { responseType: 'arraybuffer' });
+        fs.writeFileSync(originalPath, audioResponse.data);
+
+        // Convertir el audio a un formato compatible con WhatsApp (64kbps, 44100Hz)
+        await new Promise((resolve, reject) => {
+            exec(`ffmpeg -i ${originalPath} -ar 44100 -ab 64k -y ${convertedPath}`, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        // Enviar el audio convertido
+        await conn.sendMessage(m.chat, {
+            audio: fs.readFileSync(convertedPath),
+            mimetype: 'audio/mp4',
+            ptt: false, // Enviar como audio normal
+            fileName: `${title}.mp3`,
+        }, { quoted: m });
+
+        // Eliminar archivos temporales
+        fs.unlinkSync(originalPath);
+        fs.unlinkSync(convertedPath);
+
+        return await m.react('✅'); // Reacción de éxito
+    }
+
+    throw new Error("API falló o no retornó datos válidos");
+} catch (error) {
+    console.warn("Error en la API:", error.message);
+    
+try {
+    await m.react('🕓'); // Reaccionar mientras procesa
+
+    // URL de la API para obtener el audio
+    const apiUrl = `https://api.agatz.xyz/api/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
+    let apiResponse = await fetch(apiUrl);
+    let response = await apiResponse.json();
+
+    // Verificar si la API devolvió un resultado válido
+    if (response.status === 200 && Array.isArray(response.data) && response.data.length > 0) {
+        const { downloadUrl: dl, title } = response.data[0];
+
+        let originalPath = './temp_audio.mp3';
+        let convertedPath = './converted_audio.mp3';
+
+        // Descargar el audio
+        const audioResponse = await axios.get(dl, { responseType: 'arraybuffer' });
+        fs.writeFileSync(originalPath, audioResponse.data);
+
+        // Convertir el audio a un formato compatible con WhatsApp (64kbps, 44100Hz)
+        await new Promise((resolve, reject) => {
+            exec(`ffmpeg -i ${originalPath} -ar 44100 -ab 64k -y ${convertedPath}`, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        // Enviar el audio convertido
+        await conn.sendMessage(m.chat, {
+            audio: fs.readFileSync(convertedPath),
+            mimetype: 'audio/mp4',
+            ptt: false, // Enviar como audio normal
+            fileName: `${title}.mp3`,
+        }, { quoted: m });
+
+        // Eliminar archivos temporales
+        fs.unlinkSync(originalPath);
+        fs.unlinkSync(convertedPath);
+
+        return await m.react('✅'); // Reacción de éxito
+    }
+
+    throw new Error("API falló o no retornó datos válidos");
+} catch (error) {
+    console.warn("Error en la API:", error.message);
+
+
+        try {
+    await m.react('🕓'); // Reaccionar mientras procesa
+
+    // URL de la API para obtener el audio
     const apiUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(yt_play[0].url)}`;
     let apiResponse = await fetch(apiUrl);
     let response = await apiResponse.json();
@@ -224,6 +363,9 @@ if (command === 'play') {
 } catch (error) {
     console.warn("Error en la API:", error.message);
     await m.reply("❌ Error al procesar la solicitud. Inténtalo con /ply");
+}
+}
+}
 }
 }
 }
