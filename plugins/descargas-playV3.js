@@ -3,7 +3,7 @@ import axios from 'axios';
 import fs from 'fs';
 
 const handler = async (m, { conn, command, text }) => {
-  if (command === 'plu') {
+  if (command === 'play') {
     if (!text) return conn.reply(m.chat, '*Ingresa el nombre de lo que quieres buscar*', m);
 
     await m.react('🕓'); // Indicador de carga
@@ -52,8 +52,8 @@ const handler = async (m, { conn, command, text }) => {
   }
 };
 
-handler.command = ['plu'];
-handler.help = ['ply <nombre>'];
+handler.command = ['play'];
+handler.help = ['play <nombre>'];
 handler.tags = ['descargas'];
 handler.group = true;
 

@@ -9,7 +9,7 @@ import { exec } from 'child_process'
 const LimitAud = 725 * 1024 * 1024; //700MB
 const LimitVid = 425 * 1024 * 1024; //425MB
 const handler = async (m, {conn, command, args, text, usedPrefix}) => {
-
+/*
 
 if (command === 'play') {
         if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
@@ -38,7 +38,7 @@ if (command === 'play') {
 
         await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-      /*  try {
+        try {
             await m.react('🕓'); // Reaccionar mientras procesa
 
             // URL de la API para obtener el audio
@@ -84,7 +84,7 @@ if (command === 'play') {
         } catch (error) {
             console.warn("Error en la API:", error.message);
             await m.reply("❌ Error al procesar la solicitud. Inténtalo con /ply");
-        }*/
+        
         try {
     await m.react('🕓'); // Reaccionar mientras procesa
 
@@ -372,7 +372,7 @@ try {
 //
 
     }
-
+*/
 if (command == 'play2') {
     if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
     
