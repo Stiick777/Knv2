@@ -30,7 +30,7 @@ const handler = async (m, { conn, command, text }) => {
 *🚀 Se está enviando tu audio...*
 ===========================
 ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
-> Provided by DiiOffc
+> Provided by Stiiven
 `.trim();
 
       await conn.sendFile(m.chat, thumbnail, 'thumbnail.jpg', texto, m);
