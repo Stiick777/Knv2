@@ -28,6 +28,7 @@ const defaultMenu = {
 👥 𝑼𝒔𝒖𝒂𝒓𝒊𝒐𝒔 : *%totalreg*
 ⚡ 𝑶𝒘𝒏𝒆𝒓 : Stiíven
 🟢 𝑻𝒊𝒆𝒎𝒑𝒐 𝑨𝒄𝒕𝒊𝒗𝒐 : *%muptime*
+%botofc
 
 ▢  FOLLOW ME
 • https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N
@@ -137,7 +138,7 @@ npmdesc: _package.description,
 version: _package.version,
 exp: exp - min,
 maxexp: xp,
-botofc: (conn.user.jid == global.conn.user.jid ? '🚩 𝙴𝚂𝚃𝙴 𝙴𝚂 𝙴𝙻 𝙱𝙾𝚃 𝙾𝙵𝙲' : `🚩 𝚂𝚄𝙱-𝙱𝙾𝚃 𝙳𝙴: Wa.me/${global.conn.user.jid.split`@`[0]}`), 
+botofc: (conn.user.jid == global.conn.user.jid ? '❤️ 𝑩𝒐𝒕 𝑶𝒇𝒇𝒊𝒄𝒊𝒂𝒍' : `🤍 𝑺𝒖𝒃𝑩𝒐𝒕 𝑫𝒆: Wa.me/${global.conn.user.jid.split`@`[0]}`), 
 totalexp: exp,
 xp4levelup: max - exp,
 github: _package.homepage ? _package.homepage.url || _package.homepage : '[unknown github url]',
