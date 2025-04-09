@@ -399,33 +399,32 @@ if (command == 'play2') {
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
 
-/*try {
-    await m.react('🕓'); // Reacciona con un ícono de reloj mientras procesa
+try {
+    await m.react('🕓'); // Reacciona mientras procesa
 
-    // Nueva API
-    const apiUrl = `https://api.agungny.my.id/api/youtube-videov2?url=${encodeURIComponent(yt_play[0].url)}`;
-    let apiResponse = await fetch(apiUrl);
-    let response = await apiResponse.json();
+    const apiUrl = `https://dark-core-api.vercel.app/api/download/ytmp4/v2?key=api&url=${encodeURIComponent(yt_play[0].url)}`;
+    const apiResponse = await fetch(apiUrl);
+    const response = await apiResponse.json();
 
-    // Verificar si la API devolvió un resultado válido
-    if (response.status === "true" && response.result && response.result.url) {
-        const { url, title } = response.result;
+    if (response.title && response.download) {
+        const { title, quality, download } = response;
 
         await conn.sendMessage(m.chat, {
-            video: { url },
-            caption: `🎥 *${title}*\n😎 Su video by ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`,
-            mimetype: 'video/mp4',
+            video: { url: download },
+            caption: `*${title}*\nCalidad: ${quality}p`,
         }, { quoted: m });
 
-        return await m.react('✅'); // Reaccionar con éxito
+        await m.react('✅'); // Éxito
+    } else {
+        await m.react('❌');
+        m.reply('No se pudo obtener el video. Intenta con otro enlace.');
     }
-
-    throw new Error("API falló o no retornó datos válidos");
-} catch (error) {
-    console.warn("Error en la API:", error.message);
+} catch (e) {
+    await m.react('❌');
+    console.error(e);
+    m.reply('Ocurrió un error al procesar el video.');
 }
-*/
-try {
+/*try {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const apiUrl = `https://dark-core-api.vercel.app/api/download/ytmp4?key=api&url=${encodeURIComponent(yt_play[0].url)}`;
@@ -450,7 +449,7 @@ try {
     await m.react('❌');
     console.error(e);
     m.reply('Ocurrió un error al procesar el video.');
-}
+}*/
 //
 }
 
