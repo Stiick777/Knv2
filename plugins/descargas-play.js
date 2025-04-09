@@ -426,20 +426,20 @@ if (command == 'play2') {
 }
 */
 try {
-    await m.react('🕓'); // Reacciona con un ícono de reloj mientras procesa
+    await m.react('🕓'); // Reacciona mientras se procesa
 
-    const apiUrl = `https://itzpire.com/download/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
+    const apiUrl = `https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
     const apiResponse = await fetch(apiUrl);
     const response = await apiResponse.json();
 
-    if (response.status === "success" && response.data && Array.isArray(response.data.downloads)) {
-        const firstDownload = response.data.downloads[0]; // Primer objeto del array
-        const { downloadLink, quality, format } = firstDownload;
-        const title = response.data.title;
+    if (response.status === 200 && response.result?.download?.status) {
+        const videoUrl = response.result.download.url;
+        const title = response.result.metadata.title;
+        const quality = response.result.download.quality;
 
         await conn.sendMessage(m.chat, {
-            video: { url: downloadLink },
-            caption: `*${title}*\nFormato: ${format}\nCalidad: ${quality}`,
+            video: { url: videoUrl },
+            caption: `*${title}*\nCalidad: ${quality}`,
         }, { quoted: m });
 
         await m.react('✅'); // Éxito
