@@ -41,32 +41,7 @@ try {
 } catch (error) { 
     console.warn("Error en la descarga del video:", error.message); 
 }*/
-try { 
-    await m.react('🕛'); // Indicar que está procesando
-
-    let apiResponse = await fetch(`https://apidl.asepharyana.cloud/api/downloader/ytmp4?url=${encodeURIComponent(youtubeLink)}&quality=360`);
-    let data = await apiResponse.json();
-
-    if (data.url) {
-        const videoTitle = data.title;
-        const videoUrl = data.url; // URL de descarga proporcionada por la API
-
-        await conn.sendMessage(m.chat, {
-            video: { url: videoUrl },
-            fileName: `${videoTitle}.mp4`,
-            mimetype: 'video/mp4',
-            caption: `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${videoTitle}\n📌 *Calidad:* 360p`,
-        }, { quoted: m });
-
-        return await m.react('✅'); // Confirmar éxito
-    }
-
-    throw new Error("La API no devolvió datos válidos");
-
-} catch (error) { 
-    console.warn("Error en la descarga del video:", error.message); 
-    
-    try { 
+try {
     await m.react('🕛'); // Indicar que está procesando
 
     let apiResponse = await fetch(`https://api.siputzx.my.id/api/d/ytmp4?url=${encodeURIComponent(youtubeLink)}`);
@@ -88,37 +63,9 @@ try {
 
     throw new Error("La API no devolvió datos válidos");
 
-} catch (error) { 
-    console.warn("Error en la descarga del video:", error.message); 
-    
-try { 
-    await m.react('🕛'); // Indicar que está procesando
-
-    let apiResponse = await fetch(`https://bk9.fun/download/youtube?url=${encodeURIComponent(youtubeLink)}`);
-    let data = await apiResponse.json();
-
-    if (data.status && data.BK9?.BK8?.length > 0) {
-        const videoTitle = data.BK9.title;
-        const videoUrl = data.BK9.BK8[0].link; // Primer objeto del array BK8
-        const quality = data.BK9.BK8[0].quality;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: videoUrl },
-            fileName: `${videoTitle}.mp4`,
-            mimetype: 'video/mp4',
-            caption: `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${videoTitle}\n📌 *Calidad:* ${quality}`,
-        }, { quoted: m });
-
-        return await m.react('✅'); // Confirmar éxito
-    }
-
-    throw new Error("La API no devolvió datos válidos");
-
-} catch (error) { 
-    console.warn("Error en la descarga del video:", error.message); 
+} catch (error) {
+    console.warn("Error en la descarga del video:", error.message);
     await m.react('❌'); // Indicar error
-}
-}
 }
 //
 };
