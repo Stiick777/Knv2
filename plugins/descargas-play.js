@@ -398,20 +398,19 @@ if (command == 'play2') {
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-
 try {
     await m.react('🕓'); // Reacciona mientras procesa
 
-    const apiUrl = `https://dark-core-api.vercel.app/api/download/ytmp4/v2?key=api&url=${encodeURIComponent(yt_play[0].url)}`;
+    const apiUrl = `https://mahiru-shiina.vercel.app/download/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
     const apiResponse = await fetch(apiUrl);
     const response = await apiResponse.json();
 
-    if (response.title && response.download) {
-        const { title, quality, download } = response;
+    if (response.status && response.data?.download) {
+        const { title, download, duration, views, author, thumbnail } = response.data;
 
         await conn.sendMessage(m.chat, {
             video: { url: download },
-            caption: `*${title}*\nCalidad: ${quality}p`,
+            caption: `*${title}*\nDuración: ${duration}\nVistas: ${views.toLocaleString()}\nAutor: ${author.name}`,
         }, { quoted: m });
 
         await m.react('✅'); // Éxito
@@ -424,32 +423,6 @@ try {
     console.error(e);
     m.reply('Ocurrió un error al procesar el video.');
 }
-/*try {
-    await m.react('🕓'); // Reacciona mientras procesa
-
-    const apiUrl = `https://dark-core-api.vercel.app/api/download/ytmp4?key=api&url=${encodeURIComponent(yt_play[0].url)}`;
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
-
-    if (response.title && Array.isArray(response.downloads) && response.downloads.length > 0) {
-        const { link, quality, format, size } = response.downloads[0];
-        const title = response.title;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: link },
-            caption: `*${title}*\nFormato: ${format}\nCalidad: ${quality}\nTamaño: ${size}`,
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } else {
-        await m.react('❌');
-        m.reply('No se pudo obtener el video. Intenta con otro enlace.');
-    }
-} catch (e) {
-    await m.react('❌');
-    console.error(e);
-    m.reply('Ocurrió un error al procesar el video.');
-}*/
 //
 }
 
