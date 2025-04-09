@@ -259,19 +259,19 @@ setInterval(async () => {
 setInterval(async () => {
   if (stopped === 'close' || !conn || !conn.user) return;
   purgeSession();
-}, 1000 * 60 * 10); // 10 minutos
+}, 1000 * 60 * 5); // 10 minutos
 
 // Ejecutar purgeSessionSB() cada 10 minutos
 setInterval(async () => {
   if (stopped === 'close' || !conn || !conn.user) return;
   purgeSessionSB();
-}, 1000 * 60 * 10); // 10 minutos
+}, 1000 * 60 * 5); // 10 minutos
 
 // Ejecutar purgeOldFiles() cada 10 minutos
 setInterval(async () => {
   if (stopped === 'close' || !conn || !conn.user) return;
   purgeOldFiles();
-}, 1000 * 60 * 10); // 10 minutos
+}, 1000 * 60 * 5); // 10 minutos
 
 async function connectionUpdate(update) {
   const {connection, lastDisconnect, isNewLogin} = update;
