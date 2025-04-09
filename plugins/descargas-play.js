@@ -426,20 +426,19 @@ if (command == 'play2') {
 }
 */
 try {
-    await m.react('🕓'); // Reacciona mientras se procesa
+    await m.react('🕓'); // Reacciona mientras procesa
 
-    const apiUrl = `https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
+    const apiUrl = `https://dark-core-api.vercel.app/api/download/ytmp4?key=api&url=${encodeURIComponent(yt_play[0].url)}`;
     const apiResponse = await fetch(apiUrl);
     const response = await apiResponse.json();
 
-    if (response.status === 200 && response.result?.download?.status) {
-        const videoUrl = response.result.download.url;
-        const title = response.result.metadata.title;
-        const quality = response.result.download.quality;
+    if (response.title && Array.isArray(response.downloads) && response.downloads.length > 0) {
+        const { link, quality, format, size } = response.downloads[0];
+        const title = response.title;
 
         await conn.sendMessage(m.chat, {
-            video: { url: videoUrl },
-            caption: `*${title}*\nCalidad: ${quality}`,
+            video: { url: link },
+            caption: `*${title}*\nFormato: ${format}\nCalidad: ${quality}\nTamaño: ${size}`,
         }, { quoted: m });
 
         await m.react('✅'); // Éxito
