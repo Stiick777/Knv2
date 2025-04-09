@@ -425,30 +425,31 @@ if (command == 'play2') {
     console.warn("Error en la API:", error.message);
 }
 */
-try {
-    await m.react('🕓'); // Reacciona con un ícono de reloj mientras procesa
-
-    const apiUrl = `https://api.siputzx.my.id/api/d/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
-    
-    let apiResponse = await fetch(apiUrl);
-    let response = await apiResponse.json();
-
-    // Verificar si la API devolvió un resultado válido
-    if (response.status && response.data && response.data.dl) {
-        const { title, dl } = response.data;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: dl },
-            caption: `🎥 *${title}*\n📌 Calidad: 360p\n😎 Su video by ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`,
-            mimetype: 'video/mp4',
-        }, { quoted: m });
-
-        return await m.react('✅'); // Reacciona con éxito
-    }
-
-    throw new Error("API falló o no retornó datos válidos");
-} catch (error) {
-    await m.react('❌'); // Reacciona con error sin mensaje
+try {  
+    await m.react('🕓'); // Reacciona con un ícono de reloj mientras procesa  
+  
+    const apiUrl = `https://bk9.fun/download/youtube?url=${encodeURIComponent(yt_play[0].url)}`;  
+     
+    let apiResponse = await fetch(apiUrl);  
+    let response = await apiResponse.json();  
+  
+    // Verificar si la API devolvió un resultado válido  
+    if (response.status && response.BK9 && response.BK9.BK8.length > 0) {  
+        const { link, quality } = response.BK9.BK8[0]; // Primer objeto del array BK8  
+        const title = response.BK9.title;  
+  
+        await conn.sendMessage(m.chat, {  
+            video: { url: link },  
+            caption: `🎥 *${title}*\n📌 Calidad: ${quality}\n😎 Su video by ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰`,  
+            mimetype: 'video/mp4',  
+        }, { quoted: m });  
+  
+        return await m.react('✅'); // Reaccionar con éxito  
+    }  
+  
+    throw new Error("API falló o no retornó datos válidos");  
+} catch (error) {  
+    await m.react('❌'); // Reacciona con error sin mensaje  
 }
 //
 }
