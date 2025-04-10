@@ -6,48 +6,46 @@ const handler = async (m, { conn, command, text }) => {
   if (command === 'play2') {
     if (!text) return conn.reply(m.chat, '*Ingresa el nombre del video que deseas buscar*', m);
 
-    await m.react('🕓'); // Indicador de carga
+    await m.react('🕓');
 
     try {
-      const urlApi = `https://api.vreden.my.id/api/ytplaymp4?query=${encodeURIComponent(text)}`;
+      const urlApi = `https://api.agatz.xyz/api/ytplayvid?message=${encodeURIComponent(text)}`;
       const { data: res } = await axios.get(urlApi);
 
-      const info = res.result;
-      if (!res.status || !info.download?.url) throw new Error('No se encontró el video.');
-
-      const videoUrl = info.download.url;
-      const thumbnail = info.metadata.thumbnail;
+      const info = res.data;
+      const videoData = info.downloadLinks.video?.[0];
+      if (!videoData?.url) throw new Error('No se encontró el video.');
 
       const texto = `
-𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙼𝙿𝟺 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊
+𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝚅𝚒𝚍𝚎𝚘 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊
 ===========================
-> *Título:* ${info.metadata.title}
-> *Autor:* ${info.metadata.author.name}
-> *Duración:* ${info.metadata.duration.timestamp}
-> *Fecha:* ${info.metadata.ago}
-> *Vistas:* ${info.metadata.views.toLocaleString()}
+> *Título:* ${info.title}
+> *Autor:* ${info.author}
+> *Subido hace:* ${info.uploadedAt}
+> *Vistas:* ${info.views.toLocaleString()}
+> *Calidad:* ${videoData.quality}
 
-*📽️ Enviando tu video...*
+*🎬 Enviando tu video...*
 ===========================
 ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
-> Powered by Stiiven
+> API por Agat
 `.trim();
 
-      await conn.sendFile(m.chat, thumbnail, 'thumbnail.jpg', texto, m);
+      await conn.sendFile(m.chat, info.thumbnailUrl, 'thumb.jpg', texto, m);
 
-      const videoBuffer = await (await fetch(videoUrl)).buffer();
+      const videoBuffer = await (await fetch(videoData.url)).buffer();
 
       await conn.sendMessage(m.chat, {
         video: videoBuffer,
         mimetype: 'video/mp4',
-        caption: info.metadata.title
+        caption: info.title
       }, { quoted: m });
 
       await m.react('✅');
     } catch (err) {
       console.error(err);
       await m.react('❌');
-      await conn.reply(m.chat, 'Ocurrió un error al obtener el video.', m);
+      await conn.reply(m.chat, 'Hubo un error al obtener el video.', m);
     }
   }
 };
