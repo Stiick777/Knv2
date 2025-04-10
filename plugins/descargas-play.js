@@ -372,7 +372,7 @@ try {
 //
 
     }
-
+*/
 if (command == 'play2') {
     if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
     
@@ -401,16 +401,18 @@ if (command == 'play2') {
 try {
     await m.react('🕓'); // Reacciona mientras procesa
 
-    const apiUrl = `https://mahiru-shiina.vercel.app/download/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
+    const url = yt_play[0].url; // o el link que quieras procesar directamente
+    const apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(url)}&type=video&quality=720p&apikey=Paimon`;
     const apiResponse = await fetch(apiUrl);
     const response = await apiResponse.json();
 
-    if (response.status && response.data?.download) {
-        const { title, download, duration, views, author, thumbnail } = response.data;
+    if (response.status && response.data?.url) {
+        const { title, fduration, views, channel, thumbnail } = response;
+        const { url: downloadUrl } = response.data;
 
         await conn.sendMessage(m.chat, {
-            video: { url: download },
-            caption: `*${title}*\nDuración: ${duration}\nVistas: ${views.toLocaleString()}\nAutor: ${author.name}`,
+            video: { url: downloadUrl },
+            caption: `*${title}*\nDuración: ${fduration}\nVistas: ${views}\nCanal: ${channel}`,
         }, { quoted: m });
 
         await m.react('✅'); // Éxito
@@ -421,17 +423,16 @@ try {
 } catch (e) {
     await m.react('❌');
     console.error(e);
-    m.reply('Ocurrió un error al procesar el video.');
+    m.reply('Ocurrió un error al procesar el video intente con playv2.');
 }
 //
 }
-*/
+
 
 }
-//handler.help = ['play', 'play2'];
-//handler.tags = ['descargas'];
-//handler.command = ['play2']
-//handler.yenes = 3
+handler.help = ['play', 'play2'];
+handler.tags = ['descargas'];
+handler.command = ['play2']
 handler.group = true;
 export default handler;
 

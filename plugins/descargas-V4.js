@@ -28,7 +28,7 @@ const handler = async (m, { conn, command, text }) => {
 *🎬 Enviando tu video...*
 ===========================
 ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
-> API por Agat
+> Provided by Stiiven
 `.trim();
 
       await conn.sendFile(m.chat, info.thumbnailUrl, 'thumb.jpg', texto, m);
@@ -50,8 +50,8 @@ const handler = async (m, { conn, command, text }) => {
   }
 };
 
-handler.command = ['play2'];
-handler.help = ['play2 <nombre>'];
+handler.command = ['playv2'];
+handler.help = ['playv2 <nombre>'];
 handler.tags = ['descargas'];
 handler.group = true;
 
