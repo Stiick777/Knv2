@@ -58,11 +58,11 @@ import axios from 'axios';
 let handler = async (m, { conn, text, usedPrefix, command, args }) => {
   try {
     if (!text) {
-      return conn.reply(m.chat, `🌱 Ejemplo de uso: ytv https://youtube.com/watch?v=Hx920thF8X4`, m);
+      return conn.reply(m.chat, `⚡ Ejemplo de uso: ytv https://youtube.com/watch?v=Hx920thF8X4`, m, rcanal);
     }
 
     if (!/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(args[0])) {
-      return m.reply(`Enalce inválido`);
+      return m.reply(`Enalce inválido asegurese de que sea un enlace de YouTube`);
     }
 
     m.react('🕒');
@@ -70,11 +70,11 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
     let limit = 10485760;
     let size = await getSize(json.url);
 
-    const cap = `\`\`\`⊜─⌈ 📻 ◜YouTube MP4◞ 📻 ⌋─⊜\`\`\`\n≡ 🌿 \`Title\` : ${json.title}\n≡ 🌲 \`URL\` : ${args[0]}\n≡ 🌾 Peso: ${await formatSize(size) || "Desconocido"}`;
+   const cap = `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${json.title}\n*🌐 URL:* ${args[0]}\n*📦 Peso:* ${await formatSize(size) || "Desconocido"}`;
 
   conn.sendFile(m.chat, await (await fetch(json.url)).buffer(), `${json.title}.mp4`, cap, m, null, { mimetype: 'video/mp4' })
 
-    m.react('☑️');
+    m.react('✅');
   } catch (e) {
  m.reply(e)
   }
@@ -82,8 +82,8 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
 
 handler.help = ['ytmp4'];
 handler.command = ['ytv2', 'ytmp4', 'ytv'];
-handler.tags = ['dl'];
-handler.diamond = true;
+handler.tags = ['descargas'];
+handler.group = true;
 
 export default handler;
 
