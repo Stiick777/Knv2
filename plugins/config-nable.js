@@ -9,12 +9,8 @@ ${usedPrefix + command} detect
 ${usedPrefix + command} antidelete
 ${usedPrefix + command} antilink
 ${usedPrefix + command} antilink2
-${usedPrefix + command} modohorny
-${usedPrefix + command} autolevelup
 ${usedPrefix + command} autosticker
 ${usedPrefix + command} reaction
-${usedPrefix + command} antitoxic
-${usedPrefix + command} audios
 ${usedPrefix + command} modoadmin
 ${usedPrefix + command} antifake
 ${usedPrefix + command} antibot
