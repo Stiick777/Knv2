@@ -1,4 +1,4 @@
-let linkRegex = /(https?:\/\/(?:www\.)?(?:t\.me|telegram\.me|whatsapp\.com)\/\S+)|(https?:\/\/chat\.whatsapp\.com\/\S+)|(https?:\/\/whatsapp\.com\/channel\/\S+)/i;
+let linkRegex = /(https?:\/\/(?:www\.)?(?:whatsapp\.com)\/\S+)|(https?:\/\/chat\.whatsapp\.com\/\S+)|(https?:\/\/whatsapp\.com\/channel\/\S+)/i;
 
 let allowedLinks = [
     "https://chat.whatsapp.com/C5xsN9KcmIs8O1wNeOkcX9",

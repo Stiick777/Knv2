@@ -15,9 +15,11 @@ var handler = async (m, { conn, args, usedPrefix, command, isOwner, isPrems }) =
         return m.reply(`*[❗𝐈𝐍𝐅𝐎❗] 𝙄𝙉𝙂𝙍𝙀𝙎𝙀 𝙐𝙉 𝙀𝙉𝙇𝘼𝘾𝙀 𝘿𝙀 𝙈𝙀𝙂𝘼*\n\n❕ 𝙀𝙅𝙀𝙈𝙋𝙇𝙊\n*${usedPrefix}mega* https://mega.nz/file/yourfileid#yourfilekey`);
     }
 
-    if (!args[0].match(/mega/gi)) {
-        return m.reply(`[❗𝐈𝐍𝐅𝐎❗] 𝙇𝙄𝙉𝙆 𝙄𝙉𝘾𝙊𝙍𝙍𝙀𝘾𝙏𝙊*`);
-    }
+  const megaRegex = /^(https?:\/\/)?(www\.)?(mega\.nz|mega\.co\.nz)\/(file|folder)\/[a-zA-Z0-9_-]+(#|\?|!)[a-zA-Z0-9_-]+$/i;
+
+if (!megaRegex.test(args[0])) {
+  return m.reply(`[❗𝐈𝐍𝐅𝐎❗] *LINK INCORRECTO*\nAsegúrate de que el enlace sea un link válido de MEGA.`);
+}
 
     try {
         m.react('⏳'); 
