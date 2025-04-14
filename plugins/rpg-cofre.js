@@ -22,7 +22,7 @@ const handler = async (m, { isPrems, conn }) => {
     return await conn.sendMessage(m.chat, { text: mensaje }, { quoted: fkontak });  
   }  
 
-  const img = 'https://telegra.ph/file/62ba6688963b0ad407edd.png';  
+  const img = 'https://files.catbox.moe/6zxl50.jpg';  
   const dia = Math.floor(Math.random() * 30);  
   const tok = Math.floor(Math.random() * 10);  
   const ai = Math.floor(Math.random() * 4000);  
