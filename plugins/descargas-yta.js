@@ -7,7 +7,7 @@ const handler = async (m, { args, conn }) => {
   if (!args[0]) 
     return m.reply('*[❗𝐈𝐍𝐅𝐎❗] 𝙄𝙉𝙂𝙍𝙀𝙎𝙀 𝙀𝙇 𝘾𝙊𝙈𝘼𝙉𝘿𝙊 𝙈𝘼𝙎 𝙐𝙉 𝙀𝙉𝙇𝘼𝘾𝙀 𝘿𝙀 𝙔𝙊𝙐𝙏𝙐𝘽𝙀*');
 
-  
+   const youtubeLink = args[0];
 
   const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[a-zA-Z0-9_-]{11}(\S*)?$/;
 
@@ -18,7 +18,7 @@ const handler = async (m, { args, conn }) => {
  try {
   await m.react('🕓');
 
-  const youtubeLink = args[0];
+ 
   
   const apiUrl = `https://bk9.fun/download/ytmp3?url=${encodeURIComponent(youtubeLink)}&type=mp3`;
 
