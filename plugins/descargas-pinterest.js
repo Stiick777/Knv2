@@ -100,7 +100,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     } catch (e) {  
         console.error(e);  
-        await conn.reply(m.chat, `❌ Error al buscar imágenes. Inténtalo de nuevo.`, m);  
+        await conn.reply(m.chat, `❌ Error al buscar imágenes. Inténtalo con /pin2`, m);  
     }  
 };  
 
