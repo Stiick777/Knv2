@@ -88,7 +88,7 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
 };
 
 handler.help = ['ytaudio'];
-handler.command = ['yta2', 'ytaudio', 'yta'];
+handler.command = ['ytmp3', 'ytaudio', 'yta'];
 handler.tags = ['descargas'];
 handler.group = true;
 
