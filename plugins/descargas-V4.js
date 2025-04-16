@@ -3,7 +3,7 @@ import axios from 'axios';
 import fs from 'fs';
 
 const handler = async (m, { conn, command, text }) => {
-  if (command === 'play2') {
+  if (command === 'playv2') {
     if (!text) return conn.reply(m.chat, '*Ingresa el nombre del video que deseas buscar*', m);
 
     await m.react('🕓');
