@@ -236,7 +236,6 @@ function purgeOldFiles() {
           const filePath = join(dir, file);
           unlinkSync(filePath);
           deletedFiles++;
-          console.log(chalk.bold.green(`\n╭» ❍ ARCHIVO ❍\n│→ ${file} BORRADO CON ÉXITO\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`));
         }
       });
     } catch (err) {
