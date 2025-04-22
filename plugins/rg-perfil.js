@@ -10,7 +10,7 @@ var handler = async (m, { conn }) => {
         ppUrl = await conn.profilePictureUrl(who, 'image');
     } catch (e) {
         console.error('Error obteniendo la foto de perfil:', e);
-        ppUrl = 'https://files.catbox.moe/mz39y2.jpg'; // Imagen por defecto
+        ppUrl = 'https://i.ibb.co/whpcLpM7/Screenshot-20250421-195814-2.png'; // Imagen por defecto
     }
 
     let { premium, level, cookies, exp, registered, role } = global.db.data.users[who] || {};
