@@ -14,10 +14,10 @@ let handler = async (m, { conn, args }) => {
       let { name, size, image, download, developer, publish, id } = resultDelirius.data;
       let sizeMB = parseFloat(size);
 
-      if (sizeMB > MAX_SIZE_MB) {
-        await m.react('❌');
-        return conn.reply(m.chat, `⚠️ La aplicación "${name}" supera los ${MAX_SIZE_MB}MB (${size}MB). No se puede descargar.`, m, rcanal);
-      }
+      // if (sizeMB > MAX_SIZE_MB) {
+      //   await m.react('❌');
+      //   return conn.reply(m.chat, `⚠️ La aplicación "${name}" supera los ${MAX_SIZE_MB}MB (${size}MB). No se puede descargar.`, m, rcanal);
+      // }
 
       let textoDelirius = `  ❯───「 𝗔𝗣𝗞 𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗 」───❮\n` +
         `✦ 𝐍𝐨𝐦𝐛𝐫𝐞 : ⇢ ${name} 📛\n` +
@@ -48,10 +48,10 @@ let handler = async (m, { conn, args }) => {
     let { name, size, lastUpdate, icon, dllink: URL, package: packe } = resultDorratz;
     let sizeMB = parseFloat(size);
 
-    if (sizeMB > MAX_SIZE_MB) {
-      await m.react('❌');
-      return conn.reply(m.chat, `⚠️ La aplicación "${name}" supera los ${MAX_SIZE_MB}MB (${size}MB). No se puede descargar.`, m, rcanal);
-    }
+    // if (sizeMB > MAX_SIZE_MB) {
+    //   await m.react('❌');
+    //   return conn.reply(m.chat, `⚠️ La aplicación "${name}" supera los ${MAX_SIZE_MB}MB (${size}MB). No se puede descargar.`, m, rcanal);
+    // }
 
     let textoDorratz = `  ❯───「 𝗔𝗣𝗞 𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗 」───❮\n` +
       `✦ 𝐍𝐨𝐦𝐛𝐫𝐞 : ⇢ ${name} 📛\n` +

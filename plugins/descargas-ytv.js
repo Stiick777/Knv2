@@ -62,21 +62,43 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
     }
 
     if (!/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(args[0])) {
-      return m.reply(`Enalce inválido asegurese de que sea un enlace de YouTube`);
+      return m.reply(`Enlace inválido. Asegúrese de que sea un enlace de YouTube válido.`);
     }
 
-    m.react('🕒');
+    await m.react('🕒');
+
     let json = await ytdl(args[0]);
-    let limit = 10485760;
     let size = await getSize(json.url);
+    let MAX_SIZE = 104857600; // 100 MB en bytes
+    let cap = `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${json.title}\n*🌐 URL:* ${args[0]}\n*📦 Peso:* ${await formatSize(size) || "Desconocido"}`;
 
-   const cap = `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${json.title}\n*🌐 URL:* ${args[0]}\n*📦 Peso:* ${await formatSize(size) || "Desconocido"}`;
+    let buffer = await (await fetch(json.url)).buffer();
 
-  conn.sendFile(m.chat, await (await fetch(json.url)).buffer(), `${json.title}.mp4`, cap, m, null, { mimetype: 'video/mp4' })
+    let options = {
+      quoted: m,
+      mimetype: 'video/mp4',
+      fileName: `${json.title}.mp4`,
+      caption: cap
+    };
 
-    m.react('✅');
+    if (size > MAX_SIZE) {
+      // Enviar como documento si pesa más de 100MB
+      await conn.sendMessage(m.chat, {
+        document: buffer,
+        ...options
+      });
+    } else {
+      // Enviar como video normal
+      await conn.sendFile(m.chat, buffer, `${json.title}.mp4`, cap, m, null, {
+        mimetype: 'video/mp4'
+      });
+    }
+
+    await m.react('✅');
   } catch (e) {
- m.reply(e)
+    console.error(e);
+    await m.react('❌');
+    m.reply('Ocurrió un error al intentar procesar el video. Intenta nuevamente más tarde.');
   }
 };
 
@@ -87,6 +109,7 @@ handler.group = true;
 
 export default handler;
 
+// Función para obtener los datos del video
 async function ytdl(url) {
   const headers = {
     "accept": "*/*",
@@ -115,36 +138,38 @@ async function ytdl(url) {
     if (info.progress === 3) break;
   }
 
-  const result = {
+  return {
     url: convert.downloadURL,
     title: info.title
   };
-  return result;
 }
 
+// Formatear tamaño en MB/GB
 async function formatSize(bytes) {
-    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    let i = 0;
-    bytes = Number(bytes);
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let i = 0;
+  bytes = Number(bytes);
 
-    if (isNaN(bytes)) {
-        return 'Tamaño de bytes inválido'
-    }
+  if (isNaN(bytes)) {
+    return 'Tamaño inválido';
+  }
 
-    while (bytes >= 1024 && i < units.length - 1) {
-        bytes /= 1024;
-        i++;
-    }
+  while (bytes >= 1024 && i < units.length - 1) {
+    bytes /= 1024;
+    i++;
+  }
 
-    return `${bytes.toFixed(2)} ${units[i]}`;
+  return `${bytes.toFixed(2)} ${units[i]}`;
 }
 
+// Obtener tamaño del archivo desde el URL
 async function getSize(url) {
   try {
-      const response = await axios.head(url);
-      const contentLength = response.headers['content-length'];
-      return contentLength ? parseInt(contentLength, 10) : null;
+    const response = await axios.head(url);
+    const contentLength = response.headers['content-length'];
+    return contentLength ? parseInt(contentLength, 10) : null;
   } catch (error) {
-      return error;
+    console.error('Error al obtener tamaño del archivo:', error.message);
+    return null;
   }
 }
