@@ -24,7 +24,7 @@ const handler = async (m, { conn, args }) => {
   }
 
   // Buscar la calidad mínima 360p (SD)
-  const data = res.find((i) => i.resolution === '360p (SD)');
+  const data = res.find((i) => i.resolution === '720p (HD)');
 
   if (!data) { 
     return conn.reply(m.chat, '🚩 *No se encontró una resolución adecuada.*', m, rcanal);
