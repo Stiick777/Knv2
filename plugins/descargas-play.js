@@ -12,88 +12,50 @@ const handler = async (m, {conn, command, args, text, usedPrefix}) => {
 
 
 if (command === 'play') {
-        if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
+  if (!text) return conn.reply(m.chat, `*Ingresa el nombre de lo que quieres buscar*`, m, rcanal);
 
-        await m.react('🕓');
+  await m.react('🕓');
 
-        // Buscar en YouTube
-        const yt_play = await search(args.join(' '));
+  const yt_play = await search(args.join(' '));
 
-        const texto1 = `
-𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊𝚜
+  const texto1 = `
+YouTube Descargas
 ===========================
 
-> *𝚃𝚒𝚝𝚞𝚕𝚘* :  ${yt_play[0].title}
+> *Título* :  ${yt_play[0].title}
+> *Creador* :  ${yt_play[0].ago}
+> *Duración* :  ${secondString(yt_play[0].duration.seconds)}
 
-> *𝙲𝚛𝚎𝚊𝚍𝚘* :  ${yt_play[0].ago}
-
-> *𝙳𝚞𝚛𝚊𝚌𝚒𝚘𝚗* :  ${secondString(yt_play[0].duration.seconds)}
-
-*🚀 𝙎𝙀 𝙀𝙎𝙏𝘼 𝘿𝙀𝙎𝘼𝙍𝙂𝘼𝙉𝘿𝙊 𝙎𝙐 𝘼𝙐𝘿𝙄𝙊, 𝙀𝙎𝙋𝙀𝙍𝙀 𝙐𝙉 𝙈𝙊𝙈𝙀𝙉𝙏𝙊*
+*🚀 SE ESTÁ DESCARGANDO SU AUDIO, ESPERE UN MOMENTO*
 
 ===========================
-✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
+✰ KanBot ✰
 > *Provided by Stiiven*
 `.trim();
 
-        await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
+  await conn.sendFile(m.chat, yt_play[0].thumbnail, 'thumb.jpg', texto1, m, null);
 
- /*try {
-    await m.react('🕓'); // Reacciona mientras procesa
+  try {
+    await m.react('🕒'); // mientras procesa
 
-    const url = yt_play[0].url; // o cualquier link directo de YouTube
-    const apiUrl = `https://api.sylphy.xyz/download/ytmp3?url=${encodeURIComponent(url)}&apikey=sylph`;
+    // usar el scraper propio en lugar de la API
+    const json = await ytdl(yt_play[0].url, 'mp3');
+    const size = await getSize(json.url);
 
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
-
-    if (response.status && response.res?.dl) {
-        const { title, dl } = response.res;
-
-        await conn.sendMessage(m.chat, {
-            audio: { url: dl },
-            mimetype: 'audio/mp4',
-            fileName: `${title}.mp3`,
-            ptt: false // cambia a true si quieres que sea nota de voz
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } else {
-        await m.react('❌');
-        m.reply('No se pudo obtener el audio. Intenta con otro enlace.');
-    }
-} catch (e) {
-    await m.react('❌');
-    console.error(e);
-    m.reply('Ocurrió un error al procesar el audio.');
- }
-*/
-try {
-    await m.react('🕓'); // Reacciona mientras procesa
-
-    const url = yt_play[0].url;
-
-    if (!url || !/^https?:\/\/(www\.youtube\.com|youtu\.be)\//.test(url)) {
-      return m.reply('Enlace inválido. Asegúrate de que sea un enlace de YouTube.');
-    }
-
-    const result = await ytdl(url, 'mp3'); // Llama al scraper
-    const size = await getSize(result.url);
-
-    const caption = `🎧 Su audio by *_KanBot_*:\n\n*🎵 Título:* ${result.title}\n*🌐 URL:* ${url}\n*📦 Peso:* ${await formatSize(size) || "Desconocido"}`;
+    const caption = `🎧 Su audio by *_KanBot_*:\n\n*🎵 Título:* ${json.title}\n*🌐 URL:* ${yt_play[0].url}\n*📦 Peso:* ${await formatSize(size) || "Desconocido"}`;
 
     await conn.sendMessage(m.chat, {
-      audio: { url: result.url },
+      audio: { url: json.url },
       mimetype: 'audio/mp4',
-      fileName: `${result.title}.mp3`,
+      fileName: `${json.title}.mp3`,
       ptt: false
     }, { quoted: m });
 
-    await m.react('✅');
+    await m.react('✅'); // éxito
   } catch (e) {
-    console.error(e);
     await m.react('❌');
-    m.reply(`❌ Error al procesar el audio: ${e.message}`);
+    console.error(e);
+    m.reply(`❌ Error: ${e.message}`);
   }
 
     }
@@ -123,7 +85,7 @@ if (command == 'play2') {
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-try {
+try ñññ
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url; // o el link que quieras procesar directamente
@@ -252,8 +214,8 @@ if (data.status === 'ok') {
     throw new Error("No se pudo obtener la descarga desde 9Convert");
   }
 }
-// --- SCRAPER FUNCIONAL ---
-async function ytdl(url, format = 'mp3') {
+// FUNCIONES AUXILIARES
+async function ytdl(url, format = 'mp4') {
   const headers = {
     "accept": "*/*",
     "accept-language": "es-ES,es;q=0.9",
@@ -265,7 +227,6 @@ async function ytdl(url, format = 'mp3') {
 
   const initial = await fetch(`https://d.ymcdn.org/api/v1/init?p=y&23=1llum1n471&_=${Math.random()}`, { headers });
   const init = await initial.json();
-
   const id = url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/|.*embed\/))([^&?/]+)/)?.[1];
   const convertURL = init.convertURL + `&v=${id}&f=${format}&_=${Math.random()}`;
 
@@ -285,17 +246,6 @@ async function ytdl(url, format = 'mp3') {
   };
 }
 
-// --- UTILS ---
-async function getSize(url) {
-  try {
-    const response = await axios.head(url);
-    const contentLength = response.headers['content-length'];
-    return contentLength ? parseInt(contentLength, 10) : null;
-  } catch (error) {
-    return null;
-  }
-}
-
 async function formatSize(bytes) {
   const units = ['B', 'KB', 'MB', 'GB'];
   let i = 0;
@@ -307,6 +257,17 @@ async function formatSize(bytes) {
   }
   return `${bytes.toFixed(2)} ${units[i]}`;
 }
+
+async function getSize(url) {
+  try {
+    const response = await axios.head(url);
+    const contentLength = response.headers['content-length'];
+    return contentLength ? parseInt(contentLength, 10) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
 /*
 import yts from 'yt-search';
 import fetch from 'node-fetch';
