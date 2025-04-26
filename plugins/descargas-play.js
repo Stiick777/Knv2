@@ -42,13 +42,14 @@ try {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url; // o cualquier link directo de YouTube
-    const apiUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(url)}`;
+    const apiKey = 'makangratis';
+    const apiUrl = `https://api.ssateam.my.id/api/yta?url=${encodeURIComponent(url)}&quality=480&apikey=${apiKey}`;
 
     const apiResponse = await fetch(apiUrl);
     const response = await apiResponse.json();
 
-    if (response.status && response.data?.dl) {
-        const { title, dl } = response.data;
+    if (response.status && response.result?.dl) {
+        const { title, dl } = response.result;
 
         await conn.sendMessage(m.chat, {
             audio: { url: dl },
@@ -67,7 +68,6 @@ try {
     console.error('Error al procesar el audio:', e);
     m.reply('Ocurrió un error al procesar el audio.');
 }
-
 
     }
 
