@@ -42,17 +42,16 @@ try {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url; // o cualquier link directo de YouTube
-    const apiKey = 'makangratis';
-    const apiUrl = `https://api.ssateam.my.id/api/yta?url=${encodeURIComponent(url)}&quality=480&apikey=${apiKey}`;
+    const apiUrl = `https://bk9.fun/download/ytmp3?url=${encodeURIComponent(url)}&type=mp3`;
 
     const apiResponse = await fetch(apiUrl);
     const response = await apiResponse.json();
 
-    if (response.status && response.result?.dl) {
-        const { title, dl } = response.result;
+    if (response.status && response.BK9?.downloadUrl) {
+        const { title, downloadUrl } = response.BK9;
 
         await conn.sendMessage(m.chat, {
-            audio: { url: dl },
+            audio: { url: downloadUrl },
             mimetype: 'audio/mp4',
             fileName: `${title}.mp3`,
             ptt: false // cambia a true si quieres que sea nota de voz
