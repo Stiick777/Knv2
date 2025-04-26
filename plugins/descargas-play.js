@@ -1,7 +1,7 @@
 import { youtubedl, youtubedlv2 } from '@bochilteam/scraper'
 import fetch from 'node-fetch'
 import yts from 'yt-search'
-//import ytdl from 'ytdl-core'
+import ytdl from 'ytdl-core'
 import axios from 'axios'
 import fs from 'fs'
 import { exec } from 'child_process'
@@ -12,51 +12,62 @@ const handler = async (m, {conn, command, args, text, usedPrefix}) => {
 
 
 if (command === 'play') {
-  if (!text) return conn.reply(m.chat, `*Ingresa el nombre de lo que quieres buscar*`, m, rcanal);
+        if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
 
-  await m.react('🕓');
+        await m.react('🕓');
 
-  const yt_play = await search(args.join(' '));
+        // Buscar en YouTube
+        const yt_play = await search(args.join(' '));
 
-  const texto1 = `
-YouTube Descargas
+        const texto1 = `
+𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊𝚜
 ===========================
 
-> *Título* :  ${yt_play[0].title}
-> *Creador* :  ${yt_play[0].ago}
-> *Duración* :  ${secondString(yt_play[0].duration.seconds)}
+> *𝚃𝚒𝚝𝚞𝚕𝚘* :  ${yt_play[0].title}
 
-*🚀 SE ESTÁ DESCARGANDO SU AUDIO, ESPERE UN MOMENTO*
+> *𝙲𝚛𝚎𝚊𝚍𝚘* :  ${yt_play[0].ago}
+
+> *𝙳𝚞𝚛𝚊𝚌𝚒𝚘𝚗* :  ${secondString(yt_play[0].duration.seconds)}
+
+*🚀 𝙎𝙀 𝙀𝙎𝙏𝘼 𝘿𝙀𝙎𝘼𝙍𝙂𝘼𝙉𝘿𝙊 𝙎𝙐 𝘼𝙐𝘿𝙄𝙊, 𝙀𝙎𝙋𝙀𝙍𝙀 𝙐𝙉 𝙈𝙊𝙈𝙀𝙉𝙏𝙊*
 
 ===========================
-✰ KanBot ✰
+✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
 > *Provided by Stiiven*
 `.trim();
 
-  await conn.sendFile(m.chat, yt_play[0].thumbnail, 'thumb.jpg', texto1, m, null);
+        await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-  try {
-    await m.react('🕒'); // mientras procesa
+try {
+    await m.react('🕓'); // Reacciona mientras procesa
 
-    // usar el scraper propio en lugar de la API
-    const json = await ytdl(yt_play[0].url, 'mp3');
-    const size = await getSize(json.url);
+    const url = yt_play[0].url; // o cualquier link directo de YouTube
+    const apiUrl = `https://api.siputzx.my.id/api/dl/youtube/mp3?url=${encodeURIComponent(url)}`;
 
-    const caption = `🎧 Su audio by *_KanBot_*:\n\n*🎵 Título:* ${json.title}\n*🌐 URL:* ${yt_play[0].url}\n*📦 Peso:* ${await formatSize(size) || "Desconocido"}`;
+    const apiResponse = await fetch(apiUrl);
+    const response = await apiResponse.json();
 
-    await conn.sendMessage(m.chat, {
-      audio: { url: json.url },
-      mimetype: 'audio/mp4',
-      fileName: `${json.title}.mp3`,
-      ptt: false
-    }, { quoted: m });
+    if (response.status && response.data) {
+        const { data } = response;
 
-    await m.react('✅'); // éxito
-  } catch (e) {
+        await conn.sendMessage(m.chat, {
+            audio: { url: data },
+            mimetype: 'audio/mp4',
+            fileName: `${yt_play[0].title}.mp3`,
+            ptt: false // cambia a true si quieres que sea nota de voz
+        }, { quoted: m });
+
+        await m.react('✅'); // Éxito
+    } else {
+        await m.react('❌');
+        m.reply('No se pudo obtener el audio. Intenta con otro enlace.');
+    }
+} catch (e) {
     await m.react('❌');
     console.error(e);
-    m.reply(`❌ Error: ${e.message}`);
-  }
+    m.reply('Ocurrió un error al procesar el audio.');
+}
+
 
     }
 
@@ -212,59 +223,6 @@ if (data.status === 'ok') {
     return data.result.mp3;
   } else {
     throw new Error("No se pudo obtener la descarga desde 9Convert");
-  }
-}
-// FUNCIONES AUXILIARES
-async function ytdl(url, format = 'mp4') {
-  const headers = {
-    "accept": "*/*",
-    "accept-language": "es-ES,es;q=0.9",
-    "sec-ch-ua": "\"Not A(Brand\";v=\"8\", \"Chromium\";v=\"132\"",
-    "sec-ch-ua-mobile": "?1",
-    "sec-ch-ua-platform": "\"Android\"",
-    "Referer": "https://id.ytmp3.mobi/"
-  };
-
-  const initial = await fetch(`https://d.ymcdn.org/api/v1/init?p=y&23=1llum1n471&_=${Math.random()}`, { headers });
-  const init = await initial.json();
-  const id = url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/|.*embed\/))([^&?/]+)/)?.[1];
-  const convertURL = init.convertURL + `&v=${id}&f=${format}&_=${Math.random()}`;
-
-  const converts = await fetch(convertURL, { headers });
-  const convert = await converts.json();
-
-  let info = {};
-  for (let i = 0; i < 3; i++) {
-    const progressResponse = await fetch(convert.progressURL, { headers });
-    info = await progressResponse.json();
-    if (info.progress === 3) break;
-  }
-
-  return {
-    url: convert.downloadURL,
-    title: info.title
-  };
-}
-
-async function formatSize(bytes) {
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let i = 0;
-  bytes = Number(bytes);
-  if (isNaN(bytes)) return 'Tamaño desconocido';
-  while (bytes >= 1024 && i < units.length - 1) {
-    bytes /= 1024;
-    i++;
-  }
-  return `${bytes.toFixed(2)} ${units[i]}`;
-}
-
-async function getSize(url) {
-  try {
-    const response = await axios.head(url);
-    const contentLength = response.headers['content-length'];
-    return contentLength ? parseInt(contentLength, 10) : null;
-  } catch (error) {
-    return null;
   }
 }
 
