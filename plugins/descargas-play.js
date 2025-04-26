@@ -85,7 +85,7 @@ if (command == 'play2') {
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-try ñññ
+try {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url; // o el link que quieras procesar directamente
