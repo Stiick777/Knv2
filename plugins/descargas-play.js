@@ -83,7 +83,7 @@ try {
             audio: { url: downloadUrl },
             mimetype: 'audio/mpeg',
             fileName: filename || `${title}.mp3`,
-            ptt: false
+            ptt: true
         }, { quoted: m });
 
         await m.react('✅'); // Éxito
