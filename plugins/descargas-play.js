@@ -38,7 +38,7 @@ if (command === 'play') {
 
         await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
- try {
+ /*try {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url; // o cualquier link directo de YouTube
@@ -67,6 +67,34 @@ if (command === 'play') {
     console.error(e);
     m.reply('Ocurrió un error al procesar el audio.');
  }
+*/
+try {
+    await m.react('🕓'); // Reacciona mientras procesa
+
+    const url = yt_play[0].url;
+
+    if (!url || !/^https?:\/\/(www\.youtube\.com|youtu\.be)\//.test(url)) {
+      return m.reply('Enlace inválido. Asegúrate de que sea un enlace de YouTube.');
+    }
+
+    const result = await ytdl(url, 'mp3'); // Llama al scraper
+    const size = await getSize(result.url);
+
+    const caption = `🎧 Su audio by *_KanBot_*:\n\n*🎵 Título:* ${result.title}\n*🌐 URL:* ${url}\n*📦 Peso:* ${await formatSize(size) || "Desconocido"}`;
+
+    await conn.sendMessage(m.chat, {
+      audio: { url: result.url },
+      mimetype: 'audio/mp4',
+      fileName: `${result.title}.mp3`,
+      ptt: false
+    }, { quoted: m });
+
+    await m.react('✅');
+  } catch (e) {
+    console.error(e);
+    await m.react('❌');
+    m.reply(`❌ Error al procesar el audio: ${e.message}`);
+  }
 
     }
 
@@ -224,7 +252,61 @@ if (data.status === 'ok') {
     throw new Error("No se pudo obtener la descarga desde 9Convert");
   }
 }
+// --- SCRAPER FUNCIONAL ---
+async function ytdl(url, format = 'mp3') {
+  const headers = {
+    "accept": "*/*",
+    "accept-language": "es-ES,es;q=0.9",
+    "sec-ch-ua": "\"Not A(Brand\";v=\"8\", \"Chromium\";v=\"132\"",
+    "sec-ch-ua-mobile": "?1",
+    "sec-ch-ua-platform": "\"Android\"",
+    "Referer": "https://id.ytmp3.mobi/"
+  };
 
+  const initial = await fetch(`https://d.ymcdn.org/api/v1/init?p=y&23=1llum1n471&_=${Math.random()}`, { headers });
+  const init = await initial.json();
+
+  const id = url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/|.*embed\/))([^&?/]+)/)?.[1];
+  const convertURL = init.convertURL + `&v=${id}&f=${format}&_=${Math.random()}`;
+
+  const converts = await fetch(convertURL, { headers });
+  const convert = await converts.json();
+
+  let info = {};
+  for (let i = 0; i < 3; i++) {
+    const progressResponse = await fetch(convert.progressURL, { headers });
+    info = await progressResponse.json();
+    if (info.progress === 3) break;
+  }
+
+  return {
+    url: convert.downloadURL,
+    title: info.title
+  };
+}
+
+// --- UTILS ---
+async function getSize(url) {
+  try {
+    const response = await axios.head(url);
+    const contentLength = response.headers['content-length'];
+    return contentLength ? parseInt(contentLength, 10) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+async function formatSize(bytes) {
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let i = 0;
+  bytes = Number(bytes);
+  if (isNaN(bytes)) return 'Tamaño desconocido';
+  while (bytes >= 1024 && i < units.length - 1) {
+    bytes /= 1024;
+    i++;
+  }
+  return `${bytes.toFixed(2)} ${units[i]}`;
+}
 /*
 import yts from 'yt-search';
 import fetch from 'node-fetch';
