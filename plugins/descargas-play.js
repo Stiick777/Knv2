@@ -42,18 +42,18 @@ try {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url; // o cualquier link directo de YouTube
-    const apiUrl = `https://api.siputzx.my.id/api/dl/youtube/mp3?url=${encodeURIComponent(url)}`;
+    const apiUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(url)}`;
 
     const apiResponse = await fetch(apiUrl);
     const response = await apiResponse.json();
 
-    if (response.status && response.data) {
-        const { data } = response;
+    if (response.status && response.data?.dl) {
+        const { title, dl } = response.data;
 
         await conn.sendMessage(m.chat, {
-            audio: { url: data },
+            audio: { url: dl },
             mimetype: 'audio/mp4',
-            fileName: `${yt_play[0].title}.mp3`,
+            fileName: `${title}.mp3`,
             ptt: false // cambia a true si quieres que sea nota de voz
         }, { quoted: m });
 
@@ -64,7 +64,7 @@ try {
     }
 } catch (e) {
     await m.react('❌');
-    console.error(e);
+    console.error('Error al procesar el audio:', e);
     m.reply('Ocurrió un error al procesar el audio.');
 }
 
