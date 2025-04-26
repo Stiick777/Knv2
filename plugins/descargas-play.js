@@ -38,7 +38,7 @@ if (command === 'play') {
 
         await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-try {
+/*try {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url; // o cualquier link directo de YouTube
@@ -55,6 +55,35 @@ try {
             mimetype: 'audio/mp4',
             fileName: `${title}.mp3`,
             ptt: false // cambia a true si quieres que sea nota de voz
+        }, { quoted: m });
+
+        await m.react('✅'); // Éxito
+    } else {
+        await m.react('❌');
+        m.reply('No se pudo obtener el audio. Intenta con otro enlace.');
+    }
+} catch (e) {
+    await m.react('❌');
+    console.error('Error al procesar el audio:', e);
+    m.reply('Ocurrió un error al procesar el audio.');
+}*/
+try {
+    await m.react('🕓'); // Reacciona mientras procesa
+
+    const url = yt_play[0].url; // o el link directo de YouTube
+    const apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(url)}&type=audio&quality=128kbps&apikey=Paimon`;
+    const apiResponse = await fetch(apiUrl);
+    const response = await apiResponse.json();
+
+    if (response.status && response.data?.url) {
+        const { title, channel, fduration, views, thumbnail } = response;
+        const { url: downloadUrl, filename } = response.data;
+
+        await conn.sendMessage(m.chat, {
+            audio: { url: downloadUrl },
+            mimetype: 'audio/mpeg',
+            fileName: filename || `${title}.mp3`,
+            ptt: false
         }, { quoted: m });
 
         await m.react('✅'); // Éxito
