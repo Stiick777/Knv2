@@ -1,7 +1,7 @@
 import { youtubedl, youtubedlv2 } from '@bochilteam/scraper'
 import fetch from 'node-fetch'
 import yts from 'yt-search'
-import ytdl from 'ytdl-core'
+//import ytdl from 'ytdl-core'
 import axios from 'axios'
 import fs from 'fs'
 import { exec } from 'child_process'
