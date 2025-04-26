@@ -42,19 +42,19 @@ if (command === 'play') {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url; // o cualquier link directo de YouTube
-    const apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(url)}&type=audio&quality=128kbps&apikey=Paimon`;
+    const apiUrl = `https://api.ssateam.my.id/api/yta?url=${encodeURIComponent(url)}&quality=480&apikey=makangratis`;
+
     const apiResponse = await fetch(apiUrl);
     const response = await apiResponse.json();
 
-    if (response.status && response.data?.url) {
-        const { title, fduration, views, channel, thumbnail } = response;
-        const { url: downloadUrl, size, quality, filename } = response.data;
+    if (response.status && response.result?.dl) {
+        const { title, dl } = response.result;
 
         await conn.sendMessage(m.chat, {
-            audio: { url: downloadUrl },
+            audio: { url: dl },
             mimetype: 'audio/mp4',
-            fileName: filename || `${title}.mp3`,
-            ptt: false // cambiar a true si quieres que sea nota de voz
+            fileName: `${title}.mp3`,
+            ptt: false // cambia a true si quieres que sea nota de voz
         }, { quoted: m });
 
         await m.react('✅'); // Éxito
@@ -66,7 +66,7 @@ if (command === 'play') {
     await m.react('❌');
     console.error(e);
     m.reply('Ocurrió un error al procesar el audio.');
-}
+ }
 
     }
 
