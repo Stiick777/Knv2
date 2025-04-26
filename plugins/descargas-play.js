@@ -38,7 +38,7 @@ if (command === 'play') {
 
         await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-/*try {
+try {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url; // o cualquier link directo de YouTube
@@ -63,11 +63,9 @@ if (command === 'play') {
         m.reply('No se pudo obtener el audio. Intenta con otro enlace.');
     }
 } catch (e) {
-    await m.react('❌');
-    console.error('Error al procesar el audio:', e);
-    m.reply('Ocurrió un error al procesar el audio.');
-}
-*/
+    
+
+
 try {
     await m.react('🕓'); // Reacciona mientras procesa
 
@@ -97,7 +95,8 @@ try {
     console.error('Error al procesar el audio:', e);
     m.reply('Ocurrió un error al procesar el audio.');
 }
-
+}
+//
     }
 
 if (command == 'play2') {
