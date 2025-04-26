@@ -42,13 +42,13 @@ if (command === 'play') {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url; // o cualquier link directo de YouTube
-    const apiUrl = `https://api.ssateam.my.id/api/yta?url=${encodeURIComponent(url)}&quality=480&apikey=makangratis`;
+    const apiUrl = `https://api.sylphy.xyz/download/ytmp3?url=${encodeURIComponent(url)}&apikey=sylph`;
 
     const apiResponse = await fetch(apiUrl);
     const response = await apiResponse.json();
 
-    if (response.status && response.result?.dl) {
-        const { title, dl } = response.result;
+    if (response.status && response.res?.dl) {
+        const { title, dl } = response.res;
 
         await conn.sendMessage(m.chat, {
             audio: { url: dl },
