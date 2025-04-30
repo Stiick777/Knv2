@@ -36,7 +36,7 @@ m.reply(info)
 
 handler.command = handler.help = ['mf2'];
 handler.tags = ['descargas'];
-handler.group = true;
+handler.group = false
 
 export default handler;
 
