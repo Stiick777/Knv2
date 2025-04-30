@@ -62,14 +62,14 @@ let handler = async (m, { conn, args }) => {
   if (text.length > 40) return conn.reply(m.chat, '⚠️ El texto no puede tener más de 40 caracteres.', m);
 
   try {
-    const apiUrl = `https://vapis.my.id/api/bratv1?q=${encodeURIComponent(text)}`;
+    const apiUrl = `https://api.siputzx.my.id/api/m/brat?text=${encodeURIComponent(text)}&isVideo=false&delay=500`;
     const response = await axios.get(apiUrl, { responseType: 'arraybuffer' });
     if (!response.data) throw new Error('No se pudo obtener la imagen.');
 
     // Convertimos a WebP
     const webpBuffer = await toWebp(response.data);
 
-    // Añadir nombre y autor al sticker
+    // Crear sticker
     const sticker = new Sticker(webpBuffer, {
       pack: '',
       author: global.author || 'Bot',
