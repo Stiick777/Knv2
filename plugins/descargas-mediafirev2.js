@@ -1,39 +1,98 @@
-import fetch from 'node-fetch'
+import { fetch } from "undici";
+import { lookup } from "mime-types";
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-  if (!text) {
-    return m.reply(`Ingresa un link de Mediafire\n*✅ Ejemplo:* ${usedPrefix}${command} https://www.mediafire.com/file/efx4rdobvkgq8aa/Side-05.mp4/file`);
-  }
+let handler = async (m, { conn, usedPrefix, command, args, users, setting }) => {
+    try {
+        if (!args || !args[0]) {
+            return conn.reply(m.chat, `🌱 Ejemplo de uso: ${usedPrefix}${command} https://www.mediafire.com/file/c2fyjyrfckwgkum/ZETSv1%25282%2529.zip/file`, m);
+        }
 
-  conn.sendMessage(m.chat, { react: { text: "🕒", key: m.key } });
+        if (!args[0].match(/(https:\/\/www.mediafire.com\/)/gi)) {
+            return conn.reply(m.chat, `Enlace inválido.`, m);
+        }
 
-  try {
-    let res = await fetch(`https://bk9.fun/download/mediafire?url=${text}`);
-    let json = await res.json();
+        m.react('🕒');
+        const json = await mediafire(args[0]);
 
-    if (!json?.status || !json?.BK9?.link || json.BK9.link === '#' || !json.BK9.link.startsWith('http')) {
-      return m.reply('No se pudo obtener un enlace válido desde Mediafire. Verifica el link o intenta con otro.');
+        if (!json.filename) {
+            return conn.reply(m.chat, "No se pudo obtener la información del archivo.", m);
+        }
+        let info = `
+🌙 \`Nombre :\` ${json.filename}
+🔰 \`Peso :\` ${json.size}
+🔆 \`Link :\` ${args[0]}
+☢️ \`Mime :\` ${json.mimetype}
+
+⚠️ Enviando archivo *Por favor espere*
+`;
+m.reply(info)
+        await conn.sendFile(m.chat, json.download, json.filename, "", m, null, { asDocument: true, mimetype: json.mimetype });
+        m.react("✅️")
+    } catch (e) {
+      m.react("❌️")
+        return conn.reply(m.chat, `Error: ${e.message}`, m);
     }
-
-    await conn.sendFile(
-      m.chat,
-      json.BK9.link,
-      json.BK9.name,
-      `*🌙 Nombre:* ${json.BK9.name}\n*☘️ Tamaño:* ${json.BK9.size}\n*🎈 Tipo:* ${json.BK9.filetype}\n*📅 Subido:* ${json.BK9.uploaded}`,
-      m
-    );
-
-    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
-
-  } catch (err) {
-    console.error(err);
-    m.reply('Ocurrió un error al procesar el enlace. Intenta nuevamente más tarde.');
-  }
 };
 
-handler.help = ['mediafire2', 'mf2'];
+handler.command = handler.help = ['mf2'];
 handler.tags = ['descargas'];
-handler.command = /^(mediafire2|mf2)$/i;
 handler.group = true;
 
 export default handler;
+
+function sizeToKB(size) {
+    const sizeMatch = size.match(/(\d+\.?\d*)\s*(MB|GB|KB)/i);
+    if (!sizeMatch) return 0;
+
+    const value = parseFloat(sizeMatch[1]);
+    const unit = sizeMatch[2].toUpperCase();
+
+    switch (unit) {
+        case 'GB':
+            return value * 1024 * 1024;
+        case 'MB':
+            return value * 1024;
+        case 'KB':
+            return value;
+        default:
+            return 0;
+    }
+}
+async function mediafire(url) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Error al acceder a la URL');
+
+            const html = await response.text();
+            const $ = cheerio.load(html);
+
+            const typeClass = $(".dl-btn-cont").find(".icon").attr("class");
+            const type = typeClass ? typeClass.split("archive")[1]?.trim() : 'desconocido';
+
+            const filename = $(".dl-btn-label").attr("title") || 'archivo desconocido';
+
+            const sizeMatch = $('.download_link .input').text().trim().match(/\((.*?)\)/);
+            const size = sizeMatch ? sizeMatch[1] : 'desconocido';
+
+            const ext = filename.split(".").pop();
+            const mimetype = lookup(ext.toLowerCase()) || "application/" + ext.toLowerCase();
+
+            const download = $(".input").attr("href");
+            if (!download) throw new Error('No se pudo encontrar el enlace de descarga');
+
+            resolve({
+                filename,
+                type,
+                size,
+                ext,
+                mimetype,
+                download,
+            });
+        } catch (error) {
+            reject({
+                msg: "Error al obtener datos del enlace: " + error.message,
+            });
+        }
+    });
+}
