@@ -1,4 +1,4 @@
-import db from '../lib/databases/database.js'
+import db from '../src/database/database.json'
 
 let handler = async (m, { args }) => {
 let user = global.db.data.users[m.sender]
