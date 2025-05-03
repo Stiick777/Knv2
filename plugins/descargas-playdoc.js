@@ -80,6 +80,11 @@ if (command == 'play8' || command == 'playdoc2') {
     if (!text) return conn.reply(m.chat, `🧿 *Ingrese un nombre de una canción de YouTube*\n\nEjemplo: !${command} falling - Daniel Trevor`, m, rcanal);
     await m.react('🕛');
     const yt_play = await search(args.join(' '));
+    if (yt_play[0].duration.seconds > 7200) {
+    await conn.reply(m.chat, '❌ El video dura más de 2 horas y no puede ser descargado.', m);
+    await m.react('❌');
+    return;
+}
     const texto1 = `
 ┏◚◚◚◚🅓🅞🅒🅢◚◚◚◚┓
 
