@@ -1,4 +1,6 @@
-import db from '../src/database/database.json' assert { type: 'json' }
+import fs from 'fs'
+
+const db = JSON.parse(fs.readFileSync('../src/database/database.json'))
 
 let handler = async (m, { args }) => {
   let user = global.db.data.users[m.sender]
