@@ -81,7 +81,7 @@ if (command == 'play8' || command == 'playdoc2') {
     await m.react('🕛');
     const yt_play = await search(args.join(' '));
     if (yt_play[0].duration.seconds > 7200) {
-    await conn.reply(m.chat, '❌ El video dura más de 2 horas y no puede ser descargado.', m);
+    await conn.reply(m.chat, '❌ El video dura más de 2 horas y no puede ser descargado esto no es Netflix rey.', m);
     await m.react('❌');
     return;
 }
