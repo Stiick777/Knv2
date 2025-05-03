@@ -252,7 +252,7 @@ function purgeOldFiles() {
 setInterval(async () => {
   if (stopped === 'close' || !conn || !conn.user) return;
   clearTmp();
-}, 1000 * 60 * 3); // 3 minutos
+}, 1000 * 60 * 1); // 3 minutos
 
 // Ejecutar purgeSession() cada 10 minutos
 setInterval(async () => {
