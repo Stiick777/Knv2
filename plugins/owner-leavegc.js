@@ -1,42 +1,39 @@
-let handler = async (m, { conn, text, command, isOwner, isGroup }) => {
-    
+let handler = async (m, { conn, text, isGroup }) => {
+    let id = null;
 
-    let id;
     if (text && text.endsWith('@g.us')) {
-        id = text; // Si se proporciona un ID de grupo válido en privado, lo usa
+        id = text; // ID válido proporcionado en privado
     } else if (isGroup) {
-        id = m.chat; // Si se usa en un grupo sin argumentos, toma el ID del grupo actual
+        id = m.chat; // Se ejecuta desde el mismo grupo
     } else {
-        return m.reply('❌ Este comando solo funciona en grupos o debes proporcionar un ID válido.');
+        return m.reply('❌ Usa este comando dentro de un grupo o proporciona un ID de grupo válido (termina en @g.us).');
     }
 
     try {
-        let groupMetadata = await conn.groupMetadata(id).catch(() => null);
-        if (!groupMetadata) return m.reply('❌ Ese grupo no existe o el bot no está en él.');
+        // Verifica si el bot realmente está en ese grupo
+        const groupMetadata = await conn.groupMetadata(id).catch(() => null);
+        if (!groupMetadata) return m.reply('❌ El bot no está en ese grupo o el ID es inválido.');
 
-        let chat = global.db.data.chats[id];
+        // Desactivar bienvenida si existe
+        const chat = global.db.data.chats[id];
         if (chat) chat.welcome = false;
 
-        await conn.reply(id, `😮‍💨 *KanBot* abandona el grupo. ¡Fue genial estar aquí! Adios chol@s 😹`);
+        // Mensaje de despedida
+        await conn.reply(id, '😮‍💨 *KanBot* abandona el grupo. ¡Fue genial estar aquí! Adiós chol@s 😹');
         await conn.groupLeave(id);
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await m.reply(`✅ Salí correctamente del grupo *${groupMetadata.subject}* (${id})`);
 
-        let stillInGroup = await conn.groupMetadata(id).catch(() => null);
-        if (stillInGroup) {
-            await m.reply('❌ No pude salir del grupo. Puede que no tenga permisos.');
-        } else {
-            await m.reply(`✅ Me salí del grupo ${id} correctamente.`);
-        }
-
+        // Restaurar bienvenida si se desea
         if (chat) chat.welcome = true;
+
     } catch (e) {
-        console.log(e);
+        console.error(e);
         await m.reply('❌ Ocurrió un error al intentar salir del grupo.');
     }
 };
 
 handler.command = ['salir', 'leavegc', 'salirdelgrupo', 'leave'];
-handler.rowner = true; // Solo el owner del bot puede usarlo
+handler.rowner = true;
 
 export default handler;
