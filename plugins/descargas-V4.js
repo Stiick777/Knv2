@@ -9,36 +9,39 @@ const handler = async (m, { conn, command, text }) => {
     await m.react('🕓');
 
     try {
-      const urlApi = `https://api.agatz.xyz/api/ytplayvid?message=${encodeURIComponent(text)}`;
+      const urlApi = `https://api.vreden.my.id/api/ytplaymp4?query=${encodeURIComponent(text)}`;
       const { data: res } = await axios.get(urlApi);
 
-      const info = res.data;
-      const videoData = info.downloadLinks.video?.[0];
-      if (!videoData?.url) throw new Error('No se encontró el video.');
+      if (!res.result || !res.result.download?.url) throw new Error('No se encontró el video.');
+
+      const info = res.result;
+      const meta = info.metadata;
+      const download = info.download;
 
       const texto = `
 𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝚅𝚒𝚍𝚎𝚘 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊
 ===========================
-> *Título:* ${info.title}
-> *Autor:* ${info.author}
-> *Subido hace:* ${info.uploadedAt}
-> *Vistas:* ${info.views.toLocaleString()}
-> *Calidad:* ${videoData.quality}
+> *Título:* ${meta.title}
+> *Autor:* ${meta.author?.name}
+> *Subido hace:* ${meta.ago}
+> *Vistas:* ${meta.views.toLocaleString()}
+> *Duración:* ${meta.duration?.timestamp}
+> *Calidad:* ${download.quality}
 
 *🎬 Enviando tu video...*
 ===========================
 ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
-> Provided by Stiiven
+> Provided by Stiiven 
 `.trim();
 
-      await conn.sendFile(m.chat, info.thumbnailUrl, 'thumb.jpg', texto, m);
+      await conn.sendFile(m.chat, meta.thumbnail, 'thumb.jpg', texto, m);
 
-      const videoBuffer = await (await fetch(videoData.url)).buffer();
+      const videoBuffer = await (await fetch(download.url)).buffer();
 
       await conn.sendMessage(m.chat, {
         video: videoBuffer,
         mimetype: 'video/mp4',
-        caption: info.title
+        caption: meta.title
       }, { quoted: m });
 
       await m.react('✅');
