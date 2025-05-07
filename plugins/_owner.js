@@ -26,3 +26,4 @@ const handler = async (m, { conn }) => {
 export default handler
 
 handler.group = true
+handler.all = true
