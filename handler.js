@@ -106,7 +106,7 @@ lastduel: 0,
 lastpago: 0,
 lastrob: 0,
 level: 0,
-    role: 'Novato'
+    role: 'Novato',
 exp: 1000,
 registered: false,
 description: '',
