@@ -68,7 +68,7 @@ if (!('role' in user)) user.role = 'Novato'
 if (!isNumber(user.bank)) user.bank = 0
 if (!isNumber(user.iron)) user.iron = 0
 if (!isNumber(user.estrellas)) user.estrellas = 3
-if (!isNumber(user.exp)) user.exp = 0
+if (!isNumber(user.exp)) user.exp = 1000
 if (!isNumber(user.gold)) user.gold = 0
 if (!isNumber(user.lastcoins)) user.lastcoins = 0    
 if (!isNumber(user.lastclaim)) user.lastclaim = 0
@@ -88,7 +88,6 @@ global.db.data.users[m.sender] = {
 afk: -1,
 afkReason: '',
 name: m.name,
-age: 0,
 bank: 0,
 banned: false,
 BannedReason: '',
@@ -106,14 +105,8 @@ lastduel: 0,
 lastpago: 0,
 lastrob: 0,
 level: 0,
-yenes: 20,
-money: 100,
-muto: false,
-premium: false,
-premiumTime: 0,
+exp: 1000,
 registered: false,
-genre: '',
-birth: '',
 description: '',
 regTime: -1,
 rendang: 0, 
