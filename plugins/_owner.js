@@ -18,5 +18,5 @@ const handler = async (m, { conn }) => {
 
 export default handler
 
-handler.command = ['alerta'] // Usa !alerta @owner para probar
+handler.all = true  // Usa !alerta @owner para probar
 handler.group = true
