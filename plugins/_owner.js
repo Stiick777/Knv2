@@ -1,21 +1,22 @@
-const handler = async (m, { conn, usedPrefix, command }) => {
-  const contextInfo = m.message?.extendedTextMessage?.contextInfo
-  const mentioned = contextInfo?.mentionedJid || []
+const handler = async (m, { conn }) => {
+  // Obtener JIDs completos de los owners
+  const ownerJids = global.owner.map(o => o[0] + '@s.whatsapp.net')
 
-  console.log('===== DEBUG MENCIONES =====')
-  console.log('Texto:', m.text)
-  console.log('contextInfo:', contextInfo)
-  console.log('mentionedJid:', mentioned)
-  console.log('===========================')
+  // Extraer menciones desde extendedTextMessage
+  const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid || []
 
-  if (mentioned.length > 0) {
-    await conn.reply(m.chat, `Mencionaste a: ${mentioned.join(', ')}`, m)
+  // Comparar con los JIDs de los owners
+  const mencionAlOwner = mentioned.some(jid => ownerJids.includes(jid))
+
+  if (mencionAlOwner) {
+    await conn.reply(m.chat, '¡No etiquetes al owner sin necesidad!', m)
+    console.log('[antiOwnerTag] Mencionaron al owner:', mentioned)
   } else {
-    await conn.reply(m.chat, 'No detecté ninguna mención.', m)
+    await conn.reply(m.chat, 'No se mencionó a ningún owner.', m)
   }
 }
 
 export default handler
 
-handler.command = ['test']
+handler.command = ['alerta'] // Usa !alerta @owner para probar
 handler.group = true
