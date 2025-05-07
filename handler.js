@@ -47,7 +47,7 @@ if (typeof user !== 'object')
 global.db.data.users[m.sender] = {}
     user = global.db.data.users[m.sender]
 if (user) {
-if (!isNumber(user.exp)) user.exp = 0
+if (!isNumber(user.exp)) user.exp = 1000
 if (!('premium' in user)) user.premium = false
 if (!('muto' in user)) user.muto = false
 if (!isNumber(user.joincount)) user.joincount = 1
@@ -69,7 +69,7 @@ if (!('role' in user)) user.role = 'Novato'
 if (!isNumber(user.bank)) user.bank = 0
 if (!isNumber(user.iron)) user.iron = 0
 if (!isNumber(user.estrellas)) user.estrellas = 3
-if (!isNumber(user.exp)) user.exp = 1000
+
 if (!isNumber(user.gold)) user.gold = 0
 if (!isNumber(user.lastcoins)) user.lastcoins = 0    
 if (!isNumber(user.lastclaim)) user.lastclaim = 0
@@ -106,6 +106,7 @@ lastduel: 0,
 lastpago: 0,
 lastrob: 0,
 level: 0,
+    role: 'Novato'
 exp: 1000,
 registered: false,
 description: '',
