@@ -45,6 +45,7 @@ let user = global.db.data.users[m.sender]
 //if (typeof user !== 'object')
 if (typeof user !== 'object')
 global.db.data.users[m.sender] = {}
+    user = global.db.data.users[m.sender]
 if (user) {
 if (!isNumber(user.exp)) user.exp = 0
 if (!('premium' in user)) user.premium = false
