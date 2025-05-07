@@ -8,7 +8,7 @@ const handler = async (m, { conn }) => {
   const ownerNums = global.owner.map(o => o[0])
 
   // Extraer las menciones reales del mensaje
-  const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid || m.mentionedJid || []
+  const mentioned = m.message?.extendedTextMessage?.extendedText?.contextInfo?.mentionedJid || m.mentionedJid || []
 
   const mencionReal = mentioned.some(jid => ownerJids.includes(jid))
   const mencionesManual = ownerNums.some(num => m.text.includes('@' + num))
