@@ -47,20 +47,14 @@ if (typeof user !== 'object')
 global.db.data.users[m.sender] = {}
     user = global.db.data.users[m.sender]
 if (user) {
-if (!isNumber(user.exp)) user.exp = 1000
+if (!isNumber(user.exp)) user.exp = 10000
 if (!('premium' in user)) user.premium = false
 if (!('muto' in user)) user.muto = false
 if (!isNumber(user.joincount)) user.joincount = 1
-if (!isNumber(user.money)) user.money = 150
-if (!isNumber(user.yenes)) user.yenes = 20
 if (!('registered' in user)) user.registered = false
-if (!('genre' in user)) user.genre = false
-if (!('birth' in user)) user.birth = false
-if (!('description' in user)) user.description = false
     
 if (!user.registered) {
 if (!('name' in user)) user.name = m.name
-if (!('age' in user)) user.age = 0
 if (!isNumber(user.regTime)) user.regTime = -1
 }
 
@@ -68,7 +62,7 @@ if (!isNumber(user.afk)) user.afk = -1
 if (!('role' in user)) user.role = 'Novato'
 if (!isNumber(user.bank)) user.bank = 0
 if (!isNumber(user.iron)) user.iron = 0
-if (!isNumber(user.estrellas)) user.estrellas = 3
+if (!isNumber(user.estrellas)) user.estrellas = 10000
 
 if (!isNumber(user.gold)) user.gold = 0
 if (!isNumber(user.lastcoins)) user.lastcoins = 0    
@@ -76,12 +70,11 @@ if (!isNumber(user.lastclaim)) user.lastclaim = 0
 if (!isNumber(user.lastcode)) user.lastcode = 0
 if (!isNumber(user.lastcofre)) user.lastcofre = 0
 if (!isNumber(user.lastcodereg)) user.lastcodereg = 0
-if (!isNumber(user.lastdiamantes)) user.lastdiamantes = 0    
-if (!isNumber(user.lastduel)) user.lastduel = 0
+
 if (!isNumber(user.crime)) user.crime = 0
 if (!isNumber(user.lastmining)) user.lastmining = 0
-if (!isNumber(user.lastpago)) user.lastpago = 0 
-if (!isNumber(user.level)) user.level = 0
+
+if (!isNumber(user.level)) user.level = 1
 if (!isNumber(user.warn)) user.warn = 0
 if (!user.premium) user.premiumTime = 0
 } else
@@ -94,22 +87,18 @@ banned: false,
 BannedReason: '',
 Banneduser: false,
 iron: 0,
-estrellas: 3,
+estrellas: 10000,
 joincount: 1,
 gold: 0,
 lastcoins: 0,
 lastclaim: 0,
 lastcode: 0,
 lastcofre: 0,
-lastdiamantes: 0,
-lastduel: 0,
-lastpago: 0,
 lastrob: 0,
-level: 0,
-    role: 'Novato',
-exp: 1000,
+level: 1,
+role: 'Novato',
+exp: 10000,
 registered: false,
-description: '',
 regTime: -1,
 rendang: 0, 
 }
