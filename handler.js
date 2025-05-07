@@ -66,10 +66,10 @@ if (!isNumber(user.regTime)) user.regTime = -1
 if (!isNumber(user.afk)) user.afk = -1
 if (!('role' in user)) user.role = 'Novato'
 if (!isNumber(user.bank)) user.bank = 0
-if (!isNumber(user.coin)) user.coin = 0
-if (!isNumber(user.diamond)) user.diamond = 3
+if (!isNumber(user.iron)) user.iron = 0
+if (!isNumber(user.estrellas)) user.estrellas = 3
 if (!isNumber(user.exp)) user.exp = 0
-if (!isNumber(user.lastadventure)) user.lastadventure = 0
+if (!isNumber(user.gold)) user.gold = 0
 if (!isNumber(user.lastcoins)) user.lastcoins = 0    
 if (!isNumber(user.lastclaim)) user.lastclaim = 0
 if (!isNumber(user.lastcode)) user.lastcode = 0
@@ -93,10 +93,10 @@ bank: 0,
 banned: false,
 BannedReason: '',
 Banneduser: false,
-coin: 0,
-diamond: 3,
+iron: 0,
+estrellas: 3,
 joincount: 1,
-lastadventure: 0,
+gold: 0,
 lastcoins: 0,
 lastclaim: 0,
 lastcode: 0,
