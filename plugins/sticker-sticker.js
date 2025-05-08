@@ -49,8 +49,8 @@ import fs from 'fs'
 import path from 'path'
 import fetch from 'node-fetch'
 import fluent from 'fluent-ffmpeg'
-
-import { Sticker, StickerTypes } from 'wa-sticker-formatter'
+import Sticker from 'wa-sticker-formatter'
+//import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 import { fileTypeFromBuffer as fromBuffer } from 'file-type'
 
 let handler = async (m, { conn, args }) => {
@@ -75,7 +75,7 @@ let handler = async (m, { conn, args }) => {
     const webpBuffer = await toWebp(buffer)
 
     // Añadir nombre y autor al sticker
-    const sticker = new Sticker(webpBuffer, {
+    const sticker = new Sticker.Sticker(webpBuffer, {
       pack: '',
       author: global.author || 'Bot',
       type: 'full'
