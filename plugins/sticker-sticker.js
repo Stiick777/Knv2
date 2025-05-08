@@ -77,7 +77,7 @@ let handler = async (m, { conn, args }) => {
     const sticker = new Sticker(webpBuffer, {
       pack: '',
       author: global.author || 'Bot',
-      type: StickerTypes.FULL
+      type: 'full'
     })
 
     const finalSticker = await sticker.toBuffer()
