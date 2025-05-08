@@ -75,7 +75,7 @@ let handler = async (m, { conn, args }) => {
     const webpBuffer = await toWebp(buffer)
 
     // Añadir nombre y autor al sticker
-    const sticker = new Sticker.Sticker(webpBuffer, {
+    const sticker = new Sticker(webpBuffer, {
       pack: '',
       author: global.author || 'Bot',
       type: 'full'
