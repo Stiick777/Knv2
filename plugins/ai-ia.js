@@ -8,11 +8,13 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
     try {
         await m.react('💭');
 
-        const response = await fetch(`https://mahiru-shiina.vercel.app/ai/chatgpt4?text=${encodeURIComponent(text)}`);
+        // Usar la nueva API
+        const response = await fetch(`https://vapis.my.id/api/openai?q=${encodeURIComponent(text)}`);
         const data = await response.json();
 
-        if (data.status && data.answer) {
-            await conn.reply(m.chat, `*Hola!👋 soy KanBot Provided By Stiiven*:\n${data.answer}`, m);
+        if (data.status) {
+            // Responder con el mensaje fijo en lugar de la respuesta de OpenAI
+            await conn.reply(m.chat, `*Hola!👋 soy KanBot Provided By Stiiven*:\n${data.result}`, m);
         } else {
             await m.react('❌');
             await conn.reply(m.chat, '❌ Error: No se obtuvo una respuesta válida.', m, rcanal);
