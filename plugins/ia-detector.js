@@ -29,7 +29,7 @@ let handler = async (m, { conn, text, command }) => {
 
   if (!text) return m.reply('Por favor, escribe una pregunta junto con el comando.');
 
-  await m.react('⏳');
+  await m.react('👻');
 
   try {
     let media = await q.download();
@@ -49,6 +49,8 @@ let handler = async (m, { conn, text, command }) => {
     m.reply('Error al procesar la imagen o la pregunta.');
   }
 };
-
-handler.command = /^iadetector$/i;
+handler.help = ['iaq <img + txt>']
+handler.tags = ['ai']
+handler.group = true;
+handler.command = /^iaq$/i;
 export default handler;
