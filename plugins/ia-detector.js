@@ -35,17 +35,14 @@ let handler = async (m, { conn, text, command }) => {
     let media = await q.download();
     let url = await catbox(media);
 
-   let apiUrl = `https://bk9.fun/ai/geminiimg?url=${encodeURIComponent(url)}&q=${encodeURIComponent(text)}`;
+    let apiUrl = `https://bk9.fun/ai/geminiimg?url=${encodeURIComponent(url)}&q=${encodeURIComponent(text)}`;
+    let res = await fetch(apiUrl);
+    let json = await res.json();
 
-// Para verificar la URL que se está enviando
-await m.reply(`Consultando la API con:\n${apiUrl}`);
+    if (!json.status) throw json;
 
-let res = await fetch(apiUrl);
-let json = await res.json();
 
-if (!json.status) throw json;
-
-await m.reply(json.result || 'No se pudo obtener una respuesta.');
+    await m.reply(json.BK9 || 'No se pudo obtener una respuesta.');
 
   } catch (e) {
     console.error(e);
