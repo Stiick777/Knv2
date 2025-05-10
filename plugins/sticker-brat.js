@@ -95,8 +95,9 @@ async function toWebp(buffer) {
   const { ext } = await fromBuffer(buffer) || { ext: 'png' };
   if (!/(png|jpg|jpeg|gif|webp)/i.test(ext)) throw 'Media no compatible.';
 
-  const input = path.join(global.tempDir || './tmp', `${Date.now()}.${ext}`);
-  const output = path.join(global.tempDir || './tmp', `${Date.now()}.webp`);
+   const timestamp = Date.now();
+const input = path.join(global.tempDir || './tmp', `${timestamp}.${ext}`);
+const output = path.join(global.tempDir || './tmp', `${timestamp}_out.webp`);
   fs.writeFileSync(input, buffer);
 
   let options = [
