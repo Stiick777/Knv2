@@ -8,26 +8,17 @@ export async function before(m) {
 
   const user = global.db.data.users[m.sender];
   const now = Date.now();
-  const cooldown = 60 * 1000; // 1 minuto en milisegundos
+  const cooldown = 60 * 1000; // 1 minuto
 
-  // Si el usuario tiene un tiempo registrado y no ha pasado 1 minuto
+  // Verifica si el usuario debe esperar antes de ejecutar cualquier comando
   if (user.lastCommandTime && now - user.lastCommandTime < cooldown) {
     const remaining = ((cooldown - (now - user.lastCommandTime)) / 1000).toFixed(0);
     return m.reply(`《✦》Ya tienes una solicitud pendiente.\nDebes esperar *${remaining} segundos* antes de usar otro comando.`);
   }
 
-  // Validar si el comando existe en los plugins
-  const validCommand = (command, plugins) => {
-    for (let plugin of Object.values(plugins)) {
-      if (plugin.command && (Array.isArray(plugin.command) ? plugin.command : [plugin.command]).includes(command)) {
-        return true;
-      }
-    }
-    return false;
-  };
+  // Si pasa la validación, actualizamos el tiempo inmediatamente
+  user.lastCommandTime = now;
 
-  if (validCommand(command, global.plugins)) {
-    user.commands = (user.commands || 0) + 1;
-    user.lastCommandTime = now;
-  }
+  // Aquí puedes omitir la validación del comando si no te importa si existe o no
+  user.commands = (user.commands || 0) + 1;
 }
