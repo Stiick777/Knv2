@@ -10,15 +10,16 @@ export async function before(m) {
   const now = Date.now();
   const cooldown = 60 * 1000; // 1 minuto
 
-  // Verifica si el usuario debe esperar antes de ejecutar cualquier comando
+  // Solo aplicar restricción si ya tiene una marca previa de tiempo
   if (user.lastCommandTime && now - user.lastCommandTime < cooldown) {
     const remaining = ((cooldown - (now - user.lastCommandTime)) / 1000).toFixed(0);
     return m.reply(`《✦》Ya tienes una solicitud pendiente.\nDebes esperar *${remaining} segundos* antes de usar otro comando.`);
   }
 
-  // Si pasa la validación, actualizamos el tiempo inmediatamente
+  // Establecer el tiempo solo después de pasar la validación
   user.lastCommandTime = now;
 
-  // Aquí puedes omitir la validación del comando si no te importa si existe o no
   user.commands = (user.commands || 0) + 1;
 }
+
+
