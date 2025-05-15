@@ -1,5 +1,5 @@
-//const { generateWAMessageFromContent, proto } = (await import('@whiskeysockets/baileys')).default
-import { generateWAMessageFromContent, proto } = (await import('@whiskeysockets/baileys')).default
+const { generateWAMessageFromContent, proto } = (await import('@whiskeysockets/baileys')).default
+//import { generateWAMessageFromContent, proto } = (await import('@whiskeysockets/baileys')).default
 
 var handler = async (m, { conn, text}) => {
 
