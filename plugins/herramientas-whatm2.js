@@ -2,7 +2,7 @@ import fs from 'fs'
 import fetch from 'node-fetch'
 import FormData from 'form-data'
 
-const API_TOKEN = 'f67bc6a68999c0a307095f04495700fb' // Tu API Key de Audd.io
+const API_TOKEN = 'a4944ceab2e3c85ff09293cd9957fd57' // Tu API Key de Audd.io
 
 let handler = async (m, { conn }) => {
     try {
