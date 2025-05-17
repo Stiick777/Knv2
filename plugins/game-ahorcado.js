@@ -10,6 +10,11 @@ const palabras = [
 const intentosMaximos = 6;
 const gam = new Map();
 
+// Función para quitar tildes
+function quitarTildes(texto) {
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 function elegirPalabraAleatoria() {
   return palabras[Math.floor(Math.random() * palabras.length)];
 }
@@ -17,7 +22,9 @@ function elegirPalabraAleatoria() {
 function ocultarPalabra(palabra, letrasAdivinadas) {
   return palabra
     .split("")
-    .map(letra => (letrasAdivinadas.includes(letra) ? letra : "_"))
+    .map(letra =>
+      letrasAdivinadas.includes(quitarTildes(letra).toLowerCase()) ? letra : "_"
+    )
     .join(" ");
 }
 
@@ -65,13 +72,13 @@ handler.before = async (m, { conn }) => {
   let juego = gam.get(m.sender);
   if (!juego) return;
 
-  if (typeof m.text === "string" && m.text.length === 1 && /^[a-zA-Z]$/.test(m.text)) {
+  if (typeof m.text === "string" && m.text.length === 1 && /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]$/.test(m.text)) {
     let { palabra, letrasAdivinadas, intentos } = juego;
-    let letra = m.text.toLowerCase();
+    let letra = quitarTildes(m.text.toLowerCase());
 
     if (!letrasAdivinadas.includes(letra)) {
       letrasAdivinadas.push(letra);
-      if (!palabra.includes(letra)) {
+      if (!quitarTildes(palabra).toLowerCase().includes(letra)) {
         intentos--;
       }
     }
@@ -80,7 +87,7 @@ handler.before = async (m, { conn }) => {
     let resultado = juegoTerminado(m.sender, palabra, mensaje, intentos);
 
     if (resultado) {
-      gam.delete(m.sender); // Elimina el juego inmediatamente tras ganar o perder
+      gam.delete(m.sender);
       return conn.reply(m.chat, resultado, m);
     }
 
