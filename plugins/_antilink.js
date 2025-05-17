@@ -1,7 +1,7 @@
 let linkRegex = /(https?:\/\/(?:www\.)?(?:whatsapp\.com)\/\S+)|(https?:\/\/chat\.whatsapp\.com\/\S+)|(https?:\/\/whatsapp\.com\/channel\/\S+)/i;
 
 let allowedLinks = [
-    "https://chat.whatsapp.com/C5xsN9KcmIs8O1wNeOkcX9",
+    "https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw",
     "https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N"
 ];
 
