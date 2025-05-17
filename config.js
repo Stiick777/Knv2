@@ -76,11 +76,11 @@ ch1: '120363318891913110@newsletter',
 ch2: '120363318891913110@newsletter',
 }
 
-//• ↳ ◜𝑳𝑰𝑵𝑲𝑺  𝐓𝐇𝐄 𝐋𝐄𝐆𝐄𝐍𝐃𝐒 ™◞ • 🌿
-global.gp4 = 'https://chat.whatsapp.com/C5xsN9KcmIs8O1wNeOkcX9' //Grupo Oficial De Megumin
-global.gp1 = 'https://chat.whatsapp.com/C5xsN9KcmIs8O1wNeOkcX9' //Grupo 
+//• ↳ ◜𝑳𝑰𝑵𝑲𝑺  ™◞ • 🌿
+global.gp4 = 'https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw' //Grupo Oficial 
+global.gp1 = 'https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw' //Grupo 
 global.gp2 = 'https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N'//
-global.comunidad1 = 'https://chat.whatsapp.com/C5xsN9KcmIs8O1wNeOkcX9' //Comunidad Megumin
+global.comunidad1 = 'https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw' //Comunidad Megumin
 global.channel = 'https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N' //Canal Oficial
 global.yt = 'https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N' //Canal De Youtube
 global.md = 'https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N' //Github Oficial
