@@ -726,7 +726,7 @@ rowner: '「⚡」 *Esta función solo puede ser usada por mi creador*\n\n> Stii
 owner: '「🔰」 *Esta función solo puede ser usada por mi desarrollador.', 
 mods: '「🌥️」 *Esta función solo puede ser usada por mis desarrolladores.*', 
 premium: '「💡」 *Esta función solo es para usuarios Premium.', 
-group: '「🔥」 *Esta funcion solo puede ser ejecutada en el grupo ofical del bot.*\nhttps://chat.whatsapp.com/C5xsN9KcmIs8O1wNeOkcX9.', 
+group: '「🔥」 *Esta funcion solo puede ser ejecutada en el grupo ofical del bot.*\nhttps://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw', 
 private: '「💝」 *Esta función solo puede ser usada en chat privado.*', 
 admin: '「⚠️」 *Este comando solo puede ser usado por admins.*', 
 botAdmin: '「✴️」 *Para usar esta función debo ser admin.*', 
