@@ -158,7 +158,7 @@ try {
 }
 handler.help = ['play', 'play2'];
 handler.tags = ['descargas'];
-handler.command = ['play2', 'play']
+handler.command = ['play2']
 handler.group = true;
 export default handler;
 
