@@ -1,5 +1,4 @@
 
-/*
 import fetch from 'node-fetch';
 import axios from 'axios';
 import fs from 'fs';
@@ -61,4 +60,4 @@ handler.group = true;
 
 export default handler;
 
-*/
+
