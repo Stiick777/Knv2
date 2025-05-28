@@ -31,8 +31,8 @@ global.baileys = 'V 6.7.8'
 global.vs = '2.0.0'
 global.languaje = 'Español'
 global.nameqr = 'black clover- Bot'
-global.sessions = 'blackSession'
-global.jadi = 'KanBotsitos'
+global.sessions = 'Sessions'
+global.jadi = 'JadiBots' 
 global.yukiJadibts = true
 
 //• ↳ ◜𝑴𝑨𝑹𝑪𝑨𝑺 𝑫𝑬 𝑨𝑮𝑼𝑨◞ • 💌
