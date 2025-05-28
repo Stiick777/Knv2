@@ -38,19 +38,19 @@ let handler = async (m, {
     }
     async function serbot() {
         let authFolderB = crypto.randomBytes(10).toString('hex').slice(0, 8);
-        if (!fs.existsSync("./KanBotsitos/" + authFolderB)) {
-            fs.mkdirSync("./KanBotsitos/" + authFolderB, {
+        if (!fs.existsSync("./JadiBots/" + authFolderB)) {
+            fs.mkdirSync("./JadiBots/" + authFolderB, {
                 recursive: true
             });
         }
         if (args[0]) {
-            fs.writeFileSync(`KanBotsitos/creds.json`, Buffer.from(args[0], 'base64').toString('utf-8'))
+            fs.writeFileSync(`JadiBots/creds.json`, Buffer.from(args[0], 'base64').toString('utf-8'))
         }
         const {
             state,
             saveState,
             saveCreds
-        } = await useMultiFileAuthState(`./KanBotsitos/${authFolderB}`);
+        } = await useMultiFileAuthState(`./JadiBots/${authFolderB}`);
         const msgRetryCounterMap = (MessageRetryMap) => {};
         const msgRetryCounterCache = new NodeCache();
         const {
