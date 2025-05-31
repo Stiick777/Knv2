@@ -123,6 +123,38 @@ if (command == 'play2') {
 `.trim();
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
+try {
+    await m.react('🕓'); // Reacciona mientras procesa
+
+    const url = yt_play[0].url; // o cualquier URL directa de YouTube
+    const apiUrl = 'https://api.siputzx.my.id/api/d/ytmp4';
+
+    const apiResponse = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'accept': '*/*',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url })
+    });
+
+    const response = await apiResponse.json();
+
+    if (response.status && response.data?.dl) {
+        const { title, dl } = response.data;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: dl },
+            caption: `🎬 *${title}*`
+        }, { quoted: m });
+
+        await m.react('✅'); // Éxito
+    } else {
+        await m.react('❌');
+        m.reply('❌ No se pudo obtener el video. Intenta con otro enlace.');
+    }
+} catch (e) {
+    
 
 try {
     await m.react('🕓'); // Reacciona mientras procesa
@@ -147,9 +179,46 @@ try {
         m.reply('No se pudo obtener el video. Intenta con otro enlace.');
     }
 } catch (e) {
+    
+    try {
+    await m.react('🕓'); // Reacción mientras procesa
+
+    const url = yt_play[0].url; // o un enlace directo
+    const apiUrl = `https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(url)}`;
+
+    const apiResponse = await fetch(apiUrl);
+    const response = await apiResponse.json();
+
+    if (response.status === 200 && response.result?.download?.url) {
+        const {
+            metadata: {
+                title,
+                timestamp,
+                views,
+                author,
+                thumbnail
+            },
+            download: {
+                url: downloadUrl
+            }
+        } = response.result;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: downloadUrl },
+            caption: `🎬 *${title}*\n📺 Duración: ${timestamp}\n👀 Vistas: ${views.toLocaleString()}\n🎙 Autor: ${author.name}\n🔗 Canal: ${author.url}`
+        }, { quoted: m });
+
+        await m.react('✅'); // Éxito
+    } else {
+        await m.react('❌');
+        m.reply('❌ No se pudo obtener el video. Intenta con otro enlace.');
+    }
+} catch (e) {
     await m.react('❌');
     console.error(e);
-    m.reply('Ocurrió un error al procesar el video intente con playv2.');
+    m.reply('❌ Ocurrió un error al procesar el video. Intenta con playv2.');
+}
+}
 }
 //
 }
