@@ -78,22 +78,34 @@ yukiJBOptions.fromCommand = true
 yukiJadiBot(yukiJBOptions)
 global.db.data.users[m.sender].Subs = new Date * 1
 } 
-handler.help = ['qr', 'code']
-handler.tags = ['serbot']
-handler.command = ['qrs', 'cola']
-export default handler 
+handler.help = ['jad', 'cou']  
+handler.tags = ['jadibot']  
+handler.command = ['jad', 'cou']  
+export default handler
 
-export async function yukiJadiBot(options) {
-let { pathYukiJadiBot, m, conn, args, usedPrefix, command } = options
-if (command === 'cola') {
-command = 'qrs'; 
-args.unshift('cola')}
-const mcode = args[0] && /(--code|code)/.test(args[0].trim()) ? true : args[1] && /(--code|code)/.test(args[1].trim()) ? true : false
-let txtCode, codeBot, txtQR
-if (mcode) {
-args[0] = args[0].replace(/^--code$|^code$/, "").trim()
-if (args[1]) args[1] = args[1].replace(/^--code$|^code$/, "").trim()
-if (args[0] == "") args[0] = undefined
+export async function yukiJadiBot(options) {  
+  let { pathYukiJadiBot, m, conn, args, usedPrefix, command } = options  
+  
+  // Si el comando es 'cou', lo redirigimos internamente como 'jad'
+  if (command === 'cou') {  
+    command = 'jad'  // Opcional si internamente necesitas trabajar como 'jad'
+    args.unshift('cou')  // Añadimos 'cou' al inicio de args
+  }  
+  
+  // Detectar si se ha pasado el modo 'code'
+  const mcode = 
+    (args[0] && /(--code|code)/.test(args[0].trim())) ? true :
+    (args[1] && /(--code|code)/.test(args[1].trim())) ? true : false
+  
+  let txtCode, codeBot, txtQR  
+  
+  if (mcode) {  
+    args[0] = args[0].replace(/^--code$|^code$/, "").trim()  
+    if (args[1]) args[1] = args[1].replace(/^--code$|^code$/, "").trim()  
+    if (args[0] === "") args[0] = undefined  
+  }
+
+  // Aquí seguiría el resto del código que maneja el comportamiento de 'jad'/'cou'
 }
 const pathCreds = path.join(pathYukiJadiBot, "creds.json")
 if (!fs.existsSync(pathYukiJadiBot)){
