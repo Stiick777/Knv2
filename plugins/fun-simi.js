@@ -7,8 +7,11 @@ let handler = async (m, { text }) => {
   m.react('🗣️');
 
   try {
-    // Consulta a la API de SimSimi
-    let res = await fetch(`https://simsimi.ooguy.com/sim?query=${encodeURIComponent(text)}`);
+    // API key proporcionada
+    const apikey = 'b7c31bc85a84460f81247277ef50ac4da50cf68f';
+
+    // Consulta a la API de SimSimi con la API Key
+    let res = await fetch(`https://simsimi.ooguy.com/sim?query=${encodeURIComponent(text)}&apikey=${apikey}`);
     let json = await res.json();
 
     if (json.status !== 200 || !json.respond) {
@@ -22,7 +25,7 @@ let handler = async (m, { text }) => {
 
     m.reply('*SimSimi:* ' + translated.text);
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Error:', error);
     m.reply('❎ Ocurrió un error, intenta de nuevo.');
   }
 };
