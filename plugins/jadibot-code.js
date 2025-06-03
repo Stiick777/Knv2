@@ -1,4 +1,10 @@
-const {
+let handler = async (m, { conn }) => {
+    // Mostrar mensaje de redirección
+    conn.reply(m.chat, '⚠️ Por favor use *`/cou`* para el funcionamiento de este nuevo comando.', m);
+    return;
+};
+
+/*const {
     useMultiFileAuthState,
     DisconnectReason,
     fetchLatestBaileysVersion,
@@ -190,9 +196,8 @@ let handler = async (m, {
         creloadHandler(false);
     }
     serbot();
-};
-handler.help = ['code'];
-handler.tags = ['jadibot'];
+};*/
+
 handler.command = ['code'];
 // handler.register = true
 //handler.group = true
