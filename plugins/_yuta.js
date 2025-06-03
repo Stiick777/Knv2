@@ -30,8 +30,19 @@ let crm3 = "SBpbmZvLWRvbmFyLmpz"
 let crm4 = "IF9hdXRvcmVzcG9uZGVyLmpzIGluZm8tYm90Lmpz"
 let drm1 = ""
 let drm2 = ""
-let rtx = "*⪛✰ ↫ Yυƙι  -  Sυσυ  -  Bσƚ ↬ ✰⪜*\n\n✐ Cσɳҽxισɳ SυႦ-Bσƚ Mσԃҽ QR\n\n✰ Con otro celular o en la PC escanea este QR para convertirte en un *Sub-Bot* Temporal.\n\n\`1\` » Haga clic en los tres puntos en la esquina superior derecha\n\n\`2\` » Toque dispositivos vinculados\n\n\`3\` » Escanee este codigo QR para iniciar sesion con el bot\n\n✧ ¡Este código QR expira en 45 segundos!."
-let rtx2 = "*⪛✰ ↫ Yυƙι  -  Sυσυ  -  Bσƚ ↬ ✰⪜*\n\n✐ Cσɳҽxισɳ SυႦ-Bσƚ Mσԃҽ Cσԃҽ\n\n✰ Usa este Código para convertirte en un *Sub-Bot* Temporal.\n\n\`1\` » Haga clic en los tres puntos en la esquina superior derecha\n\n\`2\` » Toque dispositivos vinculados\n\n\`3\` » Selecciona Vincular con el número de teléfono\n\n\`4\` » Escriba el Código para iniciar sesion con el bot\n\n✧ No es recomendable usar tu cuenta principal."
+let rtx = "*⚡ ↫ KanBot - SubBot  V2 ↬ ⚡*\n\n" +
+"✰ Escanea este QR con otro celular o en la PC para convertirte en un *Sub-Bot* Temporal.\n\n" +
+"\`1\` » Pulsa los tres puntos en la esquina superior derecha\n" +
+"\`2\` » Selecciona *Dispositivos vinculados*\n" +
+"\`3\` » Escanea el código QR para iniciar sesión con el bot\n\n" +
+"⚠️ *Este código QR expira en 60 segundos!*";
+let rtx2 = "*⚡ ↫ KanBot - SubBot V2 ↬ ⚡*\n\n" +
+"✰ Usa este Código para convertirte en un *Sub-Bot* Temporal.\n\n" +
+"\`1\` » Pulsa los tres puntos en la esquina superior derecha\n" +
+"\`2\` » Selecciona *Dispositivos vinculados*\n" +
+"\`3\` » Elige *Vincular con el número de teléfono*\n" +
+"\`4\` » Ingresa el Código para iniciar sesión con el bot";
+
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -42,13 +53,13 @@ let handler = async (m, { conn, args, usedPrefix, command, isOwner }) => {
 //if (!globalThis.db.data.settings[conn.user.jid].jadibotmd) return m.reply(`♡ Comando desactivado temporalmente.`)
 /*
 let time = global.db.data.users[m.sender].Subs + 120000
-if (new Date - global.db.data.users[m.sender].Subs < 120000) return conn.reply(m.chat, `${emoji} Debes esperar ${msToTime(time - new Date())} para volver a vincular un *Sub-Bot.*`, m)*/
+if (new Date - global.db.data.users[m.sender].Subs < 120000) return conn.reply(m.chat, `${emoji} Debes esperar ${msToTime(time - new Date())} para volver a vincular un *Sub-Bot.*`, m)
 const subBots = [...new Set([...global.conns.filter((conn) => conn.user && conn.ws.socket && conn.ws.socket.readyState !== ws.CLOSED).map((conn) => conn)])]
 const subBotsCount = subBots.length
 if (subBotsCount === 20) {
 return m.reply(`${emoji2} No se han encontrado espacios para *Sub-Bots* disponibles.`)
 }
-/*if (Object.values(global.conns).length === 30) {
+if (Object.values(global.conns).length === 30) {
 return m.reply(`${emoji2} No se han encontrado espacios para *Sub-Bots* disponibles.`)
 }*/
 let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender
@@ -67,22 +78,35 @@ yukiJBOptions.fromCommand = true
 yukiJadiBot(yukiJBOptions)
 global.db.data.users[m.sender].Subs = new Date * 1
 } 
-handler.help = ['qr', 'code']
-handler.tags = ['serbot']
-handler.command = ['qrs', 'cola']
-export default handler 
+handler.help = ['jad', 'cou']
+handler.tags = ['jadibot']
+handler.command = ['jad', 'cou']
+export default handler
 
 export async function yukiJadiBot(options) {
-let { pathYukiJadiBot, m, conn, args, usedPrefix, command } = options
-if (command === 'cola') {
-command = 'qrs'; 
-args.unshift('cola')}
-const mcode = args[0] && /(--code|code)/.test(args[0].trim()) ? true : args[1] && /(--code|code)/.test(args[1].trim()) ? true : false
-let txtCode, codeBot, txtQR
-if (mcode) {
-args[0] = args[0].replace(/^--code$|^code$/, "").trim()
-if (args[1]) args[1] = args[1].replace(/^--code$|^code$/, "").trim()
-if (args[0] == "") args[0] = undefined
+  let { pathYukiJadiBot, m, conn, args, usedPrefix, command } = options
+
+  // Si el comando fue 'cou', lo tratamos como 'jad'
+  if (command === 'cou') {
+    command = 'jad'
+    args.unshift('cou')
+  }
+
+  // Detectar si se está usando el modo 'code'
+  const mcode =
+    (args[0] && /(--code|code)/.test(args[0].trim())) ||
+    (args[1] && /(--code|code)/.test(args[1].trim())) || false
+
+  let txtCode, codeBot, txtQR
+
+  if (mcode) {
+    args[0] = args[0].replace(/^--code$|^code$/, '').trim()
+    if (args[1]) args[1] = args[1].replace(/^--code$|^code$/, '').trim()
+    if (args[0] === '') args[0] = undefined
+  }
+
+  // Aquí sigue la lógica principal del comando 'jad'
+  // (ej. generar QR, registrar bot, etc.)
 }
 const pathCreds = path.join(pathYukiJadiBot, "creds.json")
 if (!fs.existsSync(pathYukiJadiBot)){
