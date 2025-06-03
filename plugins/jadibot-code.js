@@ -194,7 +194,7 @@ let handler = async (m, {
         creloadHandler(false);
     }
     serbot();
-};*/
+};
 
 handler.command = ['code'];
 // handler.register = true
