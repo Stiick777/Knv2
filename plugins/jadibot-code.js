@@ -30,7 +30,7 @@ if (!(global.conns instanceof Array)) global.conns = [];
 let handler = async (m, {
     conn: _conn, args, usedPrefix, command, isOwner, isROwner
 }) => {
-    conn.reply(m.chat, '⚠️ Por favor use *`/cou`* para el funcionamiento de este nuevo comando.\n*ESTE DEJARÁ DE FUNCIONAR*', m);
+    conn.reply(m.chat, '⚠️ Por favor use *`/jad code`* para el funcionamiento de este nuevo comando.\n*ESTE DEJARÁ DE FUNCIONAR*', m);
     return;
     if (!global.db.data.settings[_conn.user.jid].jadibotmd && !isROwner) {
         conn.reply(m.chat, '⚠️ Este Comando está deshabilitado por mi creador.', m, )
