@@ -4,25 +4,25 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     await m.react('🔍');
 
     try {
-        const res = await fetch(`https://api.ssateam.my.id/api/pinterest?q=${encodeURIComponent(text)}&apikey=makangratis`);
+        const res = await fetch(`https://api.vreden.my.id/api/pinterest?query=${encodeURIComponent(text)}`);
         const json = await res.json();
 
-        if (!json.status || !json.data || !json.data.length) {
+        if (json.status !== 200 || !json.result || !json.result.length) {
             return conn.reply(m.chat, `❌ No encontré resultados para *${text}*`, m);
         }
 
-        const images = json.data.slice(0, 6).map(item => item.image);
+        const images = json.result.slice(0, 6);
 
         await conn.sendMessage(m.chat, {
             image: { url: images[0] },
             caption: `📍 Resultado de: *${text}*`,
             contextInfo: {
                 externalAdReply: {
-                    mediaUrl: json.data[0].pin_url,
+                    mediaUrl: images[0],
                     mediaType: 1,
                     thumbnailUrl: images[1] || images[0],
-                    title: json.data[0].title || 'Pinterest Image',
-                    body: `Subido por: ${json.data[0].uploader.full_name || 'Desconocido'}`,
+                    title: 'Imagen de Pinterest',
+                    body: 'Fuente: api.vreden.my.id',
                     previewType: 0
                 }
             }
