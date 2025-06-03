@@ -106,7 +106,7 @@ export async function yukiJadiBot(options) {
   }
 
   // Aquí seguiría el resto del código que maneja el comportamiento de 'jad'/'cou'
-}
+
 const pathCreds = path.join(pathYukiJadiBot, "creds.json")
 if (!fs.existsSync(pathYukiJadiBot)){
 fs.mkdirSync(pathYukiJadiBot, { recursive: true })}
