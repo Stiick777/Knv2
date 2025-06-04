@@ -85,7 +85,8 @@ export default handler
 
 export async function yukiJadiBot(options) {  
   let { pathYukiJadiBot, m, conn, args, usedPrefix, command } = options  
-  
+   // Asegura que args sea array
+  if (!Array.isArray(args)) args = []
   // Si el comando es 'cou', lo redirigimos internamente como 'jad'
   if (command === 'cou') {  
     command = 'jad'  // Opcional si internamente necesitas trabajar como 'jad'
