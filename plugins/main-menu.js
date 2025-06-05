@@ -187,11 +187,27 @@ export default handler
 const more = String.fromCharCode(8206)
 const readMore = more.repeat(4001)
 
-function clockString(ms) {
+/*function clockString(ms) {
   let h = isNaN(ms) ? '--' : Math.floor(ms / 3600000)
   let m = isNaN(ms) ? '--' : Math.floor(ms / 60000) % 60
   let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60
   return [h, m, s].map(v => v.toString().padStart(2, 0)).join(':')
+}*/
+function clockString(ms) {
+  if (isNaN(ms)) return '--';
+
+  let d = Math.floor(ms / 86400000); // días
+  let h = Math.floor(ms / 3600000) % 24;
+  let m = Math.floor(ms / 60000) % 60;
+  let s = Math.floor(ms / 1000) % 60;
+
+  let parts = [];
+  if (d > 0) parts.push(`${d}d`);
+  if (h > 0 || d > 0) parts.push(`${h}h`);
+  if (m > 0 || h > 0 || d > 0) parts.push(`${m}m`);
+  parts.push(`${s}s`);
+
+  return parts.join(' ');
 }
 
   var ase = new Date();
