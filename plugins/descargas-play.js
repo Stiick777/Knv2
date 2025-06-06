@@ -123,13 +123,135 @@ if (command == 'play2') {
 `.trim();
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
+    
+    
+    try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
+    const api2 = await fetch(`https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(url)}`);
+    const res2 = await api2.json();
+
+    if (res2.status === 200 && res2.data?.success) {
+        const { title, downloadUrl } = res2.data;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: downloadUrl },
+            caption: `🎬 *${title}*`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return; // ✅ Éxito, no continuar con otras APIs
+    }
+} catch (e) {
+    console.warn('Error en API 2 (Agatz):', e);
+}
 try {
-    await m.react('🕓'); // Reacciona mientras procesa
+    await m.react('🕓');
+    const url = yt_play[0].url;
 
-    const url = yt_play[0].url; // o cualquier URL directa de YouTube
-    const apiUrl = 'https://api.siputzx.my.id/api/d/ytmp4';
+    const api4 = await fetch(`https://api.ryzumi.vip/api/downloader/ytmp4?url=${encodeURIComponent(url)}&quality=360`, {
+        headers: {
+            'accept': 'application/json'
+        }
+    });
 
-    const apiResponse = await fetch(apiUrl, {
+    const res4 = await api4.json();
+
+    if (res4?.url) {
+        const { title, author, views, lengthSeconds, quality, url: downloadUrl } = res4;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: downloadUrl },
+            caption: `🎬 *${title}*\n👤 Autor: ${author}\n👁️ Vistas: ${views}\n🕒 Duración: ${lengthSeconds}s\n📥 Calidad: ${quality}`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return; // ✅ Éxito, no continuar con otras APIs
+    }
+} catch (e) {
+    console.warn('Error en API 4 (Ryzumi):', e);
+}
+try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
+    const api5 = await fetch(`https://www.dark-yasiya-api.site/download/ytmp4?url=${encodeURIComponent(url)}&quality=360`);
+    const res5 = await api5.json();
+
+    if (res5?.status && res5.result?.download?.url) {
+        const video = res5.result.data;
+        const download = res5.result.download;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: download.url },
+            caption: `🎬 *${video.title}*\n👤 Autor: ${video.author.name}\n🕒 Duración: ${video.duration.timestamp}\n👁️ Vistas: ${video.views}\n📥 Calidad: ${download.quality}p`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return; // ✅ Éxito, no continuar con otras APIs
+    }
+} catch (e) {
+    console.warn('Error en API 5 (DarkYasiya):', e);
+}
+    try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
+    const api3 = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(url)}`);
+    const res3 = await api3.json();
+
+    if (res3.status === 200 && res3.result?.download?.url) {
+        const {
+            metadata: { title, timestamp, views, author },
+            download: { url: downloadUrl }
+        } = res3.result;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: downloadUrl },
+            caption: `🎬 *${title}*\n📺 Duración: ${timestamp}\n👀 Vistas: ${views.toLocaleString()}\n🎙 Autor: ${author.name}\n🔗 Canal: ${author.url}`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return; // ✅ Éxito
+    }
+} catch (e) {
+    console.warn('Error en API 3:', e);
+}
+    
+
+
+// Si falla la primera, pasa a la siguiente
+try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
+    const api2 = await fetch(`https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(url)}&type=video&quality=720p&apikey=Paimon`);
+    const res2 = await api2.json();
+
+    if (res2.status && res2.data?.url) {
+        const { title, fduration, views, channel } = res2;
+        const { url: downloadUrl } = res2.data;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: downloadUrl },
+            caption: `*${title}*\nDuración: ${fduration}\nVistas: ${views}\nCanal: ${channel}`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return; // ✅ Éxito, no continuar con otras APIs
+    }
+} catch (e) {
+    console.warn('Error en API 2:', e);
+}
+
+// Si falla la segunda, pasa a la tercera
+
+try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
+    const api1 = await fetch('https://api.siputzx.my.id/api/d/ytmp4', {
         method: 'POST',
         headers: {
             'accept': '*/*',
@@ -138,88 +260,26 @@ try {
         body: JSON.stringify({ url })
     });
 
-    const response = await apiResponse.json();
+    const res1 = await api1.json();
 
-    if (response.status && response.data?.dl) {
-        const { title, dl } = response.data;
-
+    if (res1.status && res1.data?.dl) {
+        const { title, dl } = res1.data;
         await conn.sendMessage(m.chat, {
             video: { url: dl },
             caption: `🎬 *${title}*`
         }, { quoted: m });
 
-        await m.react('✅'); // Éxito
-    } else {
-        await m.react('❌');
-        m.reply('❌ No se pudo obtener el video. Intenta con otro enlace.');
+        await m.react('✅');
+        return; // ✅ Éxito, no continuar con otras APIs
     }
 } catch (e) {
-    
-
-try {
-    await m.react('🕓'); // Reacciona mientras procesa
-
-    const url = yt_play[0].url; // o el link que quieras procesar directamente
-    const apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(url)}&type=video&quality=720p&apikey=Paimon`;
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
-
-    if (response.status && response.data?.url) {
-        const { title, fduration, views, channel, thumbnail } = response;
-        const { url: downloadUrl } = response.data;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: downloadUrl },
-            caption: `*${title}*\nDuración: ${fduration}\nVistas: ${views}\nCanal: ${channel}`,
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } else {
-        await m.react('❌');
-        m.reply('No se pudo obtener el video. Intenta con otro enlace.');
-    }
-} catch (e) {
-    
-    try {
-    await m.react('🕓'); // Reacción mientras procesa
-
-    const url = yt_play[0].url; // o un enlace directo
-    const apiUrl = `https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(url)}`;
-
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
-
-    if (response.status === 200 && response.result?.download?.url) {
-        const {
-            metadata: {
-                title,
-                timestamp,
-                views,
-                author,
-                thumbnail
-            },
-            download: {
-                url: downloadUrl
-            }
-        } = response.result;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: downloadUrl },
-            caption: `🎬 *${title}*\n📺 Duración: ${timestamp}\n👀 Vistas: ${views.toLocaleString()}\n🎙 Autor: ${author.name}\n🔗 Canal: ${author.url}`
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } else {
-        await m.react('❌');
-        m.reply('❌ No se pudo obtener el video. Intenta con otro enlace.');
-    }
-} catch (e) {
-    await m.react('❌');
-    console.error(e);
-    m.reply('❌ Ocurrió un error al procesar el video. Intenta con playv2.');
+    console.warn('Error en API 1:', e);
 }
-}
-}
+
+
+// Si todas fallan:
+await m.react('❌');
+m.reply('❌ No se pudo obtener el video con ninguna de las APIs. Intenta con otro enlace o usa el comando playv2.');
 //
 }
 
