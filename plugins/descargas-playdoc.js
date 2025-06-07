@@ -112,122 +112,165 @@ ${yt_play[0].author.url}
 
     await conn.sendMessage(m.chat, { text: texto1 }, { quoted: m });
     
-    /*try {
-    const apiUrl = `https://api.agungny.my.id/api/youtube-videov2?url=${encodeURIComponent(yt_play[0].url)}`;
-    const apiResponse = await fetch(apiUrl);
-    const agungData = await apiResponse.json();
+ try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
 
-    if (!agungData.status || !agungData.result?.url) {
-        await m.react('❌');
-        return; // Detener si no hay URL de descarga
-    }
+    const api2 = await fetch(`https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(url)}`);
+    const res2 = await api2.json();
 
-    const downloadUrl = agungData.result.url; // Enlace directo de descarga
-    const fileName = `${agungData.result.title}.mp4`; // Nombre del archivo con título del video
+    if (res2.status === 200 && res2.data?.success) {
+        const { title, downloadUrl } = res2.data;
 
-    await conn.sendMessage(
-        m.chat,
-        {
+        await conn.sendMessage(m.chat, {
             document: { url: downloadUrl },
-            fileName: fileName,
-            caption: `🌚 *_Provided by KanBot_* 🌝`,
-            mimetype: 'video/mp4'
-        },
-        { quoted: m }
-    );
+            mimetype: 'video/mp4',
+            fileName: `${title}.mp4`,
+            caption: `🎬 *${title}*\n\n🌚 *_Provided by KanBot_* 🌝`
+        }, { quoted: m });
 
-    await m.react('✅');
+        await m.react('✅');
+        return;
+    }
 } catch (e) {
-    console.error('Error al procesar la solicitud:', e);
-    await m.react('❌'); // Reaccionar con error
+    console.warn('Error en API 2 (Agatz):', e);
 }
-*/
+
 try {
-    const apiUrl = `https://api.siputzx.my.id/api/d/ytmp4?url=${encodeURIComponent(yt_play[0].url)}`;
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
+    await m.react('🕓');
+    const url = yt_play[0].url;
 
-    if (!response.status || !response.data?.dl) {
-        await m.react('❌');
-        return; // Detener si no hay URL de descarga
-    }
+    const api4 = await fetch(`https://api.ryzumi.vip/api/downloader/ytmp4?url=${encodeURIComponent(url)}&quality=360`, {
+        headers: { 'accept': 'application/json' }
+    });
 
-    const { title, dl: downloadUrl } = response.data;
+    const res4 = await api4.json();
 
-    await conn.sendMessage(
-        m.chat,
-        {
+    if (res4?.url) {
+        const { title, author, views, lengthSeconds, quality, url: downloadUrl } = res4;
+
+        await conn.sendMessage(m.chat, {
             document: { url: downloadUrl },
+            mimetype: 'video/mp4',
             fileName: `${title}.mp4`,
-            caption: `🌚 *_Provided by KanBot_* 🌝\n📌 *Calidad:* 360p`,
-            mimetype: 'video/mp4'
-        },
-        { quoted: m }
-    );
+            caption: `🎬 *${title}*\n👤 Autor: ${author}\n👁️ Vistas: ${views}\n🕒 Duración: ${lengthSeconds}s\n📥 Calidad: ${quality}\n\n🌚 *_Provided by KanBot_* 🌝`
+        }, { quoted: m });
 
-    await m.react('✅');
-} catch (e) {
-    console.error('Error al procesar la solicitud:', e);
-    
-    try {
-    const apiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp4?url=${encodeURIComponent(yt_play[0].url)}&quality=360`;
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
-
-    if (!response.url) {
-        await m.react('❌');
-        return; // Detener si no hay URL de descarga
+        await m.react('✅');
+        return;
     }
-
-    const { title, url: downloadUrl } = response;
-
-    await conn.sendMessage(
-        m.chat,
-        {
-            document: { url: downloadUrl },
-            fileName: `${title}.mp4`,
-            caption: `🌚 *_Provided by KanBot_* 🌝\n📌 *Calidad:* 360p`,
-            mimetype: 'video/mp4'
-        },
-        { quoted: m }
-    );
-
-    await m.react('✅');
 } catch (e) {
-    console.error('Error al procesar la solicitud:', e);
-   
-    
+    console.warn('Error en API 4 (Ryzumi):', e);
+}
+
 try {
-    const apiUrl = `https://bk9.fun/download/youtube?url=${encodeURIComponent(yt_play[0].url)}`;
-    const apiResponse = await fetch(apiUrl);
-    const bk9Data = await apiResponse.json();
+    await m.react('🕓');
+    const url = yt_play[0].url;
 
-    if (!bk9Data.status || !bk9Data.BK9?.BK8?.length) {
-        await m.react('❌');
-        return; // Detener si no hay URL de descarga
+    const api5 = await fetch(`https://www.dark-yasiya-api.site/download/ytmp4?url=${encodeURIComponent(url)}&quality=360`);
+    const res5 = await api5.json();
+
+    if (res5?.status && res5.result?.download?.url) {
+        const video = res5.result.data;
+        const download = res5.result.download;
+
+        await conn.sendMessage(m.chat, {
+            document: { url: download.url },
+            mimetype: 'video/mp4',
+            fileName: `${video.title}.mp4`,
+            caption: `🎬 *${video.title}*\n👤 Autor: ${video.author.name}\n🕒 Duración: ${video.duration.timestamp}\n👁️ Vistas: ${video.views}\n📥 Calidad: ${download.quality}p\n\n🌚 *_Provided by KanBot_* 🌝`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return;
     }
-
-    const { title } = bk9Data.BK9;
-    const { link: downloadUrl, quality } = bk9Data.BK9.BK8[0]; // Primer enlace disponible
-
-    await conn.sendMessage(
-        m.chat,
-        {
-            document: { url: downloadUrl },
-            fileName: `${title}.mp4`,
-            caption: `🌚 *_Provided by KanBot_* 🌝\n📌 *Calidad:* ${quality}`,
-            mimetype: 'video/mp4'
-        },
-        { quoted: m }
-    );
-
-    await m.react('✅');
 } catch (e) {
-    console.error('Error al procesar la solicitud:', e);
-    await m.react('❌'); // Reaccionar con error
+    console.warn('Error en API 5 (DarkYasiya):', e);
 }
+
+try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
+    const api3 = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(url)}`);
+    const res3 = await api3.json();
+
+    if (res3.status === 200 && res3.result?.download?.url) {
+        const { metadata: { title, timestamp, views, author }, download: { url: downloadUrl } } = res3.result;
+
+        await conn.sendMessage(m.chat, {
+            document: { url: downloadUrl },
+            mimetype: 'video/mp4',
+            fileName: `${title}.mp4`,
+            caption: `🎬 *${title}*\n📺 Duración: ${timestamp}\n👀 Vistas: ${views.toLocaleString()}\n🎙 Autor: ${author.name}\n🔗 Canal: ${author.url}\n\n🌚 *_Provided by KanBot_* 🌝`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return;
+    }
+} catch (e) {
+    console.warn('Error en API 3:', e);
 }
+
+try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
+    const api2 = await fetch(`https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(url)}&type=video&quality=720p&apikey=Paimon`);
+    const res2 = await api2.json();
+
+    if (res2.status && res2.data?.url) {
+        const { title, fduration, views, channel } = res2;
+        const { url: downloadUrl } = res2.data;
+
+        await conn.sendMessage(m.chat, {
+            document: { url: downloadUrl },
+            mimetype: 'video/mp4',
+            fileName: `${title}.mp4`,
+            caption: `🎬 *${title}*\n🕒 Duración: ${fduration}\n👁️ Vistas: ${views}\n📺 Canal: ${channel}\n\n🌚 *_Provided by KanBot_* 🌝`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return;
+    }
+} catch (e) {
+    console.warn('Error en API 2 (Neoxr):', e);
 }
+
+try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
+    const api1 = await fetch('https://api.siputzx.my.id/api/d/ytmp4', {
+        method: 'POST',
+        headers: {
+            'accept': '*/*',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url })
+    });
+
+    const res1 = await api1.json();
+
+    if (res1.status && res1.data?.dl) {
+        const { title, dl } = res1.data;
+
+        await conn.sendMessage(m.chat, {
+            document: { url: dl },
+            mimetype: 'video/mp4',
+            fileName: `${title}.mp4`,
+            caption: `🎬 *${title}*\n\n🌚 *_Provided by KanBot_* 🌝`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return;
+    }
+} catch (e) {
+    console.warn('Error en API 1 (Siputzx):', e);
+}
+
+// Si todas fallan:
+await m.react('❌');
 //
 }
 
