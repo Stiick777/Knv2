@@ -105,6 +105,13 @@ if (command == 'play2') {
     await m.react('🕓'); 
 
     const yt_play = await search(args.join(' '));
+    
+    // Validación de duración
+    const duracionSegundos = yt_play[0].duration.seconds || 0;
+    if (duracionSegundos > 3600) {
+        return conn.reply(m.chat, `❌ *El video supera la duración máxima permitida de 1 hora.*\n\n📌 *Duración del video:* ${secondString(duracionSegundos)} Esto no es Amazon Prime Video`, m);
+    }
+
     const texto1 = `
 𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊𝚜
 ===========================
@@ -113,7 +120,7 @@ if (command == 'play2') {
 
 > *𝙲𝚛𝚎𝚊𝚍𝚘* :  ${yt_play[0].ago}
 
-> *𝙳𝚞𝚛𝚊𝚌𝚒𝚘𝚗* :  ${secondString(yt_play[0].duration.seconds)}
+> *𝙳𝚞𝚛𝚊𝚌𝚒𝚘𝚗* :  ${secondString(duracionSegundos)}
 
 *🚀 𝙎𝙀 𝙀𝙎𝙏𝘼 𝘿𝙀𝙎𝘼𝙍𝙂𝘼𝙉𝘿𝙊 𝙎𝙐 𝙑𝙄𝘿𝙀𝙊, 𝙀𝙎𝙋𝙀𝙍𝙀 𝙐𝙉 𝙈𝙊𝙈𝙀𝙉𝙏𝙊*
 
@@ -123,7 +130,7 @@ if (command == 'play2') {
 `.trim();
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
-    
+
     
     try {
     await m.react('🕓');
