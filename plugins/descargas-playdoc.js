@@ -135,7 +135,30 @@ ${yt_play[0].author.url}
 } catch (e) {
     console.warn('Error en API 2 (Agatz):', e);
 }
+try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
 
+    const api2 = await fetch(`https://delirius-apiofc.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`);
+    const res2 = await api2.json();
+
+    if (res2.status && res2.data?.download?.url) {
+        const { title, duration, views, author } = res2.data;
+        const downloadUrl = res2.data.download.url;
+
+        await conn.sendMessage(m.chat, {
+            document: { url: downloadUrl },
+            mimetype: 'video/mp4',
+            fileName: `${title}.mp4`,
+            caption: `🎬 *${title}*\n🕒 Duración: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} minutos\n👀 Vistas: ${views}\n🎙 Canal: ${author}\n\n🌚 *_Provided by KanBot_* 🌝`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return; // ✅ Éxito, no continuar con otras APIs
+    }
+} catch (e) {
+    console.warn('Error en API 2 (Delirius):', e);
+}
 try {
     await m.react('🕓');
     const url = yt_play[0].url;
