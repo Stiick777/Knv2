@@ -2,7 +2,6 @@ import fetch from "node-fetch";
 import axios from "axios";
 import yts from 'yt-search';
 
-
 let handler = async (m, { conn, text, command, args }) => {
   if (command == 'playv2') {
     if (!text) {
@@ -12,11 +11,17 @@ let handler = async (m, { conn, text, command, args }) => {
     await m.react('🕓');
 
     const yt_play = await search(args.join(' '));
-    if (!yt_play || !yt_play[0]) return conn.reply(m.chat, '❌ No se encontraron resultados.', m);
+    if (!yt_play || !yt_play[0]) {
+      return conn.reply(m.chat, '❌ No se encontraron resultados.', m);
+    }
 
     const duracionSegundos = yt_play[0].duration.seconds || 0;
     if (duracionSegundos > 3600) {
-      return conn.reply(m.chat, `❌ *El video supera la duración máxima permitida de 1 hora.*\n\n📌 *Duración:* ${secondString(duracionSegundos)}`, m);
+      return conn.reply(
+        m.chat,
+        `❌ *El video supera la duración máxima permitida de 1 hora.*\n\n📌 *Duración:* ${secondString(duracionSegundos)}`,
+        m
+      );
     }
 
     const texto1 = `
@@ -33,33 +38,42 @@ let handler = async (m, { conn, text, command, args }) => {
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'thumb.jpg', texto1, m, null);
 
-    // ⬇️ Aquí se usa tu scraper con el URL del primer resultado
-    let json = await ytdl(yt_play[0].url);
-    let size = await getSize(json.url);
-    let MAX_SIZE = 104857600; // 100 MB
-    let cap = `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${json.title}\n*🌐 URL:* ${yt_play[0].url}\n*📦 Peso:* ${await formatSize(size) || "Desconocido"}`;
+    try {
+      let json = await ytdl(yt_play[0].url);
+      let size = await getSize(json.url);
+      let MAX_SIZE = 104857600; // 100 MB
+      let cap = `😎 Su video by *_KanBot_*:\n\n*🎬 Título:* ${json.title}\n*🌐 URL:* ${yt_play[0].url}\n*📦 Peso:* ${await formatSize(size) || "Desconocido"}`;
 
-    let buffer = await (await fetch(json.url)).buffer();
+      let buffer = await (await fetch(json.url)).buffer();
 
-    let options = {
-      quoted: m,
-      mimetype: 'video/mp4',
-      fileName: `${json.title}.mp4`,
-      caption: cap
-    };
+      let options = {
+        quoted: m,
+        mimetype: 'video/mp4',
+        fileName: `${json.title}.mp4`,
+        caption: cap
+      };
 
-    if (size > MAX_SIZE) {
-      await conn.sendMessage(m.chat, {
-        document: buffer,
-        ...options
-      });
-    } else {
-      await conn.sendFile(m.chat, buffer, `${json.title}.mp4`, cap, m, null, {
-        mimetype: 'video/mp4'
-      });
+      if (size > MAX_SIZE) {
+        await conn.sendMessage(m.chat, {
+          document: buffer,
+          ...options
+        });
+      } else {
+        await conn.sendFile(m.chat, buffer, `${json.title}.mp4`, cap, m, null, {
+          mimetype: 'video/mp4'
+        });
+      }
+
+      await m.react('✅');
+    } catch (error) {
+      console.error(error);
+      await m.react('❌');
+      await conn.reply(
+        m.chat,
+        `❌ *Ocurrió un error al intentar enviar el video.*\n\n📄 *Razón:* ${error.message}`,
+        m
+      );
     }
-
-    await m.react('✅');
   }
 };
 
