@@ -183,6 +183,28 @@ try {
     await m.react('🕓');
     const url = yt_play[0].url;
 
+    const api2 = await fetch(`https://delirius-apiofc.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`);
+    const res2 = await api2.json();
+
+    if (res2.status && res2.data?.download?.url) {
+        const { title, duration, views, author } = res2.data;
+        const downloadUrl = res2.data.download.url;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: downloadUrl },
+            caption: `*${title}*\nDuración: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} minutos\nVistas: ${views}\nCanal: ${author}`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return; // ✅ Éxito, no continuar con otras APIs
+    }
+} catch (e) {
+    console.warn('Error en API 2 (Delirius):', e);
+}
+try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
     const api5 = await fetch(`https://www.dark-yasiya-api.site/download/ytmp4?url=${encodeURIComponent(url)}&quality=360`);
     const res5 = await api5.json();
 
