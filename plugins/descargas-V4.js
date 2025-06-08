@@ -1,5 +1,7 @@
 import fetch from "node-fetch";
 import axios from "axios";
+import yts from 'yt-search';
+import ytdl from 'ytdl-core';
 
 let handler = async (m, { conn, text, command, args }) => {
   if (command == 'playv2') {
