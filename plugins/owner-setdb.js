@@ -2,47 +2,45 @@ import fs from 'fs'
 import { downloadContentFromMessage } from '@whiskeysockets/baileys'
 
 let handler = async (m, { conn }) => {
-    console.log(m)
-    try {
-        // Extraer el documento (ya sea directo o citado)
-        const document = m.msg?.documentMessage ||
-                         m.quoted?.message?.documentMessage || // caso respondido
-                         m.quoted?.msg?.documentMessage       // fallback opcional
+  try {
+    await m.react('🕓')
 
-        if (!document) {
-            throw '⚠️ Por favor responde o etiqueta un documento JSON con el comando *setdb*.'
-        }
+    // Verifica si se responde a un mensaje
+    const quoted = m.quoted?.message?.documentMessage
+    if (!quoted) throw '⚠️ Por favor responde o etiqueta un documento JSON con el comando *setdb*.'
 
-        await m.react('🕓')
+    const mime = quoted.mimetype || ''
+    const filename = quoted.fileName || 'database.json'
 
-        const mime = document.mimetype || ''
-        const filename = document.fileName || 'database.json'
-
-        if (!mime.includes('json')) {
-            throw '❌ El archivo debe ser de tipo *JSON*.'
-        }
-
-        const stream = await downloadContentFromMessage(document, 'document')
-        let buffer = Buffer.from([])
-
-        for await (const chunk of stream) {
-            buffer = Buffer.concat([buffer, chunk])
-        }
-
-        fs.writeFileSync('./src/database/database.json', buffer)
-
-        await m.react('✅')
-        await m.reply(`✅ El archivo *${filename}* se ha guardado correctamente.`)
-    } catch (err) {
-        console.error('[Error al guardar el archivo]:', err)
-        await m.react('❌')
-        await m.reply(`❌ No fue posible guardar el archivo.\n🧾 Razón: ${err.message || err}`)
+    // Asegurarse que sea un archivo JSON
+    if (!mime.includes('json')) {
+      throw '❌ El archivo debe ser un documento de tipo JSON.'
     }
+
+    // Descarga el contenido del archivo
+    const stream = await downloadContentFromMessage(quoted, 'document')
+    let buffer = Buffer.from([])
+
+    for await (const chunk of stream) {
+      buffer = Buffer.concat([buffer, chunk])
+    }
+
+    // Guarda el archivo
+    fs.writeFileSync('./src/database/database.json', buffer)
+
+    await m.react('✅')
+    await m.reply(`✅ Archivo *${filename}* guardado correctamente.`)
+
+  } catch (err) {
+    console.error(err)
+    await m.react('❌')
+    await m.reply(`❌ No fue posible guardar el archivo.\n🧾 Razón: ${err.message || err}`)
+  }
 }
 
 handler.help = ['setdb']
 handler.tags = ['owner']
-handler.command = /^(setdb)$/i
+handler.command = /^setdb$/i
 handler.rowner = true
 
 export default handler
