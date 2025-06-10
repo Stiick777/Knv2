@@ -2,6 +2,7 @@ import fs from 'fs'
 import { downloadContentFromMessage } from '@whiskeysockets/baileys'
 
 let handler = async (m, { conn }) => {
+    console.log(m)
     try {
         // Extraer el documento (ya sea directo o citado)
         const document = m.msg?.documentMessage ||
