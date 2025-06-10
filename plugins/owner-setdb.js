@@ -1,46 +1,27 @@
-import fs from 'fs'
-import { downloadContentFromMessage } from '@whiskeysockets/baileys'
-
 let handler = async (m, { conn }) => {
   try {
-    await m.react('🕓')
+    if (!m.quoted) throw '⚠️ No estás respondiendo a ningún mensaje.'
 
-    // Verifica si se responde a un mensaje
-    const quoted = m.quoted?.message?.documentMessage
-    if (!quoted) throw '⚠️ Por favor responde o etiqueta un documento JSON con el comando *setdb*.'
+    // Envia la estructura de m.quoted en formato JSON al chat
+    const rawQuoted = JSON.stringify(m.quoted, null, 2)
+    const rawMsg = JSON.stringify(m, null, 2)
 
-    const mime = quoted.mimetype || ''
-    const filename = quoted.fileName || 'database.json'
+    await conn.sendMessage(m.chat, {
+      text: `📦 *Contenido de m.quoted:*\n\`\`\`${rawQuoted}\`\`\``,
+    }, { quoted: m })
 
-    // Asegurarse que sea un archivo JSON
-    if (!mime.includes('json')) {
-      throw '❌ El archivo debe ser un documento de tipo JSON.'
-    }
-
-    // Descarga el contenido del archivo
-    const stream = await downloadContentFromMessage(quoted, 'document')
-    let buffer = Buffer.from([])
-
-    for await (const chunk of stream) {
-      buffer = Buffer.concat([buffer, chunk])
-    }
-
-    // Guarda el archivo
-    fs.writeFileSync('./src/database/database.json', buffer)
-
-    await m.react('✅')
-    await m.reply(`✅ Archivo *${filename}* guardado correctamente.`)
+    await conn.sendMessage(m.chat, {
+      text: `🧾 *Contenido completo del mensaje m:*\n\`\`\`${rawMsg}\`\`\``,
+    }, { quoted: m })
 
   } catch (err) {
-    console.error(err)
-    await m.react('❌')
-    await m.reply(`❌ No fue posible guardar el archivo.\n🧾 Razón: ${err.message || err}`)
+    await m.reply(`❌ Error: ${err}`)
   }
 }
 
-handler.help = ['setdb']
+handler.help = ['setdbdebug']
 handler.tags = ['owner']
-handler.command = /^setdb$/i
+handler.command = /^setdbdebug$/i
 handler.rowner = true
 
 export default handler
