@@ -1,27 +1,37 @@
+import { downloadContentFromMessage } from '@whiskeysockets/baileys'
+import fs from 'fs'
+
 let handler = async (m, { conn }) => {
   try {
-    if (!m.quoted) throw '⚠️ No estás respondiendo a ningún mensaje.'
+    if (!m.quoted || m.quoted.mtype !== 'documentMessage') {
+      return m.reply('❗ Debes responder a un archivo `.json` enviado como documento.')
+    }
 
-    // Envia la estructura de m.quoted en formato JSON al chat
-    const rawQuoted = JSON.stringify(m.quoted, null, 2)
-    const rawMsg = JSON.stringify(m, null, 2)
+    const mime = m.quoted.mimetype || ''
+    if (!mime.includes('json')) {
+      return m.reply('⚠️ El archivo debe tener formato `.json`.')
+    }
 
-    await conn.sendMessage(m.chat, {
-      text: `📦 *Contenido de m.quoted:*\n\`\`\`${rawQuoted}\`\`\``,
-    }, { quoted: m })
+    const stream = await downloadContentFromMessage(m.quoted.message.documentMessage || m.quoted, 'document')
+    let buffer = Buffer.from([])
 
-    await conn.sendMessage(m.chat, {
-      text: `🧾 *Contenido completo del mensaje m:*\n\`\`\`${rawMsg}\`\`\``,
-    }, { quoted: m })
+    for await (const chunk of stream) {
+      buffer = Buffer.concat([buffer, chunk])
+    }
 
+    const path = './database.json' // Puedes cambiarlo a donde uses tu DB real
+    fs.writeFileSync(path, buffer)
+
+    m.reply('✅ Base de datos actualizada con éxito desde el archivo JSON.')
   } catch (err) {
-    await m.reply(`❌ Error: ${err}`)
+    console.error(err)
+    m.reply(`❌ Error al cargar el archivo: ${err}`)
   }
 }
 
-handler.help = ['setdbdebug']
+handler.help = ['setdb']
 handler.tags = ['owner']
-handler.command = /^setdbdebug$/i
+handler.command = /^setdb$/i
 handler.rowner = true
 
 export default handler
