@@ -14,7 +14,7 @@ import {format} from 'util';
 import pino from 'pino';
 import Pino from 'pino';
 import {Boom} from '@hapi/boom';
-import {makeWASocket, protoType, serialize} from './src/libraries/simple.js';
+import {makeWASocket, protoType, serialize} from './lib/simple.js'
 import {Low, JSONFile} from 'lowdb';
 import store from './lib/store.js'
 import pkg from 'google-libphonenumber';
