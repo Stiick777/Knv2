@@ -4,7 +4,6 @@ let handler = async (m, { conn }) => {
   }
 
   const citado = m.quoted;
-  const json = citado.toJSON(); // estructura completa del mensaje citado
   const targetJid = citado.sender || citado.participant || citado.key?.participant;
 
   const tipoID = targetJid?.endsWith('@lid') ? 'LID (oculto)' :
@@ -12,11 +11,16 @@ let handler = async (m, { conn }) => {
                  targetJid?.endsWith('@s.whatsapp.net') ? 'Número normal' :
                  'Desconocido';
 
-  // Tipo de mensaje (ej. conversation, imageMessage, etc.)
   const tipoMensaje = citado.mtype || 'Desconocido';
-
-  // Texto del mensaje si existe
   const textoCitado = citado.text || '[No es un mensaje de texto]';
+
+  // reconstruimos estructura parcial
+  const resumenEstructura = {
+    key: citado.key,
+    message: citado.message,
+    participant: citado.participant,
+    remoteJid: citado.key?.remoteJid,
+  };
 
   let mensaje = `
 📨 *Información del mensaje citado:*
@@ -26,9 +30,9 @@ let handler = async (m, { conn }) => {
 📦 *Tipo de mensaje:* ${tipoMensaje}
 📝 *Contenido:* ${textoCitado}
 
-🧩 *Estructura JSON del mensaje citado:*
+🧩 *Estructura del mensaje citado (resumen)*:
 \`\`\`json
-${JSON.stringify(json, null, 2).slice(0, 4000)}
+${JSON.stringify(resumenEstructura, null, 2).slice(0, 4000)}
 \`\`\`
 (Truncado si es muy largo)
   `.trim();
@@ -41,5 +45,5 @@ ${JSON.stringify(json, null, 2).slice(0, 4000)}
 
 handler.command = ['lid'];
 handler.group = true;
-handler.rwoner = true 
+handler.rowner = true
 export default handler;
