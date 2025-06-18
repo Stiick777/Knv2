@@ -4,7 +4,16 @@ let handler = async (m, { conn }) => {
   }
 
   const citado = m.quoted;
-  const targetJid = citado.sender || citado.participant || citado.key?.participant;
+  const context = m.message?.extendedTextMessage?.contextInfo || {};
+
+  const keyData = citado.key || context.stanzaId ? {
+    remoteJid: citado.key?.remoteJid || context.remoteJid || null,
+    fromMe: citado.key?.fromMe ?? null,
+    id: citado.key?.id || context.stanzaId || null,
+    participant: citado.key?.participant || context.participant || null,
+  } : {};
+
+  const targetJid = keyData.participant || citado.sender || context.participant;
   const tipoID = targetJid?.endsWith('@lid') ? 'LID (oculto)' :
                  targetJid?.endsWith('@c.us') ? 'Número visible' :
                  targetJid?.endsWith('@s.whatsapp.net') ? 'Número normal' :
@@ -13,15 +22,8 @@ let handler = async (m, { conn }) => {
   const tipoMensaje = citado.mtype || 'Desconocido';
   const textoCitado = citado.text || '[No es un mensaje de texto]';
 
-  // Extraer desde contextInfo
-  let estructuraCitada = {};
-  try {
-    estructuraCitada = m.message?.extendedTextMessage?.contextInfo?.quotedMessage || citado.message || {};
-  } catch (e) {
-    estructuraCitada = {};
-  }
-
-  // Detectar tipo adicional
+  // Detectar tipo de contenido
+  const estructuraCitada = context.quotedMessage || citado.message || {};
   let tipoContenido = '🗒️ Texto';
   if (estructuraCitada.imageMessage) tipoContenido = '🖼️ Imagen';
   else if (estructuraCitada.stickerMessage) tipoContenido = '🔖 Sticker';
@@ -32,14 +34,15 @@ let handler = async (m, { conn }) => {
   else if (estructuraCitada.buttonsMessage) tipoContenido = '📲 Botón';
   else if (estructuraCitada.listMessage) tipoContenido = '📋 Lista';
 
-  const resumenEstructura = {
-    key: citado.key || {},
-    remoteJid: citado.key?.remoteJid || null,
-    participant: citado.participant || null,
+  // Preparar estructura de resumen
+  const resumen = {
+    key: keyData,
+    remoteJid: keyData.remoteJid || null,
+    participant: keyData.participant || null,
     message: estructuraCitada
   };
 
-  let mensaje = `
+  const mensaje = `
 📨 *Información del mensaje citado:*
 
 👤 *Remitente:* \`${targetJid || 'No detectado'}\`
@@ -50,7 +53,7 @@ let handler = async (m, { conn }) => {
 
 🧩 *Estructura del mensaje citado (resumen)*:
 \`\`\`json
-${JSON.stringify(resumenEstructura, null, 2).slice(0, 4000)}
+${JSON.stringify(resumen, null, 2).slice(0, 4000)}
 \`\`\`
 (Truncado si es muy largo)
   `.trim();
