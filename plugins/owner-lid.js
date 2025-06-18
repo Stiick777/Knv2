@@ -1,44 +1,45 @@
 let handler = async (m, { conn }) => {
-  // Verificamos si se está respondiendo a un mensaje
   if (!m.quoted) {
-    return m.reply('❌ Debes responder a un mensaje para obtener su LID o estructura.');
+    return m.reply('❌ Debes responder a un mensaje para obtener su LID y estructura.');
   }
 
   const citado = m.quoted;
-  const targetJid = citado.sender || citado.participant;
+  const json = citado.toJSON(); // estructura completa del mensaje citado
+  const targetJid = citado.sender || citado.participant || citado.key?.participant;
 
-  // Detecta el tipo de ID
-  const tipoID = targetJid.endsWith('@lid') ? 'LID (oculto)' :
-                 targetJid.endsWith('@c.us') ? 'Número visible' :
+  const tipoID = targetJid?.endsWith('@lid') ? 'LID (oculto)' :
+                 targetJid?.endsWith('@c.us') ? 'Número visible' :
+                 targetJid?.endsWith('@s.whatsapp.net') ? 'Número normal' :
                  'Desconocido';
 
-  // Armamos el mensaje de respuesta
+  // Tipo de mensaje (ej. conversation, imageMessage, etc.)
+  const tipoMensaje = citado.mtype || 'Desconocido';
+
+  // Texto del mensaje si existe
+  const textoCitado = citado.text || '[No es un mensaje de texto]';
+
   let mensaje = `
 📨 *Información del mensaje citado:*
 
-👤 *Remitente:* \`${targetJid}\`
+👤 *Remitente:* \`${targetJid || 'No detectado'}\`
 🔎 *Tipo de ID:* ${tipoID}
+📦 *Tipo de mensaje:* ${tipoMensaje}
+📝 *Contenido:* ${textoCitado}
 
-🧩 *Estructura del mensaje citado (resumen)*:
+🧩 *Estructura JSON del mensaje citado:*
 \`\`\`json
-${JSON.stringify({
-  key: citado.key,
-  message: citado.message,
-  participant: citado.participant,
-  remoteJid: citado.key?.remoteJid
-}, null, 2).slice(0, 4000)}
+${JSON.stringify(json, null, 2).slice(0, 4000)}
 \`\`\`
 (Truncado si es muy largo)
   `.trim();
 
-  // Enviamos el mensaje con mención si es posible
   await conn.sendMessage(m.chat, {
     text: mensaje,
-    mentions: [targetJid]
+    mentions: targetJid ? [targetJid] : []
   }, { quoted: m });
 };
 
 handler.command = ['lid'];
 handler.group = true;
-handler.rowner = true;
+handler.rwoner = true 
 export default handler;
