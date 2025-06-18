@@ -1,66 +1,64 @@
-let handler = async (m, { conn }) => {
-  if (!m.quoted) {
-    return m.reply('❌ Debes responder a un mensaje para obtener su LID y estructura.');
+const handler = async (m, { conn, usedPrefix, command }) => {
+  const citado = m.quoted;
+  if (!citado) {
+    return m.reply('❌ Debes responder a un mensaje para ver su estructura y LID.');
   }
 
-  const citado = m.quoted;
-  const context = m.message?.extendedTextMessage?.contextInfo || {};
-  const qmsg = context.quotedMessage || citado.message || {};
+  const { key = {}, message = {}, participant = null } = citado;
+  const contenido = citado.text || citado.body || '[sin texto]';
 
-  // Extraer JID desde el contexto si no aparece en key
-  const remoteJid = citado.key?.remoteJid || context.remoteJid || m.chat || null;
-  const participant = citado.key?.participant || context.participant || citado.sender || null;
+  // Obtener JID del citado
+  const jid = key.participant || citado.sender || m.chat || 'Desconocido';
 
-  const tipoID = participant?.endsWith('@lid') ? 'LID (oculto)' :
-                 participant?.endsWith('@c.us') ? 'Número visible' :
-                 participant?.endsWith('@s.whatsapp.net') ? 'Número normal' :
-                 'Desconocido';
+  // Detectar tipo de ID
+  let tipoID = 'Desconocido';
+  if (jid.endsWith('@lid')) tipoID = '🟡 LID (oculto)';
+  else if (jid.endsWith('@c.us')) tipoID = '🟢 Número visible';
+  else if (jid.endsWith('@s.whatsapp.net')) tipoID = '🔵 Número normal';
+  else tipoID = '🔴 Otro formato';
 
-  const tipoMensaje = citado.mtype || Object.keys(qmsg)[0] || 'Desconocido';
-  const textoCitado = citado.text || qmsg?.[tipoMensaje]?.text || '[No es un mensaje de texto]';
-
-  let tipoContenido = '🗒️ Texto';
-  if (qmsg.imageMessage) tipoContenido = '🖼️ Imagen';
-  else if (qmsg.stickerMessage) tipoContenido = '🔖 Sticker';
-  else if (qmsg.videoMessage) tipoContenido = '🎞️ Video';
-  else if (qmsg.audioMessage) tipoContenido = '🎧 Audio';
-  else if (qmsg.documentMessage) tipoContenido = '📄 Documento';
-
+  // Preparar estructura compacta
   const resumen = {
-    key: {
-      remoteJid: remoteJid,
-      fromMe: citado.key?.fromMe ?? null,
-      id: citado.key?.id || context.stanzaId || null,
-      participant: participant
-    },
-    remoteJid,
-    participant,
-    message: qmsg
+    key,
+    remoteJid: citado?.key?.remoteJid || null,
+    participant: citado.participant || null,
+    message: citado.message || {},
   };
 
-  const mensaje = `
+  // Detectar tipo de mensaje
+  const tipoMensaje = Object.keys(citado.message || {})[0] || 'desconocido';
+
+  // Clasificar tipo de contenido
+  const tipoContenido = (() => {
+    if (citado.text) return '🗒️ Texto';
+    if (citado.imageMessage) return '🖼️ Imagen';
+    if (citado.videoMessage) return '🎞️ Video';
+    if (citado.audioMessage) return '🎵 Audio';
+    if (citado.documentMessage) return '📄 Documento';
+    return '📦 Otro';
+  })();
+
+  let respuesta = `
 📨 *Información del mensaje citado:*
 
-👤 *Remitente:* \`${participant || 'Desconocido'}\`
+👤 *Remitente:* \`${jid}\`
 🔎 *Tipo de ID:* ${tipoID}
 📦 *Tipo de mensaje:* ${tipoMensaje}
-📝 *Contenido:* ${textoCitado}
+📝 *Contenido:* ${contenido}
 📂 *Tipo de contenido detectado:* ${tipoContenido}
+
+🧾 *JID detectado:* \`${jid}\`
 
 🧩 *Estructura del mensaje citado (resumen)*:
 \`\`\`json
-${JSON.stringify(resumen, null, 2).slice(0, 4000)}
+${JSON.stringify(resumen, null, 2).slice(0, 1000)}${JSON.stringify(resumen).length > 1000 ? '\n... (truncado)' : ''}
 \`\`\`
-(Truncado si es muy largo)
-  `.trim();
+`.trim();
 
-  await conn.sendMessage(m.chat, {
-    text: mensaje,
-    mentions: participant ? [participant] : []
-  }, { quoted: m });
+  await conn.reply(m.chat, respuesta, m);
 };
 
 handler.command = ['lid'];
-handler.group = true;
-
+handler.help = ['lid'];
+handler.tags = ['debug'];
 export default handler;
