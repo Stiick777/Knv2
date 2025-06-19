@@ -18,16 +18,14 @@ global.owner = [
   ['5216645011701', 'Stiiven', true],
   ['573204545069', 'Stiiven', true],
   ['573028488839']
-];
-
-//• ↳𝑺𝑶𝑳𝑶 𝑴𝑶𝑫𝑬𝑹𝑨𝑫𝑶𝑹𝑬𝑺!
-global.mods = []
-global.suittag = [] 
-global.prems = []
   
 // <-- Número @lid -->
   ['35090453283048', 'Stiven', true]
 ];
+//• ↳𝑺𝑶𝑳𝑶 𝑴𝑶𝑫𝑬𝑹𝑨𝑫𝑶𝑹𝑬𝑺!
+global.mods = []
+global.suittag = [] 
+global.prems = []
  
 global.libreria = 'Baileys'
 global.baileys = 'V 6.7.17'
