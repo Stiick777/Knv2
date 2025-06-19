@@ -21,10 +21,13 @@ global.owner = [
 ];
 
 //• ↳𝑺𝑶𝑳𝑶 𝑴𝑶𝑫𝑬𝑹𝑨𝑫𝑶𝑹𝑬𝑺!
-global.mods = ['', '', '', '', '']
-
-global.suittag = ['']
+global.mods = []
+global.suittag = [] 
 global.prems = []
+  
+// <-- Número @lid -->
+  ['35090453283048', 'Stiven', true]
+];
  
 global.libreria = 'Baileys'
 global.baileys = 'V 6.7.17'
