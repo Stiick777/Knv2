@@ -1,14 +1,26 @@
-var handler = async (m, {conn, args, usedPrefix, command}) => {
-const isClose = { 'open': 'not_announcement', 'close': 'announcement', 'abierto': 'not_announcement', 'cerrado': 'announcement', 'abrir': 'not_announcement', 'cerrar': 'announcement', 'desbloquear': 'unlocked', 'bloquear': 'locked' }[(args[0] || '')]
-if (isClose === undefined) { return conn.reply(m.chat, `*Elija una opción para configurar el grupo*\n\nEjemplo:\n*○ !${command} abrir*\n*○ !${command} cerrar*\n*○ !${command} bloquear*\n*○ !${command} desbloquear*`, m, )}
-await conn.groupSettingUpdate(m.chat, isClose)
-{ 
-conn.reply(m.chat, '✅ *Configurado correctamente*', m,  )
-await m.react(done)
-}}
-handler.help = ['group abrir / cerrar']
+var handler = async (m, { conn, command }) => {
+  const setting = (command === 'abrir' || command === 'open') ? 'not_announcement'
+                : (command === 'cerrar' || command === 'close') ? 'announcement'
+                : null
+
+  if (!setting) {
+    return conn.reply(m.chat, `*Elija una opción válida para configurar el grupo*\n\nEjemplo:\n○ *!abrir*\n○ *!cerrar*\n○ *!open*\n○ *!close*`, m)
+  }
+
+  await conn.groupSettingUpdate(m.chat, setting)
+
+  // Mensaje personalizado según acción
+  const estado = (setting === 'not_announcement') 
+    ? (command === 'abrir' ? 'abierto' : 'opened') 
+    : (command === 'cerrar' ? 'cerrado' : 'closed')
+
+  await conn.reply(m.chat, `✅ *Grupo ${estado} correctamente*`, m)
+  await m.react(done)
+}
+
+handler.help = ['abrir', 'cerrar', 'open', 'close']
 handler.tags = ['grupo']
-handler.command = ['group','grupo', 'gp']
+handler.command = ['abrir', 'cerrar', 'open', 'close']
 handler.admin = true
 handler.botAdmin = true
 
