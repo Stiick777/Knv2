@@ -33,7 +33,7 @@ global.libreria = 'Baileys'
 global.baileys = 'V 6.7.17'
 global.vs = '2.0.0'
 global.languaje = 'Español'
-global.nameqr = 'black clover- Bot'
+global.nameqr = 'KanBot 
 global.sessions = 'Sessions'
 global.jadi = 'JadiBots' 
 global.yukiJadibts = true
@@ -83,7 +83,7 @@ ch2: '120363318891913110@newsletter',
 global.gp4 = 'https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw' //Grupo Oficial 
 global.gp1 = 'https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw' //Grupo 
 global.gp2 = 'https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N'//
-global.comunidad1 = 'https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw' //Comunidad Megumin
+global.comunidad1 = 'https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw' //Comunidad 
 global.channel = 'https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N' //Canal Oficial
 global.yt = 'https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N' //Canal De Youtube
 global.md = 'https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N' //Github Oficial
