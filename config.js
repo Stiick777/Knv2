@@ -17,7 +17,7 @@ global.confirmCode = ''
 global.owner = [
   ['5216645011701', 'Stiiven', true],
   ['573204545069', 'Stiiven', true],
-  ['573028488839']
+  ['573028488839'],
   
 // <-- Número @lid -->
   ['35090453283048', 'Stiven', true]
