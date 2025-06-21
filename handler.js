@@ -90,6 +90,7 @@ registered: false,
 regTime: -1,
 rendang: 0, 
 }
+    
 let chat = global.db.data.chats[m.chat]
 if (typeof chat !== 'object')
 global.db.data.chats[m.chat] = {}
