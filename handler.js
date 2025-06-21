@@ -90,6 +90,9 @@ registered: false,
 regTime: -1,
 rendang: 0, 
 }
+let chat = global.db.data.chats[m.chat]
+if (typeof chat !== 'object')
+global.db.data.chats[m.chat] = {}
 if (chat) {
 if (!('isBanned' in chat)) chat.isBanned = false         
 if (!('welcome' in chat)) chat.welcome = true 
