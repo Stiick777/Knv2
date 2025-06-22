@@ -39,19 +39,23 @@ const PORT = process.env.PORT || process.env.SERVER_PORT || 3000
 
 let { say } = cfonts
 
-console.log(chalk.bold.redBright(`\n✰ Iniciando Yuki-Suou-Bot ✰\n`))
+console.log(chalk.bold.redBright(`\n✰ Iniciando Kan ✰\n`))
 
-say('YukiBot-MD', {
-font: 'block',
+say('KanBot', {
+font: '3d',
 align: 'center',
-colors: ['magentaBright']
-})
-
-say(`Developed By • The-King-Destroy`, {
-font: 'console',
+colors: ['green']
+});
+say(`OFC`, {
+font: '3d',
 align: 'center',
-colors: ['blueBright']
-})
+colors: ['green']
+});
+say(`Provided By • Stiiven`, {
+font: 'tiny',
+align: 'center',
+colors: ['yellow']
+});
 
 protoType()
 serialize()
@@ -206,7 +210,7 @@ if (opcion == '1' || methodCodeQR) {
 console.log(chalk.bold.yellow(`\n❐ ESCANEA EL CÓDIGO QR EXPIRA EN 45 SEGUNDOS`))}
 }
 if (connection == 'open') {
-console.log(chalk.bold.green('\n❀ Yuki Suou Conectada con éxito ❀'))
+console.log(chalk.bold.green('\n KanBot Conectado con éxito 🪐'))
 }
 let reason = new Boom(lastDisconnect?.error)?.output?.statusCode
 if (connection === 'close') {
