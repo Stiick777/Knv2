@@ -10,8 +10,8 @@ const LimitAud = 725 * 1024 * 1024; //700MB
 const LimitVid = 425 * 1024 * 1024; //425MB
 const handler = async (m, {conn, command, args, text, usedPrefix}) => {
 
-/*
-if (command === 'play') {
+
+if (command === 'playp') {
         if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
 
         await m.react('🕓');
@@ -41,64 +41,59 @@ if (command === 'play') {
 try {
     await m.react('🕓'); // Reacciona mientras procesa
 
-    const url = yt_play[0].url; // o cualquier link directo de YouTube
+    const url = yt_play[0].url;
     const apiUrl = `https://bk9.fun/download/ytmp3?url=${encodeURIComponent(url)}&type=mp3`;
 
     const apiResponse = await fetch(apiUrl);
     const response = await apiResponse.json();
 
     if (response.status && response.BK9?.downloadUrl) {
-        const { title, downloadUrl } = response.BK9;
-
+        const { title, downloadUrl } = response;
         await conn.sendMessage(m.chat, {
             audio: { url: downloadUrl },
             mimetype: 'audio/mp4',
             fileName: `${title}.mp3`,
-            ptt: false // cambia a true si quieres que sea nota de voz
+            ptt: false
         }, { quoted: m });
 
         await m.react('✅'); // Éxito
     } else {
-        await m.react('❌');
-        m.reply('No se pudo obtener el audio. Intenta con otro enlace.');
+        throw new Error('No se pudo obtener el enlace desde la primera API.');
     }
+
 } catch (e) {
-    
+    try {
+        await m.react('🕓'); // Reintenta con la segunda API
 
+        const url = yt_play[0].url;
+        const apiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
 
-try {
-    await m.react('🕓'); // Reacciona mientras procesa
+        const apiResponse = await fetch(apiUrl);
+        const response = await apiResponse.json();
 
-    const url = yt_play[0].url; // o cualquier link directo de YouTube
-    const apiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
+        if (response.url) {
+            const { title, url: audioUrl } = response;
+            await conn.sendMessage(m.chat, {
+                audio: { url: audioUrl },
+                mimetype: 'audio/mp4',
+                fileName: `${title}.mp3`,
+                ptt: false
+            }, { quoted: m });
 
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
+            await m.react('✅'); // Éxito
+        } else {
+            throw new Error('No se pudo obtener el enlace desde la segunda API.');
+        }
 
-    if (response.url) {
-        const { title, url: audioUrl } = response;
-
-        await conn.sendMessage(m.chat, {
-            audio: { url: audioUrl },
-            mimetype: 'audio/mp4',
-            fileName: `${title}.mp3`,
-            ptt: false // cambia a true si quieres que sea nota de voz
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } else {
+    } catch (err) {
         await m.react('❌');
-        m.reply('No se pudo obtener el audio. Intenta con otro enlace.');
+        console.error('Error al procesar el audio:', err);
+        m.reply('No se pudo obtener el audio con ninguna de las APIs.');
     }
-} catch (e) {
-    await m.react('❌');
-    console.error('Error al procesar el audio:', e);
-    m.reply('Ocurrió un error al procesar el audio.');
-}
 }
 //
     }
-*/
+
 if (command == 'play2') {
     if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
     
@@ -314,9 +309,9 @@ m.reply('❌ No se pudo obtener el video con ninguna de las APIs. Intenta con ot
 
 
 }
-handler.help = ['play', 'play2'];
+handler.help = ['playp', 'play2'];
 handler.tags = ['descargas'];
-handler.command = ['play2']
+handler.command = ['play2', 'playp']
 handler.group = true;
 export default handler;
 

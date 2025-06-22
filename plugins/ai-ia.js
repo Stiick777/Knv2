@@ -8,13 +8,26 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
     try {
         await m.react('💭');
 
-        // Usar la nueva API
-        const response = await fetch(`https://vapis.my.id/api/openai?q=${encodeURIComponent(text)}`);
+        const payload = [
+            {
+                role: 'system',
+                content: text
+            }
+        ];
+
+        const response = await fetch('https://api.siputzx.my.id/api/ai/gpt3', {
+            method: 'POST',
+            headers: {
+                'accept': '*/*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
         const data = await response.json();
 
-        if (data.status) {
-            // Responder con el mensaje fijo en lugar de la respuesta de OpenAI
-            await conn.reply(m.chat, `*Hola!👋 soy KanBot Provided By Stiiven*:\n${data.result}`, m);
+        if (data.status && data.data) {
+            await conn.reply(m.chat, `*KanBot Segun chatgpt:*\n${data.data}`, m);
         } else {
             await m.react('❌');
             await conn.reply(m.chat, '❌ Error: No se obtuvo una respuesta válida.', m, rcanal);
