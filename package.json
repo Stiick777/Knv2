@@ -1,8 +1,8 @@
 {
-"name": "black-clover-MD",
-"version": "4.1.0",
+"name": "KanBot",
+"version": "1.1.0",
 "description": "Bot Multi Device ",
-"main": "blackclover/start.js",
+"main": "Knv2/index.js",
 "type": "module",
 "directories": {
 "lib": "lib",
@@ -10,24 +10,24 @@
 "plugins": "plugins"
 },
 "scripts": {
-"start": "node blackclover/start.js",
-"qr": "node blackclover/start.js qr",
-"code": "node blackclover/start.js code",
+"start": "node index.js",
+"qr": "node index.js qr",
+"code": "node index.js code",
 "test": "node test.js",
-"test2": "nodemon blackclover/start.js",
+"test2": "nodemon index.js",
 "eslint": "eslint .",
 "eslintfix": "eslint --fix ."
 },
 "homepage": "https://github.com/thecarlos19/black-clover-MD",
 "author": {
-"name": "thecarlos19"
+"name": "Stiiven"
 },
 "repository": {
 "type": "git",
-"url": "git+https://github.com/thecarlos19/black-clover-MD.git"
+"url": "git+https://github.com/Stiick777/Knv2"
 },
 "bugs": {
-"url": "https://github.com/thecarlos19/black-clover-MD/issues"
+"url": "https://github.com/Stiick777/Knv2/issues"
 },
 "license": "GPL-3.0-or-later",
 "dependencies": {
