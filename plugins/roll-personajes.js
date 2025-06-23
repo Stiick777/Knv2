@@ -79,12 +79,21 @@ let myCharactersHandler = async (m, { conn, args }) => {
             message += `⭐ *${startIndex + i + 1}.* ${char.name} ─ 🏆 Valor: *${char.value}* XP\n`;
         });
 
-        // Botones para sendButton: [texto, comando]
-        const buttons = [];
-        if (page > 1) buttons.push([`⬅ Página ${page - 1}`, `.mp ${page - 1}`]);
-        if (page < totalPages) buttons.push([`➡ Página ${page + 1}`, `.mp ${page + 1}`]);
+        // Definir hasta 3 botones (máximo que acepta sendButton normalmente)
+        let button1 = '', id1 = '';
+        let button2 = '', id2 = '';
+        let button3 = '', id3 = '';
 
-        await conn.sendButton(m.chat, message, '🌸 NexusBot', buttons, m);
+        if (page > 1) {
+            button1 = `⬅ Página ${page - 1}`;
+            id1 = `.mp ${page - 1}`;
+        }
+        if (page < totalPages) {
+            button2 = `➡ Página ${page + 1}`;
+            id2 = `.mp ${page + 1}`;
+        }
+
+        await conn.sendButton(m.chat, message, '🌸 NexusBot', button1 ? [[button1, id1], [button2, id2]].filter(b => b[0]) : [], m);
 
     } catch (error) {
         await conn.reply(m.chat, `✘ Error al obtener los personajes: ${error.message}`, m);
