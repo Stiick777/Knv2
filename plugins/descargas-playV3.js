@@ -48,7 +48,7 @@ const handler = async (m, { conn, command, text }) => {
     } catch (err) {
       console.error(err);
       await m.react('❌');
-      await conn.reply(m.chat, 'Ocurrió un error al procesar la búsqueda.', m);
+      await conn.reply(m.chat, 'Ocurrió un error al procesar la búsqueda `intente con /playp`', m);
     }
   }
 };
