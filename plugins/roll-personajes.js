@@ -65,18 +65,16 @@ let myCharactersHandler = async (m, { conn, args }) => {
             return await conn.reply(m.chat, `⫷✦⫸ No tienes personajes reclamados. ⫷✦⫸`, m);
         }
 
-        // Página solicitada (por ejemplo: !mp 2)
-        const page = args[0] ? parseInt(args[0]) : 1;
         const pageSize = 10;
         const totalPages = Math.ceil(userCharacters.length / pageSize);
+        const page = args[0] ? Math.max(1, Math.min(parseInt(args[0]), totalPages)) : 1;
+
         const startIndex = (page - 1) * pageSize;
         const paginatedCharacters = userCharacters.slice(startIndex, startIndex + pageSize);
 
-        if (paginatedCharacters.length === 0) {
-            return await conn.reply(m.chat, `✘ Página ${page} vacía. Usa un número entre 1 y ${totalPages}.`, m);
-        }
+        let message = `⫷✨⫸ *Tus Personajes Reclamados* ⫷✨⫸\n`;
+        message += `📄 Página ${page} de ${totalPages}\n\n`;
 
-        let message = `⫷✨⫸ *Tus Personajes Reclamados - Página ${page} de ${totalPages}* ⫷✨⫸\n\n`;
         paginatedCharacters.forEach((char, i) => {
             message += `⭐ *${startIndex + i + 1}.* ${char.name} ─ 🏆 Valor: *${char.value}* XP\n`;
         });
@@ -84,17 +82,14 @@ let myCharactersHandler = async (m, { conn, args }) => {
         const buttons = [];
 
         if (page > 1) {
-            buttons.push({ buttonId: `.mp ${page - 1}`, buttonText: { displayText: '⬅ Página anterior' }, type: 1 });
-        }
-        if (page < totalPages) {
-            buttons.push({ buttonId: `.mp ${page + 1}`, buttonText: { displayText: '➡ Página siguiente' }, type: 1 });
+            buttons.push([`⬅ Página ${page - 1}`, `.mp ${page - 1}`]);
         }
 
-        await conn.sendMessage(m.chat, {
-            text: message,
-            buttons,
-            headerType: 1
-        }, { quoted: m });
+        if (page < totalPages) {
+            buttons.push([`➡ Página ${page + 1}`, `.mp ${page + 1}`]);
+        }
+
+        await conn.sendButton(m.chat, message, '🌸 NexusBot', buttons, m);
 
     } catch (error) {
         await conn.reply(m.chat, `✘ Error al obtener los personajes: ${error.message}`, m);
