@@ -212,7 +212,7 @@ const isOwner = isROwner || m.fromMe
 const isMods = isROwner || global.mods.map(v => v.replace(/[^0-9]/g, '') + detectwhat).includes(m.sender)
 const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, '') + detectwhat).includes(m.sender) || _user.premium == true
 
-if (m.isBaileys) return
+//if (m.isBaileys) return
 if (opts['nyimak'])  return
 if (!isROwner && opts['self']) return
 if (opts['swonly'] && m.chat !== 'status@broadcast')  return
@@ -331,8 +331,8 @@ m.plugin = name
 if (m.chat in global.db.data.chats || m.sender in global.db.data.users) {
 let chat = global.db.data.chats[m.chat]
 let user = global.db.data.users[m.sender]
-if (!['grupo-unbanchat.js'].includes(name) && chat && chat.isBanned && !isROwner) return
-if (name != 'grupo-unbanchat.js' && name != 'owner-exec.js' && name != 'owner-exec2.js' && name != 'grupo-delete.js' && chat?.isBanned && !isROwner) return
+if (!['mods-unbanchat.js'].includes(name) && chat && chat.isBanned && !isROwner) return
+if (name != 'mods-unbanchat.js' && name != 'owner-exec.js' && name != 'owner-exec2.js' && name != 'gc-delete.js' && chat?.isBanned && !isROwner) return
 if (m.text && user.banned && !isROwner) {
 m.reply(`🚫 Está baneado(a), no puede usar los comandos de este bot!\n\n${user.bannedReason ? `\n💌 *Motivo:* 
 ${user.bannedReason}` : '💌 *Motivo:* Spam'}\n\n⚠️ *Si cree que fue por error y tiene evidencia que respalde que este mensaje es un error o fue sin querer, puede exponer su caso en:*\n\n🤍 wa.me/526645011701\n\ny pedir que lo desbaneen`)
@@ -343,9 +343,9 @@ if (m.chat in global.db.data.chats || m.sender in global.db.data.users) {
 let chat = global.db.data.chats[m.chat]
 let user = global.db.data.users[m.sender]
 let setting = global.db.data.settings[this.user.jid]
-if (name != 'grupo-unbanchat.js' && chat?.isBanned)
+if (name != 'mods-unbanchat.js' && chat?.isBanned)
 return 
-if (name != 'owner-unbanuser.js' && user?.banned)
+if (name != 'mods-unbanuser.js' && user?.banned)
 return
 }}
 
