@@ -71,19 +71,19 @@ let myCharactersHandler = async (m, { conn, command }) => {
 
         const totalPages = Math.ceil(userCharacters.length / pageSize);
 
-        // 🚫 Si la página solicitada no existe, no respondas nada
+        // 🚫 Si el usuario pidió una página que no tiene, no respondemos
         if (page < 1 || page > totalPages) return;
 
         const startIndex = (page - 1) * pageSize;
         const paginatedCharacters = userCharacters.slice(startIndex, startIndex + pageSize);
 
-        let message = `⫷✨⫸ *Tus Personajes Reclamados* ⫷✨⫸\n`;
-        message += `📄 Página ${page} de ${totalPages}\n\n`;
+        let message = `⫷✨⫸ *Tus Personajes Reclamados: ${userCharacters.length}* ⫷✨⫸\n\n`;
 
         paginatedCharacters.forEach((char, index) => {
             message += `⭐ *${startIndex + index + 1}.* ${char.name} ─ 🏆 Valor: *${char.value}* XP\n`;
         });
 
+        message += `\n📄 Página ${page} de ${totalPages}`;
         if (page < totalPages) {
             message += `\n➡ Usa *.mp${page + 1}* para ver la siguiente página.`;
         }
@@ -91,7 +91,7 @@ let myCharactersHandler = async (m, { conn, command }) => {
         await conn.reply(m.chat, message, m);
 
     } catch (error) {
-        console.error(error); // No respondas al usuario con errores menores
+        console.error(error); // silencioso en caso de error no crítico
     }
 };
 
