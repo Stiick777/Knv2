@@ -79,17 +79,23 @@ let myCharactersHandler = async (m, { conn, args }) => {
             message += `⭐ *${startIndex + i + 1}.* ${char.name} ─ 🏆 Valor: *${char.value}* XP\n`;
         });
 
+        // ⬅⬅⬅ Botones como arreglo plano de objetos
         const buttons = [];
 
         if (page > 1) {
-            buttons.push([`⬅ Página ${page - 1}`, `.mp ${page - 1}`]);
+            buttons.push({ buttonText: { displayText: `⬅ Página ${page - 1}` }, buttonId: `.mp ${page - 1}`, type: 1 });
         }
 
         if (page < totalPages) {
-            buttons.push([`➡ Página ${page + 1}`, `.mp ${page + 1}`]);
+            buttons.push({ buttonText: { displayText: `➡ Página ${page + 1}` }, buttonId: `.mp ${page + 1}`, type: 1 });
         }
 
-        await conn.sendButton(m.chat, message, '🌸 NexusBot', buttons, m);
+        await conn.sendMessage(m.chat, {
+            text: message,
+            footer: '🌸 NexusBot',
+            buttons,
+            headerType: 1
+        }, { quoted: m });
 
     } catch (error) {
         await conn.reply(m.chat, `✘ Error al obtener los personajes: ${error.message}`, m);
