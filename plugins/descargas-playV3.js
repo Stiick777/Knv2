@@ -1,4 +1,4 @@
-
+/*
 import fetch from 'node-fetch';
 import axios from 'axios';
 import fs from 'fs';
@@ -60,4 +60,50 @@ handler.group = true;
 
 export default handler;
 
+*/
+import yts from "yt-search";
+import { yta } from "./_ytdl.js"; // Solo se necesita `yta` para audio
 
+const handler = async (m, { conn, text, command }) => {
+  if (!text) return m.reply("*Ingresa el nombre de lo que quieres buscar*");
+  
+
+  let res = await yts(text);
+  if (!res || !res.all || res.all.length === 0) {
+    return m.reply("No se encontraron resultados para tu búsqueda.");
+  }
+
+  let video = res.all[0];  
+  let total = Number(video.duration.seconds) || 0;
+
+  const cap = `
+𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊 𝚅𝟸
+===========================
+> *Título:* ${video.title}
+> *Autor:* ${video.author.name}
+> *Duración:* ${video.duration.timestamp}
+> *Vistas:* ${video.views}
+
+*🚀 Se está enviando tu audio...*
+===========================
+✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
+> Provided by Stiiven
+`.trim();
+  
+
+  await conn.sendFile(m.chat, await (await fetch(video.thumbnail)).buffer(), "image.jpg", cap, m);
+
+  try {
+    const api = await yta(video.url);
+    await conn.sendFile(m.chat, api.result.download, api.result.title, "", m);
+    await m.react("✔️");
+  } catch (error) {
+    return m.reply("⚠️ Ocurrió un error al descargar el audio.");
+  }
+};
+
+handler.help = ["play"];
+handler.tags = ["descargas"];
+handler.command = ["play"];
+
+export default handler;

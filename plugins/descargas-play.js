@@ -37,6 +37,58 @@ if (command === 'playp') {
 `.trim();
 
         await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
+try {
+    await m.react('🕓'); // Reacciona mientras procesa
+
+    const url = yt_play[0].url;
+    const apiUrl = `https://delirius-apiofc.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`;
+
+    const apiResponse = await fetch(apiUrl);
+    const response = await apiResponse.json();
+
+    if (response.status && response.data && response.data.download && response.data.download.url) {
+        const { title, download } = response.data;
+
+        await conn.sendMessage(m.chat, {
+            audio: { url: download.url },
+            mimetype: 'audio/mp4',
+            fileName: `${title}.mp3`,
+            ptt: false
+        }, { quoted: m });
+
+        await m.react('✅'); // Éxito
+    } else {
+        throw new Error('No se pudo obtener el enlace desde la API de Delirius.');
+    }
+
+} catch (err) {
+    
+   try {
+    await m.react('🕓'); // Indicador de procesamiento
+
+    const url = yt_play[0].url;
+    const format = 'mp3';
+    const apiUrl = `https://itzpire.com/download/youtube/v2?url=${encodeURIComponent(url)}&format=${format}`;
+
+    const apiResponse = await fetch(apiUrl);
+    const response = await apiResponse.json();
+
+    if (response.status === 'success' && response.data && response.data.downloadUrl) {
+        const { title, downloadUrl } = response.data;
+
+        await conn.sendMessage(m.chat, {
+            audio: { url: downloadUrl },
+            mimetype: 'audio/mp4', // mp3 se puede enviar con este tipo
+            fileName: `${title}.mp3`,
+            ptt: false
+        }, { quoted: m });
+
+        await m.react('✅'); // Éxito
+    } else {
+        throw new Error('No se pudo obtener el enlace desde la API de ITzpire.');
+    }
+
+} catch (err) {
 
 try {
     await m.react('🕓'); // Reacciona mientras procesa
@@ -90,6 +142,8 @@ try {
         console.error('Error al procesar el audio:', err);
         m.reply('No se pudo obtener el audio con ninguna de las APIs.');
     }
+}
+}
 }
 //
     }
