@@ -66,7 +66,7 @@ import { yta } from "./_ytdl.js"; // Solo se necesita `yta` para audio
 
 const handler = async (m, { conn, text, command }) => {
   if (!text) return m.reply("*Ingresa el nombre de lo que quieres buscar*");
-  
+  await m.react('🕓');
 
   let res = await yts(text);
   if (!res || !res.all || res.all.length === 0) {
