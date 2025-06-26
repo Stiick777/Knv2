@@ -1,149 +1,93 @@
-/*import fetch from 'node-fetch';
-import axios from 'axios';
-import fs from 'fs';
-import { exec } from 'child_process';
-
-const handler = async (m, { args, conn }) => {
-  if (!args[0]) 
-    return m.reply('*[❗𝐈𝐍𝐅𝐎❗] 𝙄𝙉𝙂𝙍𝙀𝙎𝙀 𝙀𝙇 𝘾𝙊𝙈𝘼𝙉𝘿𝙊 𝙈𝘼𝙎 𝙐𝙉 𝙀𝙉𝙇𝘼𝘾𝙀 𝘿𝙀 𝙔𝙊𝙐𝙏𝙐𝘽𝙀*');
-
-   const youtubeLink = args[0];
-
-  const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[a-zA-Z0-9_-]{11}(\S*)?$/;
-
-  if (!youtubeRegex.test(youtubeLink)) {
-    return m.reply('*[❗𝐄𝐑𝐑𝐎𝐑❗] 𝙀𝙇 𝙀𝙉𝙇𝘼𝘾𝙀 𝙋𝙍𝙊𝙋𝙊𝙍𝘾𝙄𝙊𝙉𝘼𝘿𝙊 𝙉𝙊 𝙀𝙎 𝙑𝘼́𝙇𝙄𝘿𝙊. 𝘼𝙎𝙀𝙂𝙐́𝙍𝘼𝙏𝙀 𝘿𝙀 𝙄𝙉𝙂𝙍𝙀𝙎𝘼𝙍 𝙐𝙉 𝙀𝙉𝙇𝘼𝘾𝙀 𝘾𝙊𝙍𝙍𝙀𝘾𝙏𝙊 𝘿𝙀 𝙔𝙊𝙐𝙏𝙐𝘽𝙀.*');
-  }
-
- try {
-  await m.react('🕓');
-
- 
-  
-  const apiUrl = `https://bk9.fun/download/ytmp3?url=${encodeURIComponent(youtubeLink)}&type=mp3`;
-
-  let apiResponse = await fetch(apiUrl);
-  let response = await apiResponse.json();
-
-  if (response?.status && response?.BK9?.downloadUrl) {
-    const { downloadUrl, title } = response.BK9;
-
-    await conn.sendMessage(m.chat, {
-      audio: { url: downloadUrl },
-      mimetype: 'audio/mp4',
-      ptt: false,
-      fileName: `${title}.mp3`,
-    }, { quoted: m });
-
-    return await m.react('✅');
-  }
-
-  throw new Error("La API no retornó datos válidos");
-} catch (error) {
-  console.warn("Error en la API:", error.message);
-  await m.reply("❌ Error al procesar la solicitud. Inténtalo más tarde.");
-}
-
-};
-
-handler.help = ['yta'];
-handler.tags = ['descargas'];
-handler.command = /^yta|audio|fgmp3|dlmp3|mp3|getaud|yt(a|mp3|mp3)$/i;
-handler.group = true;
-
-export default handler;
-*/
 import fetch from "node-fetch";
 import axios from "axios";
 
-let handler = async (m, { conn, text, usedPrefix, command, args }) => {
-  try {
-    if (!text) {
-      return conn.reply(m.chat, `⚡ Ejemplo de uso: ${usedPrefix}${command} https://youtube.com/watch?v=Hx920thF8X4`, m);
+const formatAudio = ['mp3', 'm4a', 'webm', 'acc', 'flac', 'opus', 'ogg', 'wav'];
+
+const ddownr = {
+  download: async (url, format) => {
+    if (!formatAudio.includes(format)) {
+      throw new Error('Formato de audio no soportado.');
     }
 
-    if (!/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(args[0])) {
-      return m.reply(`Enlace inválido. Asegúrate de que sea un enlace de YouTube.`);
+    const config = {
+      method: 'GET',
+      url: `https://p.oceansaver.in/ajax/download.php?format=${format}&url=${encodeURIComponent(url)}&api=dfcb6d76f2f6a9894gjkege8a4ab232222`,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+      }
+    };
+
+    try {
+      const response = await axios.request(config);
+      if (response.data && response.data.success) {
+        const { id } = response.data;
+        const downloadUrl = await ddownr.cekProgress(id);
+        return { downloadUrl };
+      } else {
+        throw new Error('No se pudo obtener el enlace de descarga.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
     }
+  },
 
-    m.react('🕒');
+  cekProgress: async (id) => {
+    const config = {
+      method: 'GET',
+      url: `https://p.oceansaver.in/ajax/progress.php?id=${id}`,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+      }
+    };
 
-    let json = await ytdl(args[0], 'mp3'); // tipo audio
-    let size = await getSize(json.url);
-
-    const caption = `🎧 Su audio by *_KanBot_*:\n\n*🎵 Título:* ${json.title}\n*🌐 URL:* ${args[0]}\n*📦 Peso:* ${await formatSize(size) || "Desconocido"}`;
-
-    await conn.sendMessage(m.chat, {
-      audio: { url: json.url },
-      mimetype: 'audio/mp4',
-      fileName: `${json.title}.mp3`,
-      ptt: false
-    }, { quoted: m });
-
-    m.react('✅');
-  } catch (e) {
-    console.error(e);
-    m.reply(`❌ Error: ${e.message}`);
+    try {
+      while (true) {
+        const response = await axios.request(config);
+        if (response.data && response.data.success && response.data.progress === 1000) {
+          return response.data.download_url;
+        }
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
   }
 };
 
-handler.help = ['ytaudio'];
-handler.command = ['ytmp3', 'ytaudio', 'yta'];
+const handler = async (m, { conn, text }) => {
+  try {
+    if (!text || !isValidYouTubeUrl(text)) {
+      return conn.reply(m.chat, '⚠️ Proporciona un *enlace válido de YouTube*.', m);
+    }
+
+    // Reacción inicial de espera ⏳
+    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
+
+    const { downloadUrl } = await ddownr.download(text, 'mp3');
+
+    // Reacción de éxito ✅
+    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+
+    await conn.sendMessage(m.chat, { audio: { url: downloadUrl }, mimetype: "audio/mpeg" }, { quoted: m });
+
+  } catch (error) {
+    // Reacción de error (opcional)
+    // await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+
+    return m.reply(`⚠️ Error: ${error.message}`);
+  }
+};
+
+handler.command = ['ytmp3', 'yta'];
+handler.help = ['ytmp3 <url>'];
 handler.tags = ['descargas'];
-handler.group = true;
+handler.group = true
 
 export default handler;
 
-// FUNCIONES AUXILIARES
-async function ytdl(url, format = 'mp4') {
-  const headers = {
-    "accept": "*/*",
-    "accept-language": "es-ES,es;q=0.9",
-    "sec-ch-ua": "\"Not A(Brand\";v=\"8\", \"Chromium\";v=\"132\"",
-    "sec-ch-ua-mobile": "?1",
-    "sec-ch-ua-platform": "\"Android\"",
-    "Referer": "https://id.ytmp3.mobi/"
-  };
-
-  const initial = await fetch(`https://d.ymcdn.org/api/v1/init?p=y&23=1llum1n471&_=${Math.random()}`, { headers });
-  const init = await initial.json();
-  const id = url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/|.*embed\/))([^&?/]+)/)?.[1];
-  const convertURL = init.convertURL + `&v=${id}&f=${format}&_=${Math.random()}`;
-
-  const converts = await fetch(convertURL, { headers });
-  const convert = await converts.json();
-
-  let info = {};
-  for (let i = 0; i < 3; i++) {
-    const progressResponse = await fetch(convert.progressURL, { headers });
-    info = await progressResponse.json();
-    if (info.progress === 3) break;
-  }
-
-  return {
-    url: convert.downloadURL,
-    title: info.title
-  };
-}
-
-async function formatSize(bytes) {
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let i = 0;
-  bytes = Number(bytes);
-  if (isNaN(bytes)) return 'Tamaño desconocido';
-  while (bytes >= 1024 && i < units.length - 1) {
-    bytes /= 1024;
-    i++;
-  }
-  return `${bytes.toFixed(2)} ${units[i]}`;
-}
-
-async function getSize(url) {
-  try {
-    const response = await axios.head(url);
-    const contentLength = response.headers['content-length'];
-    return contentLength ? parseInt(contentLength, 10) : null;
-  } catch (error) {
-    return null;
-  }
+function isValidYouTubeUrl(url) {
+  const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/;
+  return regex.test(url.trim());
 }
