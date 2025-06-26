@@ -140,7 +140,7 @@ try {
     } catch (err) {
         await m.react('❌');
         console.error('Error al procesar el audio:', err);
-        m.reply('No se pudo obtener el audio con ninguna de las APIs.');
+        m.reply('No se pudo obtener el audio intente con `playp2`.');
     }
 }
 }
