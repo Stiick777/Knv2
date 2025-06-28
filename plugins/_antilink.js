@@ -43,6 +43,8 @@ export async function before(m, { isAdmin, isBotAdmin }) {
         if (isBotAdmin) {
             await conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: delet }});
             await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove');
+            await conn.sendMessage(m.chat, { text: `🚫 Se eliminó a @${m.sender.split('@')[0]} por enviar un enlace.`, mentions: [m.sender] });
+        
         } else if (!bot.restrict) {
             return conn.reply(m.chat, `*¡Esta característica está desactivada!*`, m, rcanal);
         }
