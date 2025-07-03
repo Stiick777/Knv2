@@ -4,14 +4,14 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     await m.react('🔍');
 
     try {
-        const res = await fetch(`https://api.vreden.my.id/api/pinterest?query=${encodeURIComponent(text)}`);
+        const res = await fetch(`https://delirius-apiofc.vercel.app/search/pinterest?text=${encodeURIComponent(text)}`);
         const json = await res.json();
 
-        if (json.status !== 200 || !json.result || !json.result.length) {
+        if (!json.status || !json.results || !json.results.length) {
             return conn.reply(m.chat, `❌ No encontré resultados para *${text}*`, m);
         }
 
-        const images = json.result.slice(0, 6);
+        const images = json.results.slice(0, 6);
 
         await conn.sendMessage(m.chat, {
             image: { url: images[0] },
@@ -22,7 +22,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
                     mediaType: 1,
                     thumbnailUrl: images[1] || images[0],
                     title: 'Imagen de Pinterest',
-                    body: 'Fuente: api.vreden.my.id',
+                    body: 'Fuente: delirius-apiofc.vercel.app',
                     previewType: 0
                 }
             }
