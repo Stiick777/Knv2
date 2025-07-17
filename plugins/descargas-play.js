@@ -115,6 +115,59 @@ try {
 
 } catch (e) {
     try {
+    await m.react('🕓'); // Reacciona mientras procesa
+
+    const url = yt_play[0].url; // Asegúrate de que yt_play[0].url esté definido
+    const apiKey = 'i1fER4';
+    const apiUrl = `https://alyachan.dev/api/yta?url=${encodeURIComponent(url)}&apikey=${apiKey}`;
+
+    const apiResponse = await fetch(apiUrl);
+    const response = await apiResponse.json();
+
+    if (response.status && response.data && response.data.url) {
+        const { title, data } = response;
+
+        await conn.sendMessage(m.chat, {
+            audio: { url: data.url },
+            mimetype: 'audio/mp4',
+            fileName: `${title}.mp3`,
+            ptt: false
+        }, { quoted: m });
+
+        await m.react('✅'); // Éxito
+    } else {
+        throw new Error('No se pudo obtener el enlace desde la API de AlyaChan.');
+    }
+
+} catch (err) {
+
+    try {
+    await m.react('🕓'); // Reacciona mientras procesa
+
+    const url = yt_play[0].url;
+    const apiUrl = `https://api.sylphy.xyz/download/ytmp3?url=${encodeURIComponent(url)}`;
+
+    const apiResponse = await fetch(apiUrl);
+    const response = await apiResponse.json();
+
+    if (response.status && response.res && response.res.url) {
+        const { title, url: audioUrl } = response.res;
+
+        await conn.sendMessage(m.chat, {
+            audio: { url: audioUrl },
+            mimetype: 'audio/mp4',
+            fileName: `${title}.mp3`,
+            ptt: false
+        }, { quoted: m });
+
+        await m.react('✅'); // Éxito
+    } else {
+        throw new Error('No se pudo obtener el enlace desde la API de Sylphy.');
+    }
+
+} catch (err) {
+
+    try {
         await m.react('🕓'); // Reintenta con la segunda API
 
         const url = yt_play[0].url;
@@ -142,6 +195,8 @@ try {
         console.error('Error al procesar el audio:', err);
         m.reply('No se pudo obtener el audio intente con `playp2`.');
     }
+}
+}
 }
 }
 }
@@ -180,54 +235,6 @@ if (command == 'play2') {
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-    
-    try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api2 = await fetch(`https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(url)}`);
-    const res2 = await api2.json();
-
-    if (res2.status === 200 && res2.data?.success) {
-        const { title, downloadUrl } = res2.data;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: downloadUrl },
-            caption: `🎬 *${title}*`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return; // ✅ Éxito, no continuar con otras APIs
-    }
-} catch (e) {
-    console.warn('Error en API 2 (Agatz):', e);
-}
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api4 = await fetch(`https://api.ryzumi.vip/api/downloader/ytmp4?url=${encodeURIComponent(url)}&quality=360`, {
-        headers: {
-            'accept': 'application/json'
-        }
-    });
-
-    const res4 = await api4.json();
-
-    if (res4?.url) {
-        const { title, author, views, lengthSeconds, quality, url: downloadUrl } = res4;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: downloadUrl },
-            caption: `🎬 *${title}*\n👤 Autor: ${author}\n👁️ Vistas: ${views}\n🕒 Duración: ${lengthSeconds}s\n📥 Calidad: ${quality}`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return; // ✅ Éxito, no continuar con otras APIs
-    }
-} catch (e) {
-    console.warn('Error en API 4 (Ryzumi):', e);
-}
 try {
     await m.react('🕓');
     const url = yt_play[0].url;
@@ -272,6 +279,57 @@ try {
 } catch (e) {
     console.warn('Error en API 5 (DarkYasiya):', e);
 }
+try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
+    const apiAlya = await fetch(`https://api.alyachan.dev/api/ytv?url=${encodeURIComponent(url)}&apikey=i1fER4`);
+    const resAlya = await apiAlya.json();
+
+    if (resAlya.status && resAlya.data?.url) {
+        const {
+            title,
+            duration,
+            channel,
+            views,
+            publish,
+            thumbnail,
+            data
+        } = resAlya;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: data.url },
+            caption: `🎬 *${title}*\n🕒 Duración: ${duration}\n👤 Canal: ${channel}\n👁️ Vistas: ${views}\n📅 Publicado: ${publish}\n📥 Calidad: ${data.quality} - ${data.size}`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return; // ✅ Éxito, no continuar con otras APIs
+    }
+} catch (e) {
+    console.warn('Error en API (AlyaChan):', e);
+}
+try {
+    await m.react('🕓');
+    const url = yt_play[0].url;
+
+    const apiSylphy = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(url)}`);
+    const resSylphy = await apiSylphy.json();
+
+    if (resSylphy.status && resSylphy.res?.url) {
+        const { title, url: videoUrl } = resSylphy.res;
+
+        await conn.sendMessage(m.chat, {
+            video: { url: videoUrl },
+            caption: `🎬 *${title}*`
+        }, { quoted: m });
+
+        await m.react('✅');
+        return; // ✅ Éxito, no continuar con otras APIs
+    }
+} catch (e) {
+    console.warn('Error en API (Sylphy):', e);
+}
+
     try {
     await m.react('🕓');
     const url = yt_play[0].url;
