@@ -16,7 +16,7 @@ const handler = async (m, { conn, args }) => {
     res = await response.json();
   } catch (err) {
     await m.react('❌');
-    return conn.reply(m.chat, '❎ *Error al obtener datos. Verifica el enlace.*', m, rcanal);
+    return conn.reply(m.chat, '❎ *Error al obtener datos. Verifica el enlace o use `/fb2`*', m, rcanal);
   }
 
   if (!res || res.length === 0) { 
@@ -42,7 +42,7 @@ const handler = async (m, { conn, args }) => {
     await m.react('✅'); // Reacción de éxito
   } catch (err) {
     await m.react('❌');
-    return conn.reply(m.chat, '❌ *Error al enviar el video.*', m, rcanal);
+    return conn.reply(m.chat, '❌ *Error al enviar el video use `/fb2`*', m, rcanal);
   }
 };
 
