@@ -10,29 +10,32 @@ const handler = async (m, { conn, text, command, usedPrefix }) => {
       : text;
   } else who = m.chat;
 
-  const user = global.db.data.users[who];
-  const dReason = 'No especificado';
-  const msgtext = text || dReason;
-  const sdms = msgtext.replace(/@\d+-?\d* /g, '');
-  const warntext = `*[❗] ETIQUETE A UNA PERSONA O RESPONDA A UN MENSAJE DEL GRUPO PARA ELIMINAR UNA ADVERTENCIA*\n\n*—◉ EJEMPLO:*\n*${usedPrefix + command} @${global.suittag}*`;
-
   if (!who) {
+    let warntext = `*[❗] ETIQUETE A UNA PERSONA O RESPONDA A UN MENSAJE DEL GRUPO PARA ELIMINAR UNA ADVERTENCIA*\n\n*—◉ EJEMPLO:*\n*${usedPrefix + command} @usuario*`;
     throw m.reply(warntext, m.chat, { mentions: conn.parseMention(warntext) });
   }
 
+  let user = global.db.data.users[who];
+  if (!user) {
+    global.db.data.users[who] = { warn: 0, warnReasons: [] };
+    user = global.db.data.users[who];
+  }
+  if (!user.warn) user.warn = 0;
+  if (!user.warnReasons) user.warnReasons = [];
+
   if (user.warn > 0) {
     user.warn -= 1;
-    if (Array.isArray(user.warnReasons) && user.warnReasons.length > 0) {
-      user.warnReasons.pop(); // Elimina la última razón
-    }
+
+    let motivoEliminado = user.warnReasons.pop() || "No especificado";
+
     await m.reply(
-      `*@${who.split`@`[0]}* Se ha eliminado una advertencia.\nMotivo eliminado: ${sdms}\n*Advertencias restantes: ${user.warn}/3*`,
+      `*@${who.split`@`[0]}* Se ha eliminado una advertencia.\nMotivo eliminado: ${motivoEliminado}\n*Advertencias restantes: ${user.warn}/3*`,
       null,
       { mentions: [who] }
     );
   } else {
     await m.reply(
-      `*@${who.split`@`[0]}* No hay advertencias que eliminar.`,
+      `*@${who.split`@`[0]}* No tiene advertencias para eliminar.`,
       null,
       { mentions: [who] }
     );
