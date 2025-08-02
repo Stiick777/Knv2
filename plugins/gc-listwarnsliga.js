@@ -36,4 +36,4 @@ handler.command = /^(listwarns|listawarns|warnslist)$/i;
 handler.admin = true;
 handler.group = true;
 
-export default;
+export default handler;
