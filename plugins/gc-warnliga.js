@@ -12,18 +12,18 @@ const handler = async (m, { conn, text, command, usedPrefix }) => {
 
   if (!who) {
     const warntext = `*[❗] ETIQUETE A UNA PERSONA O RESPONDA A UN MENSAJE DEL GRUPO PARA ADVERTIR*\n\n*—◉ EJEMPLO:*\n*${usedPrefix + command} @usuario motivo*`;
-    return m.reply(warntext, m.chat, { mentions: conn.parseMention(warntext) });
+    throw m.reply(warntext, m.chat, { mentions: conn.parseMention(warntext) });
   }
 
-  // Asegurar que el usuario exista en la base de datos
+  // Asegurar que el usuario existe en la DB
   if (!global.db.data.users[who]) {
-    global.db.data.users[who] = {
-      warn: 0,
-      warnReasons: []
-    };
+    global.db.data.users[who] = { warn: 0, warnReasons: [] };
   }
 
   const user = global.db.data.users[who];
+  if (typeof user.warn !== 'number') user.warn = 0;
+  if (!Array.isArray(user.warnReasons)) user.warnReasons = [];
+
   const motivo = text ? text.replace(/@\d+-?\d* /g, '') : 'No especificado';
 
   // Aumenta advertencia y guarda motivo
@@ -38,7 +38,9 @@ const handler = async (m, { conn, text, command, usedPrefix }) => {
 
   // Si llega a 3 advertencias
   if (user.warn >= 3) {
-    let razones = user.warnReasons.map((r, i) => `• ${i + 1}. ${r}`).join('\n');
+    let razones = user.warnReasons
+      .map((r, i) => `• ${i + 1}. ${r}`)
+      .join('\n');
 
     await m.reply(
       `@${who.split`@`[0]} Has cometido las 3 advertencias y seras expulsado de la liga.\n\n*Motivos:*\n${razones}`,
@@ -57,4 +59,5 @@ const handler = async (m, { conn, text, command, usedPrefix }) => {
 handler.command = /^(warnt)$/i;
 handler.admin = true;
 handler.group = true;
+
 export default handler;

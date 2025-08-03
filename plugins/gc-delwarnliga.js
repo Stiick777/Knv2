@@ -15,13 +15,14 @@ const handler = async (m, { conn, text, command, usedPrefix }) => {
     throw m.reply(warntext, m.chat, { mentions: conn.parseMention(warntext) });
   }
 
-  let user = global.db.data.users[who];
-  if (!user) {
+  // Asegurar estructura de usuario en DB
+  if (!global.db.data.users[who]) {
     global.db.data.users[who] = { warn: 0, warnReasons: [] };
-    user = global.db.data.users[who];
   }
-  if (!user.warn) user.warn = 0;
-  if (!user.warnReasons) user.warnReasons = [];
+
+  let user = global.db.data.users[who];
+  if (typeof user.warn !== 'number') user.warn = 0;
+  if (!Array.isArray(user.warnReasons)) user.warnReasons = [];
 
   if (user.warn > 0) {
     user.warn -= 1;
