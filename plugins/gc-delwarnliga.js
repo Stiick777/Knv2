@@ -47,7 +47,6 @@ const handler = async (m, { conn, text, command, usedPrefix }) => {
 
 handler.command = /^(delwarnt)$/i;
 handler.admin = true;
-handler.group = true;
-handler.botAdmin = true;
+handler.group = true;;
 
 export default handler;
