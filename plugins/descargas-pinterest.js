@@ -75,7 +75,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         }  
 
         // Tomamos hasta 6 imágenes  
-        const images = json.data.slice(0, 6).map(item => item.images_url);
+        const images = json.data.slice(0, 6).map(item => item.image_url);
 
         // Enviar todas las imágenes juntas
         await conn.sendMessage(m.chat, { 
