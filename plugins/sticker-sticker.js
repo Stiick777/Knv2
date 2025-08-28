@@ -73,11 +73,11 @@ let handler = async (m, { conn, args }) => {
 
     // Convertimos a WebP
     const webpBuffer = await toWebp(buffer)
-
+const userName = m.pushName || m.sender.split('@')[0]
     // Añadir nombre y autor al sticker
     const sticker = new Sticker(webpBuffer, {
-      pack: '',
-      author: global.author || 'Bot',
+      pack: '✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰',
+      author: `@${userName}`,
       type: 'full'
     })
 
