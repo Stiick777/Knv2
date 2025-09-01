@@ -13,34 +13,27 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
   try {
     m.react('🕒');
-    const { data } = await axios.post('https://api.siputzx.my.id/api/tiktok/v2', { url: args[0] }, {
-      headers: {
-        'accept': '*/*',
-        'Content-Type': 'application/json'
-      }
-    });
+    const { data } = await axios.get(`https://api.diioffc.web.id/api/download/tiktok?url=${args[0]}`);
 
-    if (!data.success) {
+    if (!data.status) {
       m.react('❌');
       return conn.reply(m.chat, '🚩 Error al procesar el contenido.', m);
     }
 
-    const info = data.data;
-    const meta = info.metadata;
-    const dl = info.download;
-
-    const caption = `🎬 Descripción: ${meta.description || 'Sin descripción'}
-📌 Región: ${meta.locationCreated || 'Desconocido'}
-▶️ Reproducciones: ${meta.stats.playCount}
-❤️ Me gusta: ${meta.stats.likeCount}
-💬 Comentarios: ${meta.stats.commentCount}
-🔁 Compartidos: ${meta.stats.shareCount}
+    const info = data.result;
+    const caption = `🎬 Descripción: ${info.title || 'Sin descripción'}
+👤 Autor: ${info.author?.nickname || 'Desconocido'}
+📌 Región: ${info.region || 'Desconocida'}
+▶️ Reproducciones: ${info.play_count}
+❤️ Me gusta: ${info.digg_count}
+💬 Comentarios: ${info.comment_count}
+🔁 Compartidos: ${info.share_count}
 
 📥 Contenido descargado exitosamente por KanBot.`;
 
-    // Verificar si es foto
-    if (dl.photo && dl.photo.length > 0) {
-      for (const img of dl.photo) {
+    // Si es imagen (photomode)
+    if (info.images && info.images.length > 0) {
+      for (const img of info.images) {
         await m.react('📤');
         await conn.sendMessage(
           m.chat,
@@ -52,26 +45,21 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
         );
       }
 
-      if (dl.audio) {
+      if (info.music) {
         await conn.sendMessage(
           m.chat,
           {
-            audio: { url: dl.audio },
+            audio: { url: info.music },
             mimetype: 'audio/mp4',
             ptt: false
           },
           { quoted: m }
         );
       }
-    }
-    // Verificar si es video
-    else if (dl.video && dl.video.length > 0) {
-      const videoUrl = dl.video[1] || dl.video[0]; // intenta HD primero
-      if (!videoUrl) {
-        m.react('❌');
-        return conn.reply(m.chat, '*🚫 No se encontró un enlace de video válido.*', m);
-      }
-
+    } 
+    // Si es video
+    else if (info.play) {
+      const videoUrl = info.hdplay || info.play; // intenta HD primero
       await m.react('📤');
       await conn.sendMessage(
         m.chat,
@@ -81,6 +69,9 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
         },
         { quoted: m }
       );
+    } else {
+      m.react('❌');
+      return conn.reply(m.chat, '*🚫 No se encontró un enlace válido de video o imagen.*', m);
     }
 
     m.react('✅');
@@ -94,7 +85,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
 handler.tags = ['descargas'];
 handler.help = ['tiktok2'];
-handler.command = ['tiktok2', 'ttdl2', 'tt2'];
+handler.command = ['tiktok2', 'tt2', 'ttdl2'];
 handler.group = true;
 
 export default handler;
