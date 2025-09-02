@@ -30,7 +30,7 @@ var handler = async (m, { conn, text, usedPrefix, command }) => {
 
 handler.help = ['pregunta'];
 handler.tags = ['fun'];
-handler.command = ['pregunta', 'preguntas'];
+handler.command = ['pregunta', 'preguntas', 'answer'];
 handler.group = true;
 
 export default handler;
