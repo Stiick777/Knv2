@@ -12,10 +12,10 @@ const handler = async (m, { conn, args }) => {
   try {
     await m.react('⏳');
     const response = await fetch(
-      `https://api.dorratz.com/v3/fb2?url=${encodeURIComponent(args[0])}`,
+      `https://apis-starlights-team.koyeb.app/starlight/facebook?url=${encodeURIComponent(args[0])}`,
       {
         headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+          "User-Agent": "Mozilla/5.0",
           "Accept": "application/json",
         },
       }
@@ -33,8 +33,15 @@ const handler = async (m, { conn, args }) => {
     return conn.reply(m.chat, `❎ *Error al obtener datos:* ${err.message}`, m, rcanal);
   }
 
-  // Verificamos que tenga al menos un enlace válido
-  const video = res.hd || res.sd;
+  if (!Array.isArray(res) || res.length === 0) {
+    return conn.reply(m.chat, '⚠️ *No se encontraron resultados.*', m, rcanal);
+  }
+
+  // Intentar usar HD primero, luego SD
+  const hd = res.find(v => v.link_hd)?.link_hd;
+  const sd = res.find(v => v.link_sd)?.link_sd;
+  const video = hd || sd;
+
   if (!video) {
     return conn.reply(m.chat, '🚩 *No se encontró un enlace de descarga válido.*', m, rcanal);
   }
@@ -43,7 +50,7 @@ const handler = async (m, { conn, args }) => {
     await m.react('📤');
     await conn.sendMessage(m.chat, {
       video: { url: video },
-      caption: `🎈 *${res.title || 'Video de Facebook'}*\n📌 By KanBot`,
+      caption: `🎈 *Facebook Video*\n📌 Calidad: ${hd ? "HD" : "SD"}\n✨ By KanBot`,
       fileName: 'facebook_video.mp4',
       mimetype: 'video/mp4'
     }, { quoted: m });
