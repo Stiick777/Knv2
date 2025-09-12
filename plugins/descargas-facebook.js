@@ -23,11 +23,11 @@ const handler = async (m, { conn, args }) => {
     return conn.reply(m.chat, '⚠️ *No se encontraron resultados.*', m, rcanal);
   }
 
-  // Buscar la calidad mínima 360p (SD)
-  const data = res.find((i) => i.resolution === '720p (HD)');
+  // Tomar el primer objeto del array
+  const data = res[0];
 
-  if (!data) { 
-    return conn.reply(m.chat, '🚩 *No se encontró una resolución adecuada.*', m, rcanal);
+  if (!data || !data.url) { 
+    return conn.reply(m.chat, '🚩 *No se encontró un enlace de descarga válido.*', m, rcanal);
   }
 
   let video = data.url;
@@ -35,7 +35,7 @@ const handler = async (m, { conn, args }) => {
     await m.react('📤'); // Reacción de envío
     await conn.sendMessage(m.chat, { 
       video: { url: video }, 
-      caption: '🎈 *Tu video de Facebook by KanBot.*', 
+      caption: `🎈 *Tu video de Facebook (${data.resolution}) by KanBot.*`, 
       fileName: 'facebook_video.mp4', 
       mimetype: 'video/mp4' 
     }, { quoted: m });
