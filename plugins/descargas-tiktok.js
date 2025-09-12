@@ -109,7 +109,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     const { data } = await axios.get(`https://api.dorratz.com/v2/tiktok-dl?url=${args[0]}`);
     if (!data.status) {
       m.react('❌');
-      return conn.reply(m.chat, `*🚩 Error al procesar el contenido.*`, m);
+      return conn.reply(m.chat, `*🚩 Error al procesar el contenido use `tt2`*`, m);
     }
 
     const info = data.data;
@@ -162,7 +162,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   } catch (error) {
     console.error(error);
     m.react('❌');
-    return conn.reply(m.chat, '*🌟 Error al procesar la solicitud. Intente más tarde.*', m);
+    return conn.reply(m.chat, '*🌟 Error al procesar la solicitud. Intente más tarde o use `tt2`.*', m);
   }
 };
 
