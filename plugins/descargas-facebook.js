@@ -11,17 +11,25 @@ const handler = async (m, { conn, args }) => {
   let res;
   try {
     await m.react('⏳');
-    const response = await fetch(`https://api.dorratz.com/fbvideo?url=${encodeURIComponent(args[0])}`);
+    const response = await fetch(
+      `https://api.dorratz.com/fbvideo?url=${encodeURIComponent(args[0])}`,
+      {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+          "Accept": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       const errText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errText}`);
+      throw new Error(`HTTP ${response.status}: ${errText.slice(0, 200)}...`);
     }
 
-    const text = await response.text(); // leer siempre como texto primero
+    const text = await response.text();
     try {
       res = JSON.parse(text);
-    } catch (jsonErr) {
+    } catch {
       throw new Error(`No se pudo parsear JSON: ${text.slice(0, 200)}...`);
     }
   } catch (err) {
@@ -34,17 +42,13 @@ const handler = async (m, { conn, args }) => {
     return conn.reply(m.chat, '⚠️ *No se encontraron resultados.*', m, rcanal);
   }
 
-  // Buscar el primer enlace válido (absoluto o relativo)
-  const data = res.find(item => item.url);
+  // Buscar el mejor enlace válido (http absoluto)
+  const data = res.find(item => item.url && item.url.startsWith('http'));
   if (!data) {
     return conn.reply(m.chat, '🚩 *No se encontró un enlace de descarga válido.*', m, rcanal);
   }
 
-  // Resolver URL relativa
-  let video = data.url.startsWith('/')
-    ? `https://d.rapidcdn.app${data.url}`
-    : data.url;
-
+  let video = data.url;
   try {
     await m.react('📤');
     await conn.sendMessage(m.chat, {
