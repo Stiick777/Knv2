@@ -29,7 +29,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     if (videoData.duration === 0 || videoData.size === 0) {
       // 2. Si es foto -> usar endpoint de imágenes
       const { data: imgData } = await axios.get(`https://apis-starlights-team.koyeb.app/starlight/tiktok-images?url=${args[0]}`);
-      const caption = `*📌 Autor:* ${imgData.title}\n\n📥 *Descargado exitosamente by KanBot.*`;
+      const caption = `*📌 Titulo:* ${imgData.title}\n\n📥 *Descargado exitosamente by KanBot.*`;
 
       for (const img of imgData.images) {
         await m.react('📤');
