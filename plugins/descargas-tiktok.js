@@ -85,7 +85,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   } catch (error) {
     console.error(error);
     m.react('❌');
-    return conn.reply(m.chat, '*🌟 Error al procesar la solicitud. Intente más tarde.*', m);
+    return conn.reply(m.chat, '*🌟 Error al procesar la solicitud. Intente con `/tt2`*', m);
   }
 };
 
