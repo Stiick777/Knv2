@@ -9,133 +9,112 @@ let handler = async (m, { conn: star, args }) => {
 
   await m.react('🕓'); // Reaccionar con reloj mientras procesa
 
-/*try {
+try {
     let v = args[0];
+    let title, download_url, thumbnail;
 
-    // Llamada a la API
-    let apiResponse = await fetch(`https://api.agungny.my.id/api/youtube-videov2?url=${encodeURIComponent(v)}`);
-    let data = await apiResponse.json();
+    // === API PRINCIPAL (Starlight) ===
+    try {
+        let apiResponse1 = await fetch(`https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(v)}`);
+        let data1 = await apiResponse1.json();
 
-    if (!data.result || !data.result.url || !data.result.title) {
-        throw new Error('Error en la API');
+        if (!data1.url || !data1.title) {
+            throw new Error('Respuesta inválida de Starlight');
+        }
+
+        title = data1.title;
+        download_url = data1.url;
+        thumbnail = data1.thumbnail;
+
+    } catch (err1) {
+        console.warn("Error con Starlight, intentando con Delirius:", err1.message);
+
+        // === API RESPALDO 1 (Delirius) ===
+        try {
+            let apiResponse2 = await fetch(`https://delirius-apiofc.vercel.app/download/ytmp4?url=${encodeURIComponent(v)}`);
+            let data2 = await apiResponse2.json();
+
+            if (!data2.status || !data2.data || !data2.data.download) {
+                throw new Error('Respuesta inválida de Delirius');
+            }
+
+            title = data2.data.title;
+            download_url = data2.data.download.url;
+            thumbnail = data2.data.image;
+
+        } catch (err2) {
+            console.warn("Error con Delirius, intentando con StellarWA:", err2.message);
+
+            // === API RESPALDO 2 (StellarWA) ===
+            try {
+                let apiResponse3 = await fetch(`https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(v)}&apikey=stellar-p1N9EsSo`);
+                let data3 = await apiResponse3.json();
+
+                if (!data3.status || !data3.data || !data3.data.dl || !data3.data.title) {
+                    throw new Error('Respuesta inválida de StellarWA');
+                }
+
+                title = data3.data.title;
+                download_url = data3.data.dl;
+                thumbnail = data3.data.thumbnail;
+
+            } catch (err3) {
+                console.warn("Error con StellarWA, intentando con Sylphy:", err3.message);
+
+                // === API RESPALDO 3 (Sylphy) ===
+                try {
+                    let apiResponse4 = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(v)}&apikey=sylphy-25c2`);
+                    let data4 = await apiResponse4.json();
+
+                    if (!data4.status || !data4.res || !data4.res.url || !data4.res.title) {
+                        throw new Error('Respuesta inválida de Sylphy');
+                    }
+
+                    title = data4.res.title;
+                    download_url = data4.res.url;
+                    thumbnail = null;
+
+                } catch (err4) {
+                    console.warn("Error con Sylphy, intentando con Vreden:", err4.message);
+
+                    // === API RESPALDO 4 (Vreden) ===
+                    let apiResponse5 = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(v)}`);
+                    let data5 = await apiResponse5.json();
+
+                    if (!data5.result || !data5.result.download || !data5.result.metadata) {
+                        throw new Error('Respuesta inválida de Vreden');
+                    }
+
+                    title = data5.result.metadata.title;
+                    download_url = data5.result.download.url;
+                    thumbnail = data5.result.metadata.thumbnail;
+                }
+            }
+        }
     }
 
-    let { title, url: download_url } = data.result;
-
+    // === Mensaje de espera ===
     let txt = '`🅓🅞🅒🅢 🅥➋ - 🅚🅐🅝🅑🅞🅣`\n\n';
     txt += `	🍁   *Título*: ${title}\n\n`;
     txt += `> ️ *Se está enviando su video, por favor espere*`;
 
     await star.reply(m.chat, txt, m);
 
+    // === Enviar el video como documento ===
     await star.sendMessage(m.chat, {
-        document: { url: download_url }, 
+        document: { url: download_url },
         caption: `🌝 *Provided by KanBot* 🌚`,
         mimetype: 'video/mp4',
-        fileName: `${title}.mp4`
+        fileName: `${title}.mp4`,
+        jpegThumbnail: thumbnail ? await (await fetch(thumbnail)).buffer() : null
     }, { quoted: m });
 
-    return await m.react('✅'); // Reaccionar con éxito
+    return await m.react('✅'); // Reacción de éxito
+
 } catch (error) {
     console.error("Error en la API:", error.message);
     await m.react('✖️');
     await star.reply(m.chat, '❌ _*Error al procesar el enlace. Por favor, intenta de nuevo.*_', m, rcanal);
-}*/
-try {
-    let v = args[0];
-
-    // Llamada a la API de SiputXZ
-    let apiResponse = await fetch(`https://api.siputzx.my.id/api/d/ytmp4?url=${encodeURIComponent(v)}`);
-    let data = await apiResponse.json();
-
-    if (!data.status || !data.data?.dl) {
-        throw new Error('Error en la API');
-    }
-
-    let { title, dl: download_url } = data.data; // Obtener datos de la API
-
-    let txt = '`🅓🅞🅒🅢 🅥➋ - 🅚🅐🅝🅑🅞🅣`\n\n';
-    txt += `🍁   *Título*: ${title}\n`;
-    txt += `🎥   *Calidad*: 360p\n\n`;
-    txt += `> ️ *Se está enviando su video, por favor espere*`;
-
-    await star.reply(m.chat, txt, m);
-
-    await star.sendMessage(m.chat, {
-        document: { url: download_url }, 
-        caption: `🌝 *Provided by KanBot* 🌚\n📌 *Calidad:* 360p`,
-        mimetype: 'video/mp4',
-        fileName: `${title}.mp4`
-    }, { quoted: m });
-
-    return await m.react('✅'); // Reaccionar con éxito
-} catch (error) {
-    
-    try {
-    let v = args[0];
-
-    // Llamada a la API de Aserpahyana
-    let apiResponse = await fetch(`https://apidl.asepharyana.cloud/api/downloader/ytmp4?url=${encodeURIComponent(v)}&quality=360`);
-    let data = await apiResponse.json();
-
-    if (!data.url) {
-        throw new Error('Error en la API');
-    }
-
-    let { title, url: download_url } = data; // Obtener datos de la API
-
-    let txt = '`🅓🅞🅒🅢 🅥➋ - 🅚🅐🅝🅑🅞🅣`\n\n';
-    txt += `🍁   *Título*: ${title}\n`;
-    txt += `🎥   *Calidad*: 360p\n\n`;
-    txt += `> ️ *Se está enviando su video, por favor espere*`;
-
-    await star.reply(m.chat, txt, m);
-
-    await star.sendMessage(m.chat, {
-        document: { url: download_url }, 
-        caption: `🌝 *Provided by KanBot* 🌚\n📌 *Calidad:* 360p`,
-        mimetype: 'video/mp4',
-        fileName: `${title}.mp4`
-    }, { quoted: m });
-
-    return await m.react('✅'); // Reaccionar con éxito
-} catch (error) {
-    
-try {
-    let v = args[0];
-
-    // Llamada a la API
-    let apiResponse = await fetch(`https://bk9.fun/download/youtube?url=${encodeURIComponent(v)}`);
-    let data = await apiResponse.json();
-
-    if (!data.status || !data.BK9?.BK8?.length) {
-        throw new Error('Error en la API');
-    }
-
-    let { title } = data.BK9;
-    let { link: download_url, quality } = data.BK9.BK8[0]; // Primer enlace disponible
-
-    let txt = '`🅓🅞🅒🅢 🅥➋ - 🅚🅐🅝🅑🅞🅣`\n\n';
-    txt += `🍁   *Título*: ${title}\n`;
-    txt += `🎥   *Calidad*: ${quality}\n\n`;
-    txt += `> ️ *Se está enviando su video, por favor espere*`;
-
-    await star.reply(m.chat, txt, m);
-
-    await star.sendMessage(m.chat, {
-        document: { url: download_url }, 
-        caption: `🌝 *Provided by KanBot* 🌚\n📌 *Calidad:* ${quality}`,
-        mimetype: 'video/mp4',
-        fileName: `${title}.mp4`
-    }, { quoted: m });
-
-    return await m.react('✅'); // Reaccionar con éxito
-} catch (error) {
-    console.error("Error en la API:", error.message);
-    await m.react('✖️');
-    await star.reply(m.chat, '❌ _*Error al procesar el enlace. Por favor, intenta de nuevo.*_', m, rcanal);
-}
-}
 }
 //
 };
