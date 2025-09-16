@@ -61,7 +61,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     }
 
     // 3. Si es realmente un video
-    const caption = `*🎬 Título:* ${videoData.title || 'Sin título'}\n*📌 Autor:* ${videoData.author?.nickname || 'Desconocido'} (@${videoData.creator})\n*🌍 Región:* ${videoData.region || '??'}\n*▶️ Vistas:* ${videoData.views || 0}\n\n📥 *Descargado exitosamente by KanBot.*`;
+    const caption = `*🎬 Título:* ${videoData.title || 'Sin título'}\n*📌 Autor:* ${videoData.author?.nickname || 'Desconocido'}\n*🌍 Región:* ${videoData.region || '??'}\n*▶️ Vistas:* ${videoData.views || 0}\n\n📥 *Descargado exitosamente by KanBot.*`;
 
     const videoUrl = videoData.hd || videoData.nowm || videoData.wm;
     if (!videoUrl) {
