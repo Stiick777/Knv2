@@ -41,164 +41,87 @@ try {
     await m.react('🕓'); // Reacciona mientras procesa
 
     const url = yt_play[0].url;
-    const apiUrl = `https://delirius-apiofc.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`;
 
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
+    let title, downloadUrl;
 
-    if (response.status && response.data && response.data.download && response.data.download.url) {
-        const { title, download } = response.data;
-
-        await conn.sendMessage(m.chat, {
-            audio: { url: download.url },
-            mimetype: 'audio/mp4',
-            fileName: `${title}.mp3`,
-            ptt: false
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } else {
-        throw new Error('No se pudo obtener el enlace desde la API de Delirius.');
-    }
-
-} catch (err) {
-    
-   try {
-    await m.react('🕓'); // Indicador de procesamiento
-
-    const url = yt_play[0].url;
-    const format = 'mp3';
-    const apiUrl = `https://itzpire.com/download/youtube/v2?url=${encodeURIComponent(url)}&format=${format}`;
-
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
-
-    if (response.status === 'success' && response.data && response.data.downloadUrl) {
-        const { title, downloadUrl } = response.data;
-
-        await conn.sendMessage(m.chat, {
-            audio: { url: downloadUrl },
-            mimetype: 'audio/mp4', // mp3 se puede enviar con este tipo
-            fileName: `${title}.mp3`,
-            ptt: false
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } else {
-        throw new Error('No se pudo obtener el enlace desde la API de ITzpire.');
-    }
-
-} catch (err) {
-
-try {
-    await m.react('🕓'); // Reacciona mientras procesa
-
-    const url = yt_play[0].url;
-    const apiUrl = `https://bk9.fun/download/ytmp3?url=${encodeURIComponent(url)}&type=mp3`;
-
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
-
-    if (response.status && response.BK9?.downloadUrl) {
-        const { title, downloadUrl } = response;
-        await conn.sendMessage(m.chat, {
-            audio: { url: downloadUrl },
-            mimetype: 'audio/mp4',
-            fileName: `${title}.mp3`,
-            ptt: false
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } else {
-        throw new Error('No se pudo obtener el enlace desde la primera API.');
-    }
-
-} catch (e) {
+    // --- API Principal: Delirius ---
     try {
-    await m.react('🕓'); // Reacciona mientras procesa
+        const apiUrlDelirius = `https://delirius-apiofc.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`;
+        const apiResponseDelirius = await fetch(apiUrlDelirius);
+        const responseDelirius = await apiResponseDelirius.json();
 
-    const url = yt_play[0].url; // Asegúrate de que yt_play[0].url esté definido
-    const apiKey = 'i1fER4';
-    const apiUrl = `https://alyachan.dev/api/yta?url=${encodeURIComponent(url)}&apikey=${apiKey}`;
-
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
-
-    if (response.status && response.data && response.data.url) {
-        const { title, data } = response;
-
-        await conn.sendMessage(m.chat, {
-            audio: { url: data.url },
-            mimetype: 'audio/mp4',
-            fileName: `${title}.mp3`,
-            ptt: false
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } else {
-        throw new Error('No se pudo obtener el enlace desde la API de AlyaChan.');
-    }
-
-} catch (err) {
-
-    try {
-    await m.react('🕓'); // Reacciona mientras procesa
-
-    const url = yt_play[0].url;
-    const apiUrl = `https://api.sylphy.xyz/download/ytmp3?url=${encodeURIComponent(url)}`;
-
-    const apiResponse = await fetch(apiUrl);
-    const response = await apiResponse.json();
-
-    if (response.status && response.res && response.res.url) {
-        const { title, url: audioUrl } = response.res;
-
-        await conn.sendMessage(m.chat, {
-            audio: { url: audioUrl },
-            mimetype: 'audio/mp4',
-            fileName: `${title}.mp3`,
-            ptt: false
-        }, { quoted: m });
-
-        await m.react('✅'); // Éxito
-    } else {
-        throw new Error('No se pudo obtener el enlace desde la API de Sylphy.');
-    }
-
-} catch (err) {
-
-    try {
-        await m.react('🕓'); // Reintenta con la segunda API
-
-        const url = yt_play[0].url;
-        const apiUrl = `https://apidl.asepharyana.cloud/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
-
-        const apiResponse = await fetch(apiUrl);
-        const response = await apiResponse.json();
-
-        if (response.url) {
-            const { title, url: audioUrl } = response;
-            await conn.sendMessage(m.chat, {
-                audio: { url: audioUrl },
-                mimetype: 'audio/mp4',
-                fileName: `${title}.mp3`,
-                ptt: false
-            }, { quoted: m });
-
-            await m.react('✅'); // Éxito
-        } else {
-            throw new Error('No se pudo obtener el enlace desde la segunda API.');
+        if (responseDelirius.status && responseDelirius.data && responseDelirius.data.download && responseDelirius.data.download.url) {
+            title = responseDelirius.data.title;
+            downloadUrl = responseDelirius.data.download.url;
         }
-
-    } catch (err) {
-        await m.react('❌');
-        console.error('Error al procesar el audio:', err);
-        m.reply('No se pudo obtener el audio intente con `playp2`.');
+    } catch (e) {
+        console.log('❌ Delirius falló, intentando Vreden...');
     }
-}
-}
-}
-}
+
+    // --- Respaldo: Vreden ---
+    if (!downloadUrl) {
+        try {
+            const apiUrlVreden = `https://api.vreden.my.id/api/ytmp3?url=${encodeURIComponent(url)}`;
+            const apiResponseVreden = await fetch(apiUrlVreden);
+            const responseVreden = await apiResponseVreden.json();
+
+            if (responseVreden.status === 200 && responseVreden.result && responseVreden.result.download && responseVreden.result.download.url) {
+                title = responseVreden.result.metadata.title;
+                downloadUrl = responseVreden.result.download.url;
+            }
+        } catch (e) {
+            console.log('❌ Vreden falló, intentando Sylphy...');
+        }
+    }
+
+    // --- Respaldo: Sylphy ---
+    if (!downloadUrl) {
+        try {
+            const apiUrlSylphy = `https://api.sylphy.xyz/download/ytmp3?url=${encodeURIComponent(url)}&apikey=sylphy-25c2`;
+            const apiResponseSylphy = await fetch(apiUrlSylphy);
+            const responseSylphy = await apiResponseSylphy.json();
+
+            if (responseSylphy.status && responseSylphy.res && responseSylphy.res.url) {
+                title = responseSylphy.res.title;
+                downloadUrl = responseSylphy.res.url;
+            }
+        } catch (e) {
+            console.log('❌ Sylphy falló, intentando Stellar...');
+        }
+    }
+
+    // --- Respaldo: Stellar ---
+    if (!downloadUrl) {
+        try {
+            const apiUrlStellar = `https://api.stellarwa.xyz/dow/ytmp3?url=${encodeURIComponent(url)}&apikey=stellar-p1N9EsSo`;
+            const apiResponseStellar = await fetch(apiUrlStellar);
+            const responseStellar = await apiResponseStellar.json();
+
+            if (responseStellar.status && responseStellar.data && responseStellar.data.dl) {
+                title = responseStellar.data.title;
+                downloadUrl = responseStellar.data.dl;
+            }
+        } catch (e) {
+            console.log('❌ Stellar también falló');
+        }
+    }
+
+    if (!downloadUrl) throw new Error('No se pudo obtener el enlace desde ninguna API.');
+
+    // --- Enviar audio ---
+    await conn.sendMessage(m.chat, {
+        audio: { url: downloadUrl },
+        mimetype: 'audio/mp4',
+        fileName: `${title}.mp3`,
+        ptt: false
+    }, { quoted: m });
+
+    await m.react('✅'); // Éxito
+
+} catch (err) {
+    await m.react('❌');
+    console.error(err);
+    await conn.sendMessage(m.chat, { text: `❌ Error: ${err.message}` }, { quoted: m });
 }
 //
     }
