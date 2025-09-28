@@ -10,8 +10,9 @@ const desc = groupMetadata.desc?.toString() || 'Sin descripción'
 const mensaje = (chat.sWelcome || 'Edita con el comando "setwelcome"').replace(/{usuario}/g, `${username}`).replace(/{grupo}/g, `*${groupMetadata.subject}*`).replace(/{desc}/g, `${desc}`)
 const caption = 
 `╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
-¡Bienvenido/a, ✰ @${username}
+¡Bienvenido/a, ✰ ${username}
 A ${groupMetadata.subject}
+● ${fecha}
 ╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
 
 Esperamos que disfrutes tu estancia en el grupo.
@@ -28,8 +29,9 @@ const desc = groupMetadata.desc?.toString() || 'Sin descripción'
 const mensaje = (chat.sBye || 'Edita con el comando "setbye"').replace(/{usuario}/g, `${username}`).replace(/{grupo}/g, `${groupMetadata.subject}`).replace(/{desc}/g, `*${desc}*`)
 const caption = 
 `╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
-¡Adiós, ✰ @${username}
+¡Adiós, ✰ ${username}
 DE ${groupMetadata.subject}
+● ${fecha}
 ╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
 
 Gracias por haber estado con nosotros.
