@@ -73,8 +73,8 @@ ${text}`,
 }
 
 handler.help = ['sockets']
-handler.tags = ['grupo']
-handler.command = ['sockets', 'listsockets', 'setprimary']
+handler.tags = ['jadibot']
+handler.command = ['sockets', 'listsockets', 'sockets 1']
 handler.group = true
 handler.admin = true
 
