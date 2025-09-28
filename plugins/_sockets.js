@@ -13,6 +13,25 @@ const handler = async (m, { conn, args }) => {
 
   const chat = global.db.data.chats[m.chat]
 
+function dhms(ms) {
+  var segundos = Math.floor(ms / 1000);
+  var minutos = Math.floor(segundos / 60);
+  var horas = Math.floor(minutos / 60);
+  var días = Math.floor(horas / 24);
+
+  segundos %= 60;
+  minutos %= 60;
+  horas %= 24;
+
+  var resultado = "";
+  if (días !== 0) resultado += días + 'd ';
+  if (horas !== 0) resultado += horas + 'h ';
+  if (minutos !== 0) resultado += minutos + 'm ';
+  if (segundos !== 0) resultado += segundos + 's';
+
+  return resultado.trim();
+}
+  
   // --- Si no hay argumentos: listar sockets ---
   if (!args[0] && !m.mentionedJid?.length && !m.quoted) {
     if (!subBots.length) return conn.reply(m.chat, '🚫 *No hay sockets activos.*', m)
