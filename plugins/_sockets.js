@@ -22,6 +22,7 @@ const handler = async (m, { conn, args }) => {
 │🎈 TAG: @${jid.split('@')[0]}
 │🔥 LINK: https://wa.me/${jid.split('@')[0]}
 │📍 JID: ${jid}
+│⏳ RUNTIME ${v.uptime ? dhms(Date.now() - v.uptime) : "Desconocido"}
 ╰──────────────────⬣`).join('\n\n')
 
     return conn.sendMessage(m.chat, {
