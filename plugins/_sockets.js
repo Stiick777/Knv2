@@ -49,7 +49,7 @@ const handler = async (m, { conn, args }) => {
     return conn.sendMessage(m.chat, {
       text: `╭━〔 𝗦𝗢𝗖𝗞𝗘𝗧𝗦 𝗔𝗖𝗧𝗜𝗩𝗢𝗦 〕⬣
 ┃ ⚡ *Total:* ${subBots.length}
-┃ > Para dejar un socket como primario usa: *.sockets 4*
+┃ > Para dejar un socket (Subbot) como primario usa: *.sockets 1* o el numero del socket que desea que sea principal 
 ╰━━━━━━━━━━━━━━━━⬣
 
 ${text}`,
