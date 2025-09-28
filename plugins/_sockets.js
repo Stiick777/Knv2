@@ -27,6 +27,7 @@ const handler = async (m, { conn, args }) => {
     return conn.sendMessage(m.chat, {
       text: `╭━〔 𝗦𝗢𝗖𝗞𝗘𝗧𝗦 𝗔𝗖𝗧𝗜𝗩𝗢𝗦 〕⬣
 ┃ ⚡ *Total:* ${subBots.length}
+┃ > para dejar un socket (Subbot) como principal use #sockets y el numero del socket ejemplo #sockets 4
 ╰━━━━━━━━━━━━━━━━⬣
 
 ${text}`,
@@ -74,7 +75,7 @@ ${text}`,
 
 handler.help = ['sockets']
 handler.tags = ['jadibot']
-handler.command = ['sockets', 'listsockets', 'sockets 1']
+handler.command = ['sockets', 'listsockets']
 handler.group = true
 handler.admin = true
 
