@@ -1,7 +1,8 @@
-let linkRegex = /(https?:\/\/(?:www\.)?(?:whatsapp\.com)\/\S+)|(https?:\/\/chat\.whatsapp\.com\/\S+)|(https?:\/\/whatsapp\.com\/channel\/\S+)/i;
+// Solo detectar links de grupos y canales
+let linkRegex = /(https?:\/\/chat\.whatsapp\.com\/\S+)|(https?:\/\/whatsapp\.com\/channel\/\S+)/i;
 
 let allowedLinks = [
-    "https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw",
+    "https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw?mode=ems_copy_c",
     "https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N"
 ];
 
@@ -18,15 +19,15 @@ export async function before(m, { isAdmin, isBotAdmin }) {
     const grupo = `https://chat.whatsapp.com`;
     
     // Permitir admins enviar enlaces
-    if (isAdmin && chat.antiLink && m.text.includes(grupo)) {
-        return conn.reply(m.chat, `⚠️ *Hey!! el anti link está activo pero eres admin, ¡salvado!*`, m, );
+    if (isAdmin && chat.antiLink && isGroupLink) {
+        return conn.reply(m.chat, `⚠️ *Hey!! el anti link está activo pero eres admin, ¡salvado!*`, m);
     }
     
     // Si el anti-link está activado y el mensaje contiene un enlace
     if (chat.antiLink && isGroupLink && !isAdmin) {
-        // Permitir los enlaces específicos
-       if (allowedLinks.some(link => m.text.includes(link))) {
-            return !0; // No eliminar el mensaje ni expulsar
+        // Permitir solo los enlaces de la lista
+        if (allowedLinks.some(link => m.text.includes(link))) {
+            return !0; // Permitido, no borrar ni expulsar
         }
 
         if (isBotAdmin) {
@@ -36,17 +37,17 @@ export async function before(m, { isAdmin, isBotAdmin }) {
 
         // Si el bot no es admin, no puede eliminar usuarios
         if (!isBotAdmin) {
-            return conn.reply(m.chat, `⚡ *No soy admin, no puedo eliminar intrusos*`, m, );
+            return conn.reply(m.chat, `⚡ *No soy admin, no puedo eliminar intrusos*`, m);
         }
 
         // Eliminar mensaje y expulsar usuario
         if (isBotAdmin) {
             await conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: delet }});
             await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove');
-            await conn.sendMessage(m.chat, { text: `🚫 Se eliminó a @${m.sender.split('@')[0]} por enviar un enlace.`, mentions: [m.sender] });
+            await conn.sendMessage(m.chat, { text: `🚫 Se eliminó a @${m.sender.split('@')[0]} por enviar un enlace prohibido.`, mentions: [m.sender] });
         
         } else if (!bot.restrict) {
-            return conn.reply(m.chat, `*¡Esta característica está desactivada!*`, m, rcanal);
+            return conn.reply(m.chat, `*¡Esta característica está desactivada!*`, m);
         }
     }
     
