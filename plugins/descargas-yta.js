@@ -1,60 +1,4 @@
 import fetch from "node-fetch";
-import axios from "axios";
-
-const formatAudio = ['mp3', 'm4a', 'webm', 'acc', 'flac', 'opus', 'ogg', 'wav'];
-
-const ddownr = {
-  download: async (url, format) => {
-    if (!formatAudio.includes(format)) {
-      throw new Error('Formato de audio no soportado.');
-    }
-
-    const config = {
-      method: 'GET',
-      url: `https://p.oceansaver.in/ajax/download.php?format=${format}&url=${encodeURIComponent(url)}&api=dfcb6d76f2f6a9894gjkege8a4ab232222`,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-      }
-    };
-
-    try {
-      const response = await axios.request(config);
-      if (response.data && response.data.success) {
-        const { id } = response.data;
-        const downloadUrl = await ddownr.cekProgress(id);
-        return { downloadUrl };
-      } else {
-        throw new Error('No se pudo obtener el enlace de descarga.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      throw error;
-    }
-  },
-
-  cekProgress: async (id) => {
-    const config = {
-      method: 'GET',
-      url: `https://p.oceansaver.in/ajax/progress.php?id=${id}`,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-      }
-    };
-
-    try {
-      while (true) {
-        const response = await axios.request(config);
-        if (response.data && response.data.success && response.data.progress === 1000) {
-          return response.data.download_url;
-        }
-        await new Promise(resolve => setTimeout(resolve, 5000));
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      throw error;
-    }
-  }
-};
 
 const handler = async (m, { conn, text }) => {
   try {
@@ -62,20 +6,126 @@ const handler = async (m, { conn, text }) => {
       return conn.reply(m.chat, '⚠️ Proporciona un *enlace válido de YouTube*.', m);
     }
 
-    // Reacción inicial de espera ⏳
+    // Reacción inicial ⏳
     await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
 
-    const { downloadUrl } = await ddownr.download(text, 'mp3');
+    let title, thumbnail, url, filesize, quality, format;
+
+    try {
+      // =========================
+      // API PRINCIPAL: Ruby Core
+      // =========================
+      const rubyUrl = `https://ruby-core.vercel.app/api/download/youtube/mp3?url=${encodeURIComponent(text)}`;
+      const res1 = await fetch(rubyUrl);
+      const data1 = await res1.json();
+
+      if (!data1.status || !data1.download || !data1.download.url) throw new Error("Ruby Core falló");
+
+      title = data1.metadata.title;
+      thumbnail = data1.metadata.thumbnail;
+      url = data1.download.url;
+      filesize = "Desconocido";
+      quality = data1.download.quality || "128kbps";
+      format = "mp3";
+
+    } catch (err1) {
+      console.log("⚠️ Ruby Core falló, usando respaldo Yupra...");
+
+      try {
+        // =========================
+        // API BACKUP 1: Yupra
+        // =========================
+        const yupraUrl = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(text)}`;
+        const res2 = await fetch(yupraUrl);
+        const data2 = await res2.json();
+
+        if (data2.status !== 200 || !data2.result || !data2.result.link) throw new Error("Yupra falló");
+
+        title = data2.result.title;
+        thumbnail = `https://i.ytimg.com/vi/${extractVideoId(text)}/0.jpg`;
+        url = data2.result.link;
+        filesize = `${(data2.result.filesize / 1024 / 1024).toFixed(2)} MB`;
+        quality = "128kbps";
+        format = "mp3";
+
+      } catch (err2) {
+        console.log("⚠️ Yupra falló, usando respaldo Zenzxz...");
+
+        try {
+          // =========================
+          // API BACKUP 2: Zenzxz
+          // =========================
+          const zenzUrl = `https://api.zenzxz.my.id/downloader/ytmp3?url=${encodeURIComponent(text)}`;
+          const res3 = await fetch(zenzUrl);
+          const data3 = await res3.json();
+
+          if (!data3.status || !data3.download_url) throw new Error("Zenzxz falló");
+
+          title = data3.title;
+          thumbnail = data3.thumbnail;
+          url = data3.download_url;
+          filesize = "Desconocido";
+          quality = "128kbps";
+          format = "mp3";
+
+        } catch (err3) {
+          console.log("⚠️ Zenzxz falló, usando respaldo Sylphy...");
+
+          try {
+            // =========================
+            // API BACKUP 3: Sylphy
+            // =========================
+            const sylphyKey = "sylphy-25c2";
+            const sylphyUrl = `https://api.sylphy.xyz/download/ytmp3?url=${encodeURIComponent(text)}&apikey=${sylphyKey}`;
+            const res4 = await fetch(sylphyUrl);
+            const data4 = await res4.json();
+
+            if (!data4.status || !data4.res || !data4.res.url) throw new Error("Sylphy falló");
+
+            ({ title, thumbnail, url, filesize, quality, format } = data4.res);
+
+          } catch (err4) {
+            console.log("⚠️ Sylphy falló, usando respaldo Stellar...");
+
+            // =========================
+            // API BACKUP 4: Stellar
+            // =========================
+            const stellarKey = "stellar-53mIXDr2";
+            const stellarUrl = `https://api.stellarwa.xyz/dow/ytmp3?url=${encodeURIComponent(text)}&apikey=${stellarKey}`;
+            const res5 = await fetch(stellarUrl);
+            const data5 = await res5.json();
+
+            if (!data5.status || !data5.data || !data5.data.dl) throw new Error("Stellar también falló");
+
+            title = data5.data.title;
+            thumbnail = `https://i.ytimg.com/vi/${extractVideoId(text)}/0.jpg`;
+            url = data5.data.dl;
+            filesize = "Desconocido";
+            quality = "128kbps";
+            format = "mp3";
+          }
+        }
+      }
+    }
 
     // Reacción de éxito ✅
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
 
-    await conn.sendMessage(m.chat, { audio: { url: downloadUrl }, mimetype: "audio/mpeg" }, { quoted: m });
+    // Preview del audio
+    await conn.sendMessage(m.chat, {
+      image: { url: thumbnail },
+      caption: `🎶 *${title}*\n📦 ${filesize}\n🎧 ${quality} ${format}`
+    }, { quoted: m });
+
+    // Enviar audio
+    await conn.sendMessage(m.chat, {
+      audio: { url },
+      mimetype: "audio/mpeg",
+      fileName: `${title}.mp3`
+    }, { quoted: m });
 
   } catch (error) {
-    // Reacción de error (opcional)
-    // await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
-
+    console.error(error);
     return m.reply(`⚠️ Error: ${error.message}`);
   }
 };
@@ -83,11 +133,16 @@ const handler = async (m, { conn, text }) => {
 handler.command = ['ytmp3', 'yta'];
 handler.help = ['ytmp3 <url>'];
 handler.tags = ['descargas'];
-handler.group = true
+handler.group = true;
 
 export default handler;
 
 function isValidYouTubeUrl(url) {
   const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/;
   return regex.test(url.trim());
+}
+
+function extractVideoId(url) {
+  const match = url.match(/(v=|youtu\.be\/)([\w-]{11})/);
+  return match ? match[2] : null;
 }
