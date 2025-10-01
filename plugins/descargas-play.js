@@ -262,7 +262,7 @@ try {
 
     // ❌ Si todas las APIs fallaron
     await conn.sendMessage(m.chat, { 
-        text: "❌ No se pudo obtener el video. Todas las APIs fallaron." 
+        text: "❌ No se pudo obtener el video. Todas las APIs fallaron intente con playv2" 
     }, { quoted: m });
 
     await m.react('❌');
