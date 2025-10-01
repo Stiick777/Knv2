@@ -44,33 +44,49 @@ try {
 
     let title, downloadUrl;
 
-    // --- API Principal: Delirius ---
+    // --- API Principal: Ruby ---
     try {
-        const apiUrlDelirius = `https://delirius-apiofc.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`;
-        const apiResponseDelirius = await fetch(apiUrlDelirius);
-        const responseDelirius = await apiResponseDelirius.json();
+        const apiUrlRuby = `https://ruby-core.vercel.app/api/download/youtube/mp3?url=${encodeURIComponent(url)}`;
+        const apiResponseRuby = await fetch(apiUrlRuby);
+        const responseRuby = await apiResponseRuby.json();
 
-        if (responseDelirius.status && responseDelirius.data && responseDelirius.data.download && responseDelirius.data.download.url) {
-            title = responseDelirius.data.title;
-            downloadUrl = responseDelirius.data.download.url;
+        if (responseRuby.status && responseRuby.download && responseRuby.download.url) {
+            title = responseRuby.metadata.title;
+            downloadUrl = responseRuby.download.url;
         }
     } catch (e) {
-        console.log('❌ Delirius falló, intentando Vreden...');
+        console.log('❌ Ruby falló, intentando Yupra...');
     }
 
-    // --- Respaldo: Vreden ---
+    // --- Respaldo: Yupra ---
     if (!downloadUrl) {
         try {
-            const apiUrlVreden = `https://api.vreden.my.id/api/ytmp3?url=${encodeURIComponent(url)}`;
-            const apiResponseVreden = await fetch(apiUrlVreden);
-            const responseVreden = await apiResponseVreden.json();
+            const apiUrlYupra = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
+            const apiResponseYupra = await fetch(apiUrlYupra);
+            const responseYupra = await apiResponseYupra.json();
 
-            if (responseVreden.status === 200 && responseVreden.result && responseVreden.result.download && responseVreden.result.download.url) {
-                title = responseVreden.result.metadata.title;
-                downloadUrl = responseVreden.result.download.url;
+            if (responseYupra.status === 200 && responseYupra.result && responseYupra.result.link) {
+                title = responseYupra.result.title;
+                downloadUrl = responseYupra.result.link;
             }
         } catch (e) {
-            console.log('❌ Vreden falló, intentando Sylphy...');
+            console.log('❌ Yupra falló, intentando Zenzxz...');
+        }
+    }
+
+    // --- Respaldo: Zenzxz ---
+    if (!downloadUrl) {
+        try {
+            const apiUrlZenz = `https://api.zenzxz.my.id/downloader/ytmp3?url=${encodeURIComponent(url)}`;
+            const apiResponseZenz = await fetch(apiUrlZenz);
+            const responseZenz = await apiResponseZenz.json();
+
+            if (responseZenz.status && responseZenz.download_url) {
+                title = responseZenz.title;
+                downloadUrl = responseZenz.download_url;
+            }
+        } catch (e) {
+            console.log('❌ Zenzxz falló, intentando Sylphy...');
         }
     }
 
@@ -93,7 +109,7 @@ try {
     // --- Respaldo: Stellar ---
     if (!downloadUrl) {
         try {
-            const apiUrlStellar = `https://api.stellarwa.xyz/dow/ytmp3?url=${encodeURIComponent(url)}&apikey=stellar-p1N9EsSo`;
+            const apiUrlStellar = `https://api.stellarwa.xyz/dow/ytmp3?url=${encodeURIComponent(url)}&apikey=stellar-53mIXDr2`;
             const apiResponseStellar = await fetch(apiUrlStellar);
             const responseStellar = await apiResponseStellar.json();
 

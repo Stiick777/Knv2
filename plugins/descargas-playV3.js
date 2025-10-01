@@ -9,26 +9,42 @@ const handler = async (m, { conn, text, command }) => {
   if (!text) return m.reply('*Ingresa el nombre de lo que quieres buscar*');
   await m.react('🕓');
 
-  if (command === 'playp2') {
-    // Versión con API externa
+if (command === 'playp2') {
+  try {
+    let info, audioUrl, thumbnail;
+
+    // Primera API (diioffc)
     try {
-      const urlApi = `https://api.diioffc.web.id/api/search/ytplay?query=${encodeURIComponent(text)}`;
-      const { data: res } = await axios.get(urlApi);
+      const urlApi1 = `https://api.diioffc.web.id/api/search/ytplay?query=${encodeURIComponent(text)}`;
+      const { data: res1 } = await axios.get(urlApi1);
 
-      if (!res.status || !res.result?.download?.url) throw new Error('No se encontró el audio.');
+      if (!res1.status || !res1.result?.download?.url) throw new Error('Sin resultados en API 1');
 
-      const info = res.result;
-      const audioUrl = info.download.url;
-      const thumbnail = info.thumbnail;
+      info = res1.result;
+      audioUrl = info.download.url;
+      thumbnail = info.thumbnail;
+    } catch (err1) {
+      console.log('⚠️ API 1 falló, intentando con API Vreden...', err1.message);
 
-      const texto = `
+      // Segunda API (vreden)
+      const urlApi2 = `https://api.vreden.my.id/api/v1/download/play/audio?query=${encodeURIComponent(text)}`;
+      const { data: res2 } = await axios.get(urlApi2);
+
+      if (!res2.status || !res2.result?.download?.url) throw new Error('Sin resultados en API 2');
+
+      info = res2.result.metadata;
+      audioUrl = res2.result.download.url;
+      thumbnail = res2.result.metadata.thumbnail;
+    }
+
+    const texto = `
 𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊 𝚅𝟸
 ===========================
-> *Título:* ${info.title}
-> *Autor:* ${info.author.name}
-> *Duración:* ${info.duration.timestamp}
-> *Fecha:* ${info.ago}
-> *Vistas:* ${info.views.toLocaleString()}
+> *Título:* ${info.title || 'N/A'}
+> *Autor:* ${info.author?.name || 'Desconocido'}
+> *Duración:* ${info.duration?.timestamp || 'N/A'}
+> *Fecha:* ${info.ago || 'N/A'}
+> *Vistas:* ${info.views ? info.views.toLocaleString() : 'N/A'}
 
 *🚀 Se está enviando tu audio...*
 ===========================
@@ -36,21 +52,22 @@ const handler = async (m, { conn, text, command }) => {
 > Provided by Stiiven
 `.trim();
 
-      await conn.sendFile(m.chat, thumbnail, 'thumbnail.jpg', texto, m);
+    await conn.sendFile(m.chat, thumbnail, 'thumbnail.jpg', texto, m);
 
-      const audioBuffer = await (await fetch(audioUrl)).buffer();
+    const audioBuffer = await (await fetch(audioUrl)).buffer();
 
-      await conn.sendMessage(m.chat, {
-        audio: audioBuffer,
-        mimetype: 'audio/mpeg'
-      }, { quoted: m });
+    await conn.sendMessage(m.chat, {
+      audio: audioBuffer,
+      mimetype: 'audio/mpeg'
+    }, { quoted: m });
 
-      await m.react('✅');
-    } catch (err) {
-      console.error(err);
-      await m.react('❌');
-      await conn.reply(m.chat, 'Ocurrió un error al procesar la búsqueda en todos los play :(', m);
-    }
+    await m.react('✅');
+  } catch (err) {
+    console.error(err);
+    await m.react('❌');
+    await conn.reply(m.chat, 'Ocurrió un error al procesar la búsqueda en todos los play :(', m);
+  }
+
 
   } else if (command === 'play') {
     // Versión con yt-search y yta
