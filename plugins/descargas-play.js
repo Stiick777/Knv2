@@ -178,184 +178,97 @@ try {
     await m.react('🕓');
     const url = yt_play[0].url;
 
-    const api2 = await fetch(`https://delirius-apiofc.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`);
-    const res2 = await api2.json();
+    // 🔹 API 1: Ruby-Core
+    let api1 = await fetch(`https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(url)}`);
+    let res1 = await api1.json();
 
-    if (res2.status && res2.data?.download?.url) {
-        const { title, duration, views, author } = res2.data;
-        const downloadUrl = res2.data.download.url;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: downloadUrl },
-            caption: `*${title}*\nDuración: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} minutos\nVistas: ${views}\nCanal: ${author}`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return; // ✅ Éxito, no continuar con otras APIs
-    }
-} catch (e) {
-    console.warn('Error en API 2 (Delirius):', e);
-}
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api5 = await fetch(`https://www.dark-yasiya-api.site/download/ytmp4?url=${encodeURIComponent(url)}&quality=360`);
-    const res5 = await api5.json();
-
-    if (res5?.status && res5.result?.download?.url) {
-        const video = res5.result.data;
-        const download = res5.result.download;
+    if (res1.status && res1.download?.url) {
+        const { metadata, download } = res1;
 
         await conn.sendMessage(m.chat, {
             video: { url: download.url },
-            caption: `🎬 *${video.title}*\n👤 Autor: ${video.author.name}\n🕒 Duración: ${video.duration.timestamp}\n👁️ Vistas: ${video.views}\n📥 Calidad: ${download.quality}p`
+            caption: `*${metadata.title}*\nAutor: ${metadata.author}\nDuración: ${metadata.duration.timestamp}\nCalidad: ${download.quality}`,
+            jpegThumbnail: await (await fetch(metadata.thumbnail)).buffer()
         }, { quoted: m });
 
         await m.react('✅');
-        return; // ✅ Éxito, no continuar con otras APIs
+        return;
     }
-} catch (e) {
-    console.warn('Error en API 5 (DarkYasiya):', e);
-}
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
 
-    const apiAlya = await fetch(`https://api.alyachan.dev/api/ytv?url=${encodeURIComponent(url)}&apikey=i1fER4`);
-    const resAlya = await apiAlya.json();
+    // 🔹 API 2: Starlight
+    let api2 = await fetch(`https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}`);
+    let res2 = await api2.json();
 
-    if (resAlya.status && resAlya.data?.url) {
-        const {
-            title,
-            duration,
-            channel,
-            views,
-            publish,
-            thumbnail,
-            data
-        } = resAlya;
+    if (res2.url) {
+        await conn.sendMessage(m.chat, {
+            video: { url: res2.url },
+            caption: `*${res2.title}*\nDuración: ${res2.duration}\nAutor: ${res2.creator}`,
+            jpegThumbnail: await (await fetch(res2.thumbnail)).buffer()
+        }, { quoted: m });
+
+        await m.react('✅');
+        return;
+    }
+
+    // 🔹 API 3: Yupra
+    let api3 = await fetch(`https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`);
+    let res3 = await api3.json();
+
+    if (res3.status === 200 && res3.result?.formats?.length > 0) {
+        const { title, formats } = res3.result;
+        const video360 = formats.find(f => f.itag === 18) || formats[0];
 
         await conn.sendMessage(m.chat, {
-            video: { url: data.url },
-            caption: `🎬 *${title}*\n🕒 Duración: ${duration}\n👤 Canal: ${channel}\n👁️ Vistas: ${views}\n📅 Publicado: ${publish}\n📥 Calidad: ${data.quality} - ${data.size}`
+            video: { url: video360.url },
+            caption: `*${title}*\nCalidad: ${video360.qualityLabel || "Desconocida"}`
         }, { quoted: m });
 
         await m.react('✅');
-        return; // ✅ Éxito, no continuar con otras APIs
+        return;
     }
-} catch (e) {
-    console.warn('Error en API (AlyaChan):', e);
-}
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
 
-    const apiSylphy = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(url)}`);
-    const resSylphy = await apiSylphy.json();
+    // 🔹 API 4: Sylphy
+    let api4 = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(url)}&apikey=sylphy-25c2`);
+    let res4 = await api4.json();
 
-    if (resSylphy.status && resSylphy.res?.url) {
-        const { title, url: videoUrl } = resSylphy.res;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: videoUrl },
-            caption: `🎬 *${title}*`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return; // ✅ Éxito, no continuar con otras APIs
-    }
-} catch (e) {
-    console.warn('Error en API (Sylphy):', e);
-}
-
-    try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api3 = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(url)}`);
-    const res3 = await api3.json();
-
-    if (res3.status === 200 && res3.result?.download?.url) {
-        const {
-            metadata: { title, timestamp, views, author },
-            download: { url: downloadUrl }
-        } = res3.result;
+    if (res4.status && res4.res?.url) {
+        const { title, url: downloadUrl } = res4.res;
 
         await conn.sendMessage(m.chat, {
             video: { url: downloadUrl },
-            caption: `🎬 *${title}*\n📺 Duración: ${timestamp}\n👀 Vistas: ${views.toLocaleString()}\n🎙 Autor: ${author.name}\n🔗 Canal: ${author.url}`
+            caption: `*${title}*`
         }, { quoted: m });
 
         await m.react('✅');
-        return; // ✅ Éxito
+        return;
     }
-} catch (e) {
-    console.warn('Error en API 3:', e);
-}
-    
 
+    // 🔹 API 5: Stellar
+    let api5 = await fetch(`https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(url)}&apikey=stellar-53mIXDr2`);
+    let res5 = await api5.json();
 
-// Si falla la primera, pasa a la siguiente
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
+    if (res5.status && res5.data?.dl) {
+        const { title, duration, dl, thumbnail } = res5.data;
 
-    const api2 = await fetch(`https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(url)}&type=video&quality=720p&apikey=Paimon`);
-    const res2 = await api2.json();
-
-    if (res2.status && res2.data?.url) {
-        const { title, fduration, views, channel } = res2;
-        const { url: downloadUrl } = res2.data;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: downloadUrl },
-            caption: `*${title}*\nDuración: ${fduration}\nVistas: ${views}\nCanal: ${channel}`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return; // ✅ Éxito, no continuar con otras APIs
-    }
-} catch (e) {
-    console.warn('Error en API 2:', e);
-}
-
-// Si falla la segunda, pasa a la tercera
-
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api1 = await fetch('https://api.siputzx.my.id/api/d/ytmp4', {
-        method: 'POST',
-        headers: {
-            'accept': '*/*',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ url })
-    });
-
-    const res1 = await api1.json();
-
-    if (res1.status && res1.data?.dl) {
-        const { title, dl } = res1.data;
         await conn.sendMessage(m.chat, {
             video: { url: dl },
-            caption: `🎬 *${title}*`
+            caption: `*${title}*\nDuración: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} minutos`,
+            jpegThumbnail: await (await fetch(thumbnail)).buffer()
         }, { quoted: m });
 
         await m.react('✅');
-        return; // ✅ Éxito, no continuar con otras APIs
+        return;
     }
+
+    // ❌ Si todas las APIs fallaron
+    await conn.sendMessage(m.chat, { 
+        text: "❌ No se pudo obtener el video. Todas las APIs fallaron." 
+    }, { quoted: m });
+
+    await m.react('❌');
+
 } catch (e) {
-    console.warn('Error en API 1:', e);
-}
 
-
-// Si todas fallan:
-await m.react('❌');
-m.reply('❌ No se pudo obtener el video con ninguna de las APIs. Intenta con otro enlace o usa el comando playv2.');
-//
 }
 
 
