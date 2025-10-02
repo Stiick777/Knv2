@@ -270,7 +270,7 @@ try {
 } catch (e) {
 
 }
-
+}
 
 }
 handler.help = ['playp', 'play2'];
