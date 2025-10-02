@@ -116,189 +116,105 @@ ${yt_play[0].author.url}
     await m.react('🕓');
     const url = yt_play[0].url;
 
-    const api2 = await fetch(`https://api.agatz.xyz/api/ytmp4?url=${encodeURIComponent(url)}`);
-    const res2 = await api2.json();
+    let title, downloadUrl, thumbnail;
 
-    if (res2.status === 200 && res2.data?.success) {
-        const { title, downloadUrl } = res2.data;
+    // === API 1: Ruby-Core ===
+    try {
+        const api1 = await fetch(`https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(url)}`);
+        const res1 = await api1.json();
 
-        await conn.sendMessage(m.chat, {
-            document: { url: downloadUrl },
-            mimetype: 'video/mp4',
-            fileName: `${title}.mp4`,
-            caption: `🎬 *${title}*\n\n🌚 *_Provided by KanBot_* 🌝`
-        }, { quoted: m });
+        if (!res1.status || !res1.download?.url) throw new Error("Ruby-Core inválido");
 
-        await m.react('✅');
-        return;
+        title = res1.metadata.title;
+        downloadUrl = res1.download.url;
+        thumbnail = res1.metadata.thumbnail;
+    } catch (err1) {
+        console.warn("Error Ruby-Core:", err1.message);
+
+        // === API 2: Starlight ===
+        try {
+            const api2 = await fetch(`https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}`);
+            const res2 = await api2.json();
+
+            if (!res2.url || !res2.title) throw new Error("Starlight inválido");
+
+            title = res2.title;
+            downloadUrl = res2.url;
+            thumbnail = res2.thumbnail;
+        } catch (err2) {
+            console.warn("Error Starlight:", err2.message);
+
+            // === API 3: Yupra ===
+            try {
+                const api3 = await fetch(`https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`);
+                const res3 = await api3.json();
+
+                if (!res3.status || !res3.result?.formats?.length) throw new Error("Yupra inválido");
+
+                const video = res3.result.formats.find(f => f.itag === 18) || res3.result.formats[0];
+                title = res3.result.title;
+                downloadUrl = video.url;
+                thumbnail = res3.result.thumbnail;
+            } catch (err3) {
+                console.warn("Error Yupra:", err3.message);
+
+                // === API 4: Shylpy ===
+                try {
+                    const api4 = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(url)}&apikey=sylphy-25c2`);
+                    const res4 = await api4.json();
+
+                    if (!res4.status || !res4.res?.url) throw new Error("Shylpy inválido");
+
+                    title = res4.res.title;
+                    downloadUrl = res4.res.url;
+                    thumbnail = null;
+                } catch (err4) {
+                    console.warn("Error Shylpy:", err4.message);
+
+                    // === API 5: Stellar ===
+                    try {
+                        const api5 = await fetch(`https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(url)}&apikey=stellar-53mIXDr2`);
+                        const res5 = await api5.json();
+
+                        if (!res5.status || !res5.data?.dl) throw new Error("Stellar inválido");
+
+                        title = res5.data.title;
+                        downloadUrl = res5.data.dl;
+                        thumbnail = res5.data.thumbnail;
+                    } catch (err5) {
+                        console.warn("Error Stellar:", err5.message);
+
+                        // ❌ Todas fallaron
+                        await conn.sendMessage(m.chat, { text: "❌ No se pudo descargar el video. Todas las APIs fallaron." }, { quoted: m });
+                        return await m.react('✖️');
+                    }
+                }
+            }
+        }
     }
+
+    // ✅ Enviar el video como documento
+    await conn.sendMessage(m.chat, {
+        document: { url: downloadUrl },
+        mimetype: 'video/mp4',
+        fileName: `${title}.mp4`,
+        caption: `🎬 *${title}*\n\n🌚 *_Provided by KanBot_* 🌝`,
+        jpegThumbnail: thumbnail ? await (await fetch(thumbnail)).buffer() : null
+    }, { quoted: m });
+
+    await m.react('✅');
+    return;
+
 } catch (e) {
-    console.warn('Error en API 2 (Agatz):', e);
+    console.warn("Error general:", e);
+    await m.react('✖️');
+    await conn.sendMessage(m.chat, { text: "❌ Error inesperado al procesar el enlace." }, { quoted: m });
 }
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api2 = await fetch(`https://delirius-apiofc.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`);
-    const res2 = await api2.json();
-
-    if (res2.status && res2.data?.download?.url) {
-        const { title, duration, views, author } = res2.data;
-        const downloadUrl = res2.data.download.url;
-
-        await conn.sendMessage(m.chat, {
-            document: { url: downloadUrl },
-            mimetype: 'video/mp4',
-            fileName: `${title}.mp4`,
-            caption: `🎬 *${title}*\n🕒 Duración: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} minutos\n👀 Vistas: ${views}\n🎙 Canal: ${author}\n\n🌚 *_Provided by KanBot_* 🌝`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return; // ✅ Éxito, no continuar con otras APIs
-    }
-} catch (e) {
-    console.warn('Error en API 2 (Delirius):', e);
-}
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api4 = await fetch(`https://api.ryzumi.vip/api/downloader/ytmp4?url=${encodeURIComponent(url)}&quality=360`, {
-        headers: { 'accept': 'application/json' }
-    });
-
-    const res4 = await api4.json();
-
-    if (res4?.url) {
-        const { title, author, views, lengthSeconds, quality, url: downloadUrl } = res4;
-
-        await conn.sendMessage(m.chat, {
-            document: { url: downloadUrl },
-            mimetype: 'video/mp4',
-            fileName: `${title}.mp4`,
-            caption: `🎬 *${title}*\n👤 Autor: ${author}\n👁️ Vistas: ${views}\n🕒 Duración: ${lengthSeconds}s\n📥 Calidad: ${quality}\n\n🌚 *_Provided by KanBot_* 🌝`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return;
-    }
-} catch (e) {
-    console.warn('Error en API 4 (Ryzumi):', e);
-}
-
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api5 = await fetch(`https://www.dark-yasiya-api.site/download/ytmp4?url=${encodeURIComponent(url)}&quality=360`);
-    const res5 = await api5.json();
-
-    if (res5?.status && res5.result?.download?.url) {
-        const video = res5.result.data;
-        const download = res5.result.download;
-
-        await conn.sendMessage(m.chat, {
-            document: { url: download.url },
-            mimetype: 'video/mp4',
-            fileName: `${video.title}.mp4`,
-            caption: `🎬 *${video.title}*\n👤 Autor: ${video.author.name}\n🕒 Duración: ${video.duration.timestamp}\n👁️ Vistas: ${video.views}\n📥 Calidad: ${download.quality}p\n\n🌚 *_Provided by KanBot_* 🌝`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return;
-    }
-} catch (e) {
-    console.warn('Error en API 5 (DarkYasiya):', e);
-}
-
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api3 = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(url)}`);
-    const res3 = await api3.json();
-
-    if (res3.status === 200 && res3.result?.download?.url) {
-        const { metadata: { title, timestamp, views, author }, download: { url: downloadUrl } } = res3.result;
-
-        await conn.sendMessage(m.chat, {
-            document: { url: downloadUrl },
-            mimetype: 'video/mp4',
-            fileName: `${title}.mp4`,
-            caption: `🎬 *${title}*\n📺 Duración: ${timestamp}\n👀 Vistas: ${views.toLocaleString()}\n🎙 Autor: ${author.name}\n🔗 Canal: ${author.url}\n\n🌚 *_Provided by KanBot_* 🌝`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return;
-    }
-} catch (e) {
-    console.warn('Error en API 3:', e);
-}
-
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api2 = await fetch(`https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(url)}&type=video&quality=720p&apikey=Paimon`);
-    const res2 = await api2.json();
-
-    if (res2.status && res2.data?.url) {
-        const { title, fduration, views, channel } = res2;
-        const { url: downloadUrl } = res2.data;
-
-        await conn.sendMessage(m.chat, {
-            document: { url: downloadUrl },
-            mimetype: 'video/mp4',
-            fileName: `${title}.mp4`,
-            caption: `🎬 *${title}*\n🕒 Duración: ${fduration}\n👁️ Vistas: ${views}\n📺 Canal: ${channel}\n\n🌚 *_Provided by KanBot_* 🌝`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return;
-    }
-} catch (e) {
-    console.warn('Error en API 2 (Neoxr):', e);
-}
-
-try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-
-    const api1 = await fetch('https://api.siputzx.my.id/api/d/ytmp4', {
-        method: 'POST',
-        headers: {
-            'accept': '*/*',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ url })
-    });
-
-    const res1 = await api1.json();
-
-    if (res1.status && res1.data?.dl) {
-        const { title, dl } = res1.data;
-
-        await conn.sendMessage(m.chat, {
-            document: { url: dl },
-            mimetype: 'video/mp4',
-            fileName: `${title}.mp4`,
-            caption: `🎬 *${title}*\n\n🌚 *_Provided by KanBot_* 🌝`
-        }, { quoted: m });
-
-        await m.react('✅');
-        return;
-    }
-} catch (e) {
-    console.warn('Error en API 1 (Siputzx):', e);
-}
-
-// Si todas fallan:
-await m.react('❌');
 //
 }
 
 }
-handler.help = ['play7', 'play8', 'playdoc2', 'playdoc'];
+handler.help = [ 'play8'];
 handler.tags = ['descargas'];
 handler.command = ['play7', 'playdoc', 'playdoc2' , 'play8']
 handler.group = true;
