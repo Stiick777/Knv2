@@ -7,90 +7,85 @@ let handler = async (m, { conn: star, args }) => {
   if (!args[0].match(/youtu/gi)) 
     return star.reply(m.chat, `Verifica que el enlace sea de YouTube.`, m, rcanal).then(() => m.react('✖️'));
 
-  await m.react('🕓'); // Reaccionar con reloj mientras procesa
+  await m.react('🕓'); // Reacción mientras procesa
 
-try {
+  try {
     let v = args[0];
     let title, download_url, thumbnail;
 
-    // === API PRINCIPAL (Starlight) ===
+    // === API 1: Ruby-Core ===
     try {
-        let apiResponse1 = await fetch(`https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(v)}`);
-        let data1 = await apiResponse1.json();
+      let res1 = await fetch(`https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(v)}`);
+      let data1 = await res1.json();
 
-        if (!data1.url || !data1.title) {
-            throw new Error('Respuesta inválida de Starlight');
-        }
+      if (!data1.status || !data1.download?.url) throw new Error("Ruby-Core no válido");
 
-        title = data1.title;
-        download_url = data1.url;
-        thumbnail = data1.thumbnail;
-
+      title = data1.metadata.title;
+      download_url = data1.download.url;
+      thumbnail = data1.metadata.thumbnail;
     } catch (err1) {
-        console.warn("Error con Starlight, intentando con Delirius:", err1.message);
+      console.warn("Error Ruby-Core:", err1.message);
 
-        // === API RESPALDO 1 (Delirius) ===
+      // === API 2: Starlight ===
+      try {
+        let res2 = await fetch(`https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(v)}`);
+        let data2 = await res2.json();
+
+        if (!data2.url || !data2.title) throw new Error("Starlight no válido");
+
+        title = data2.title;
+        download_url = data2.url;
+        thumbnail = data2.thumbnail;
+      } catch (err2) {
+        console.warn("Error Starlight:", err2.message);
+
+        // === API 3: Yupra ===
         try {
-            let apiResponse2 = await fetch(`https://delirius-apiofc.vercel.app/download/ytmp4?url=${encodeURIComponent(v)}`);
-            let data2 = await apiResponse2.json();
+          let res3 = await fetch(`https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(v)}`);
+          let data3 = await res3.json();
 
-            if (!data2.status || !data2.data || !data2.data.download) {
-                throw new Error('Respuesta inválida de Delirius');
-            }
+          if (!data3.status || !data3.result?.formats?.length) throw new Error("Yupra no válido");
 
-            title = data2.data.title;
-            download_url = data2.data.download.url;
-            thumbnail = data2.data.image;
+          let video = data3.result.formats.find(f => f.itag === 18) || data3.result.formats[0];
+          title = data3.result.title;
+          download_url = video.url;
+          thumbnail = data3.result.thumbnail;
+        } catch (err3) {
+          console.warn("Error Yupra:", err3.message);
 
-        } catch (err2) {
-            console.warn("Error con Delirius, intentando con StellarWA:", err2.message);
+          // === API 4: Shylpy ===
+          try {
+            let res4 = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(v)}&apikey=sylphy-25c2`);
+            let data4 = await res4.json();
 
-            // === API RESPALDO 2 (StellarWA) ===
+            if (!data4.status || !data4.res?.url) throw new Error("Shylpy no válido");
+
+            title = data4.res.title;
+            download_url = data4.res.url;
+            thumbnail = null;
+          } catch (err4) {
+            console.warn("Error Shylpy:", err4.message);
+
+            // === API 5: Stellar ===
             try {
-                let apiResponse3 = await fetch(`https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(v)}&apikey=stellar-p1N9EsSo`);
-                let data3 = await apiResponse3.json();
+              let res5 = await fetch(`https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(v)}&apikey=stellar-53mIXDr2`);
+              let data5 = await res5.json();
 
-                if (!data3.status || !data3.data || !data3.data.dl || !data3.data.title) {
-                    throw new Error('Respuesta inválida de StellarWA');
-                }
+              if (!data5.status || !data5.data?.dl) throw new Error("Stellar no válido");
 
-                title = data3.data.title;
-                download_url = data3.data.dl;
-                thumbnail = data3.data.thumbnail;
+              title = data5.data.title;
+              download_url = data5.data.dl;
+              thumbnail = data5.data.thumbnail;
+            } catch (err5) {
+              console.warn("Error Stellar:", err5.message);
 
-            } catch (err3) {
-                console.warn("Error con StellarWA, intentando con Sylphy:", err3.message);
-
-                // === API RESPALDO 3 (Sylphy) ===
-                try {
-                    let apiResponse4 = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(v)}&apikey=sylphy-25c2`);
-                    let data4 = await apiResponse4.json();
-
-                    if (!data4.status || !data4.res || !data4.res.url || !data4.res.title) {
-                        throw new Error('Respuesta inválida de Sylphy');
-                    }
-
-                    title = data4.res.title;
-                    download_url = data4.res.url;
-                    thumbnail = null;
-
-                } catch (err4) {
-                    console.warn("Error con Sylphy, intentando con Vreden:", err4.message);
-
-                    // === API RESPALDO 4 (Vreden) ===
-                    let apiResponse5 = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(v)}`);
-                    let data5 = await apiResponse5.json();
-
-                    if (!data5.result || !data5.result.download || !data5.result.metadata) {
-                        throw new Error('Respuesta inválida de Vreden');
-                    }
-
-                    title = data5.result.metadata.title;
-                    download_url = data5.result.download.url;
-                    thumbnail = data5.result.metadata.thumbnail;
-                }
+              // ❌ Si todas las APIs fallan
+              await star.sendMessage(m.chat, { text: "❌ No se pudo obtener el video. Todas las APIs fallaron." }, { quoted: m });
+              return await m.react('✖️');
             }
+          }
         }
+      }
     }
 
     // === Mensaje de espera ===
@@ -102,21 +97,20 @@ try {
 
     // === Enviar el video como documento ===
     await star.sendMessage(m.chat, {
-        document: { url: download_url },
-        caption: `🌝 *Provided by KanBot* 🌚`,
-        mimetype: 'video/mp4',
-        fileName: `${title}.mp4`,
-        jpegThumbnail: thumbnail ? await (await fetch(thumbnail)).buffer() : null
+      document: { url: download_url },
+      caption: `🌝 *Provided by KanBot* 🌚`,
+      mimetype: 'video/mp4',
+      fileName: `${title}.mp4`,
+      jpegThumbnail: thumbnail ? await (await fetch(thumbnail)).buffer() : null
     }, { quoted: m });
 
     return await m.react('✅'); // Reacción de éxito
 
-} catch (error) {
-    console.error("Error en la API:", error.message);
+  } catch (error) {
+    console.error("Error general:", error.message);
     await m.react('✖️');
     await star.reply(m.chat, '❌ _*Error al procesar el enlace. Por favor, intenta de nuevo.*_', m, rcanal);
-}
-//
+  }
 };
 
 handler.help = ['ytmp4doc *<link yt>*'];
