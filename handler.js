@@ -34,7 +34,7 @@ global.db.data.users[m.sender] = {}
 if (user) {
 if (!("name" in user)) user.name = m.name
 if (!isNumber(user.exp)) user.exp = 0
-if (!isNumber(user.coin)) user.coin = 0
+if (!isNumber(user.estrellas)) user.estrellas = 0
 if (!isNumber(user.bank)) user.bank = 0
 if (!isNumber(user.level)) user.level = 0
 if (!isNumber(user.health)) user.health = 100
@@ -54,7 +54,7 @@ if (!isNumber(user.warn)) user.warn = 0
 } else global.db.data.users[m.sender] = {
 name: m.name,
 exp: 0,
-coin: 0,
+estrellas: 0,
 bank: 0,
 level: 0,
 health: 100,
