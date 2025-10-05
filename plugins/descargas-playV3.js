@@ -2,6 +2,7 @@
 import fetch from 'node-fetch';
 import axios from 'axios';
 import fs from 'fs';
+import { safeSend } from '../lib/safeSend.js';
 import yts from 'yt-search';
 import { yta } from './_ytdl.js';
 
@@ -52,14 +53,17 @@ if (command === 'playp2') {
 > Provided by Stiiven
 `.trim();
 
-    await conn.sendFile(m.chat, thumbnail, 'thumbnail.jpg', texto, m);
+  //  await conn.sendFile(m.chat, thumbnail, 'thumbnail.jpg', texto, m);
+await safeSend(conn, m.chat, thumbnail, { filename: 'thumbnail.jpg', caption: texto, quoted: m }, 'file');
 
     const audioBuffer = await (await fetch(audioUrl)).buffer();
 
-    await conn.sendMessage(m.chat, {
+    /*await conn.sendMessage(m.chat, {
       audio: audioBuffer,
       mimetype: 'audio/mpeg'
-    }, { quoted: m });
+    }, { quoted: m }); */
+    
+    await safeSend(conn, m.chat, { audio: audioBuffer, mimetype: 'audio/mpeg' }, { quoted: m });
 
     await m.react('✅');
   } catch (err) {
