@@ -77,8 +77,8 @@ ch2: '120363318891913110@newsletter',
 }
 
 //• ↳ ◜𝑳𝑰𝑵𝑲𝑺  ™◞ • 🌿
-global.gp4 = 'https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw' //Grupo Oficial 
-global.gp1 = 'https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw' //Grupo 
+global.gp4 = 'https://chat.whatsapp.com/FhJrUdTpY8AL9jXcmb4ohT?mode=ems_copy_c' //Grupo Oficial 
+global.gp1 = 'https://chat.whatsapp.com/FhJrUdTpY8AL9jXcmb4ohT?mode=ems_copy_c' //Grupo 
 global.gp2 = 'https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N'//
 global.comunidad1 = 'https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw' //Comunidad 
 global.channel = 'https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N' //Canal Oficial
