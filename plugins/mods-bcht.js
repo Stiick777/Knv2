@@ -12,9 +12,8 @@ let handler = async (m, { conn, args }) => {
   conn.reply(m.chat, `✅ *KanBot ha sido desactivado en el grupo con ID:* ${chatId}`, m)
 }
 
-handler.help = ['bcht <ID>']
-handler.tags = ['owner']
+
 handler.command = ['bcht']
-handler.rowner = true
+
 
 export default handler
