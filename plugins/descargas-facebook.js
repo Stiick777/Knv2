@@ -33,18 +33,17 @@ const handler = async (m, { conn, args }) => {
     return conn.reply(m.chat, `❎ *Error al obtener datos:* ${err.message}`, m, rcanal);
   }
 
-  if (!Array.isArray(res) || res.length === 0) {
-    return conn.reply(m.chat, '⚠️ *No se encontraron resultados.*', m, rcanal);
-  }
+  if (!res || (!res.hd && !res.sd)) {
+  return conn.reply(m.chat, '⚠️ *No se encontraron resultados o enlaces de descarga.*', m, rcanal);
+}
 
-  // Intentar usar HD primero, luego SD
-  const hd = res.find(v => v.link_hd)?.link_hd;
-  const sd = res.find(v => v.link_sd)?.link_sd;
-  const video = hd || sd;
+const hd = res.hd;
+const sd = res.sd;
+const video = hd || sd;
 
-  if (!video) {
-    return conn.reply(m.chat, '🚩 *No se encontró un enlace de descarga válido.*', m, rcanal);
-  }
+if (!video) {
+  return conn.reply(m.chat, '🚩 *No se encontró un enlace de descarga válido.*', m, rcanal);
+}
 
   try {
     await m.react('📤');
