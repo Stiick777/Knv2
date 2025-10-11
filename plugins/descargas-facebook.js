@@ -12,7 +12,7 @@ const handler = async (m, { conn, args }) => {
   try {
     await m.react('⏳');
     const response = await fetch(
-      `https://apis-starlights-team.koyeb.app/starlight/facebook?url=${encodeURIComponent(args[0])}`,
+      `https://ruby-core.vercel.app/api/download/facebook?url=${encodeURIComponent(args[0])}`,
       {
         headers: {
           "User-Agent": "Mozilla/5.0",
@@ -33,23 +33,19 @@ const handler = async (m, { conn, args }) => {
     return conn.reply(m.chat, `❎ *Error al obtener datos:* ${err.message}`, m, rcanal);
   }
 
-  if (!res || (!res.hd && !res.sd)) {
-  return conn.reply(m.chat, '⚠️ *No se encontraron resultados o enlaces de descarga.*', m, rcanal);
-}
+  if (!res || res.true === false || !res.download) {
+    return conn.reply(m.chat, '⚠️ *No se encontraron resultados o enlaces de descarga.*', m, rcanal);
+  }
 
-const hd = res.hd;
-const sd = res.sd;
-const video = hd || sd;
-
-if (!video) {
-  return conn.reply(m.chat, '🚩 *No se encontró un enlace de descarga válido.*', m, rcanal);
-}
+  const videoUrl = res.download;
+  const title = res.metadata?.title || "Video de Facebook";
+  const description = res.metadata?.description || "Sin descripción disponible.";
 
   try {
     await m.react('📤');
     await conn.sendMessage(m.chat, {
-      video: { url: video },
-      caption: `🎈 *Facebook Video*\n📌 Calidad: ${hd ? "HD" : "SD"}\n✨ By KanBot`,
+      video: { url: videoUrl },
+      caption: `🎥 *Facebook Video*\n📌 *Título:* ${title}\n📝 *Descripción:* ${description}\n✨ *By KanBot*`,
       fileName: 'facebook_video.mp4',
       mimetype: 'video/mp4'
     }, { quoted: m });
