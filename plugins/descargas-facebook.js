@@ -45,7 +45,7 @@ const handler = async (m, { conn, args }) => {
     await m.react('📤');
     await conn.sendMessage(m.chat, {
       video: { url: videoUrl },
-      caption: `🎥 *Facebook Video*\n📌 *Título:* ${title}\n📝 *Descripción:* ${description}\n✨ *By KanBot*`,
+      caption: `🎥 *Facebook Video*\n📌 *Título:* ${title}\n✨ *_By KanBot_*`,
       fileName: 'facebook_video.mp4',
       mimetype: 'video/mp4'
     }, { quoted: m });
@@ -53,7 +53,7 @@ const handler = async (m, { conn, args }) => {
   } catch (err) {
     console.error('Error al enviar video:', err);
     await m.react('❌');
-    return conn.reply(m.chat, `❌ *Error al enviar el video:* ${err.message}`, m, rcanal);
+    return conn.reply(m.chat, `❌ *Error al enviar el video use /fb2:* ${err.message}`, m, rcanal);
   }
 };
 
