@@ -174,7 +174,7 @@ if (command == 'play2') {
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
-ayudame a que el video se envie como documento si excese las 30MB
+
 try {
 await m.react('🕓');
 const url = yt_play[0].url;
