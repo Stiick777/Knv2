@@ -177,6 +177,33 @@ if (command == 'play2') {
 try {
     await m.react('🕓');
     const url = yt_play[0].url;
+    const SIZE_LIMIT = 30 * 1024 * 1024; // 30 MB en bytes
+
+    async function sendVideoWithCheck(downloadUrl, caption, thumbnailUrl) {
+        try {
+            // Obtenemos el tamaño del video (HEAD request para no descargarlo)
+            const head = await fetch(downloadUrl, { method: 'HEAD' });
+            const contentLength = head.headers.get('content-length');
+            const size = contentLength ? parseInt(contentLength) : 0;
+
+            const isTooBig = size > SIZE_LIMIT;
+            const type = isTooBig ? 'document' : 'video';
+
+            await conn.sendMessage(m.chat, {
+                [type]: { url: downloadUrl },
+                caption: caption,
+                mimetype: 'video/mp4',
+                fileName: 'video.mp4',
+                jpegThumbnail: thumbnailUrl ? await (await fetch(thumbnailUrl)).buffer() : null
+            }, { quoted: m });
+
+            await m.react('✅');
+        } catch (err) {
+            console.error('Error enviando video:', err);
+            await conn.sendMessage(m.chat, { text: '❌ Error al enviar el video.' }, { quoted: m });
+            await m.react('❌');
+        }
+    }
 
     // 🔹 API 1: Ruby-Core
     let api1 = await fetch(`https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(url)}`);
@@ -184,14 +211,11 @@ try {
 
     if (res1.status && res1.download?.url) {
         const { metadata, download } = res1;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: download.url },
-            caption: `*${metadata.title}*\nAutor: ${metadata.author}\nDuración: ${metadata.duration.timestamp}\nCalidad: ${download.quality}`,
-            jpegThumbnail: await (await fetch(metadata.thumbnail)).buffer()
-        }, { quoted: m });
-
-        await m.react('✅');
+        await sendVideoWithCheck(
+            download.url,
+            `*${metadata.title}*\nAutor: ${metadata.author}\nDuración: ${metadata.duration.timestamp}\nCalidad: ${download.quality}`,
+            metadata.thumbnail
+        );
         return;
     }
 
@@ -200,13 +224,11 @@ try {
     let res2 = await api2.json();
 
     if (res2.url) {
-        await conn.sendMessage(m.chat, {
-            video: { url: res2.url },
-            caption: `*${res2.title}*\nDuración: ${res2.duration}\nAutor: ${res2.creator}`,
-            jpegThumbnail: await (await fetch(res2.thumbnail)).buffer()
-        }, { quoted: m });
-
-        await m.react('✅');
+        await sendVideoWithCheck(
+            res2.url,
+            `*${res2.title}*\nDuración: ${res2.duration}\nAutor: ${res2.creator}`,
+            res2.thumbnail
+        );
         return;
     }
 
@@ -218,12 +240,10 @@ try {
         const { title, formats } = res3.result;
         const video360 = formats.find(f => f.itag === 18) || formats[0];
 
-        await conn.sendMessage(m.chat, {
-            video: { url: video360.url },
-            caption: `*${title}*\nCalidad: ${video360.qualityLabel || "Desconocida"}`
-        }, { quoted: m });
-
-        await m.react('✅');
+        await sendVideoWithCheck(
+            video360.url,
+            `*${title}*\nCalidad: ${video360.qualityLabel || "Desconocida"}`
+        );
         return;
     }
 
@@ -234,12 +254,10 @@ try {
     if (res4.status && res4.res?.url) {
         const { title, url: downloadUrl } = res4.res;
 
-        await conn.sendMessage(m.chat, {
-            video: { url: downloadUrl },
-            caption: `*${title}*`
-        }, { quoted: m });
-
-        await m.react('✅');
+        await sendVideoWithCheck(
+            downloadUrl,
+            `*${title}*`
+        );
         return;
     }
 
@@ -250,25 +268,24 @@ try {
     if (res5.status && res5.data?.dl) {
         const { title, duration, dl, thumbnail } = res5.data;
 
-        await conn.sendMessage(m.chat, {
-            video: { url: dl },
-            caption: `*${title}*\nDuración: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} minutos`,
-            jpegThumbnail: await (await fetch(thumbnail)).buffer()
-        }, { quoted: m });
-
-        await m.react('✅');
+        await sendVideoWithCheck(
+            dl,
+            `*${title}*\nDuración: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} minutos`,
+            thumbnail
+        );
         return;
     }
 
     // ❌ Si todas las APIs fallaron
     await conn.sendMessage(m.chat, { 
-        text: "❌ No se pudo obtener el video. Todas las APIs fallaron intente con playv2" 
+        text: "❌ No se pudo obtener el video. Todas las APIs fallaron, intente con *playv2*." 
     }, { quoted: m });
-
     await m.react('❌');
 
 } catch (e) {
-
+    console.error(e);
+    await conn.sendMessage(m.chat, { text: "❌ Error inesperado." }, { quoted: m });
+    await m.react('❌');
 }
 }
 
