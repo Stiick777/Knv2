@@ -175,117 +175,137 @@ if (command == 'play2') {
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
 try {
-    await m.react('🕓');
-    const url = yt_play[0].url;
-    const SIZE_LIMIT = 30 * 1024 * 1024; // 30 MB en bytes
+  await m.react('🕓');
+  const url = yt_play[0].url;
+  let videoUrl = null;
+  let title = "Video";
+  let caption = "";
+  let thumbnail = null;
 
-    async function sendVideoWithCheck(downloadUrl, caption, thumbnailUrl) {
-        try {
-            // Obtenemos el tamaño del video (HEAD request para no descargarlo)
-            const head = await fetch(downloadUrl, { method: 'HEAD' });
-            const contentLength = head.headers.get('content-length');
-            const size = contentLength ? parseInt(contentLength) : 0;
-
-            const isTooBig = size > SIZE_LIMIT;
-            const type = isTooBig ? 'document' : 'video';
-
-            await conn.sendMessage(m.chat, {
-                [type]: { url: downloadUrl },
-                caption: caption,
-                mimetype: 'video/mp4',
-                fileName: 'video.mp4',
-                jpegThumbnail: thumbnailUrl ? await (await fetch(thumbnailUrl)).buffer() : null
-            }, { quoted: m });
-
-            await m.react('✅');
-        } catch (err) {
-            console.error('Error enviando video:', err);
-            await conn.sendMessage(m.chat, { text: '❌ Error al enviar el video.' }, { quoted: m });
-            await m.react('❌');
-        }
-    }
-
-    // 🔹 API 1: Ruby-Core
-    let api1 = await fetch(`https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(url)}`);
-    let res1 = await api1.json();
+  // 🔹 API 1: Ruby-Core  
+  try {
+    const api1 = await fetch(`https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(url)}`);
+    const res1 = await api1.json();
 
     if (res1.status && res1.download?.url) {
-        const { metadata, download } = res1;
-        await sendVideoWithCheck(
-            download.url,
-            `*${metadata.title}*\nAutor: ${metadata.author}\nDuración: ${metadata.duration.timestamp}\nCalidad: ${download.quality}`,
-            metadata.thumbnail
-        );
-        return;
+      const { metadata, download } = res1;
+      videoUrl = download.url;
+      title = metadata.title;
+      caption = `*${metadata.title}*\nAutor: ${metadata.author}\nDuración: ${metadata.duration.timestamp}\nCalidad: ${download.quality}`;
+      thumbnail = metadata.thumbnail;
+      throw "found"; // cortar flujo
     }
+  } catch (err) {
+    if (err === "found") throw err;
+  }
 
-    // 🔹 API 2: Starlight
-    let api2 = await fetch(`https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}`);
-    let res2 = await api2.json();
+  // 🔹 API 2: Starlight  
+  try {
+    const api2 = await fetch(`https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}`);
+    const res2 = await api2.json();
 
     if (res2.url) {
-        await sendVideoWithCheck(
-            res2.url,
-            `*${res2.title}*\nDuración: ${res2.duration}\nAutor: ${res2.creator}`,
-            res2.thumbnail
-        );
-        return;
+      videoUrl = res2.url;
+      title = res2.title;
+      caption = `*${res2.title}*\nDuración: ${res2.duration}\nAutor: ${res2.creator}`;
+      thumbnail = res2.thumbnail;
+      throw "found";
     }
+  } catch (err) {
+    if (err === "found") throw err;
+  }
 
-    // 🔹 API 3: Yupra
-    let api3 = await fetch(`https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`);
-    let res3 = await api3.json();
+  // 🔹 API 3: Yupra  
+  try {
+    const api3 = await fetch(`https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`);
+    const res3 = await api3.json();
 
     if (res3.status === 200 && res3.result?.formats?.length > 0) {
-        const { title, formats } = res3.result;
-        const video360 = formats.find(f => f.itag === 18) || formats[0];
-
-        await sendVideoWithCheck(
-            video360.url,
-            `*${title}*\nCalidad: ${video360.qualityLabel || "Desconocida"}`
-        );
-        return;
+      const { title: t, formats } = res3.result;
+      const video360 = formats.find(f => f.itag === 18) || formats[0];
+      videoUrl = video360.url;
+      title = t;
+      caption = `*${t}*\nCalidad: ${video360.qualityLabel || "Desconocida"}`;
+      throw "found";
     }
+  } catch (err) {
+    if (err === "found") throw err;
+  }
 
-    // 🔹 API 4: Sylphy
-    let api4 = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(url)}&apikey=sylphy-25c2`);
-    let res4 = await api4.json();
+  // 🔹 API 4: Sylphy  
+  try {
+    const api4 = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(url)}&apikey=sylphy-25c2`);
+    const res4 = await api4.json();
 
     if (res4.status && res4.res?.url) {
-        const { title, url: downloadUrl } = res4.res;
-
-        await sendVideoWithCheck(
-            downloadUrl,
-            `*${title}*`
-        );
-        return;
+      videoUrl = res4.res.url;
+      title = res4.res.title;
+      caption = `*${title}*`;
+      throw "found";
     }
+  } catch (err) {
+    if (err === "found") throw err;
+  }
 
-    // 🔹 API 5: Stellar
-    let api5 = await fetch(`https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(url)}&apikey=stellar-53mIXDr2`);
-    let res5 = await api5.json();
+  // 🔹 API 5: Stellar  
+  try {
+    const api5 = await fetch(`https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(url)}&apikey=stellar-53mIXDr2`);
+    const res5 = await api5.json();
 
     if (res5.status && res5.data?.dl) {
-        const { title, duration, dl, thumbnail } = res5.data;
+      const { title: t, duration, dl, thumbnail: thumb } = res5.data;
+      videoUrl = dl;
+      title = t;
+      thumbnail = thumb;
+      caption = `*${t}*\nDuración: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} minutos`;
+      throw "found";
+    }
+  } catch (err) {
+    if (err === "found") throw err;
+  }
 
-        await sendVideoWithCheck(
-            dl,
-            `*${title}*\nDuración: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} minutos`,
-            thumbnail
-        );
-        return;
+  // ❌ Si todas las APIs fallaron  
+  await conn.sendMessage(m.chat, {
+    text: "❌ No se pudo obtener el video. Todas las APIs fallaron. Intente con *playv2*."
+  }, { quoted: m });
+  await m.react('❌');
+  return;
+
+} catch (result) {
+  if (result !== "found") return; // Solo continuar si se encontró video
+
+  try {
+    // 🧩 Comprobar tamaño del video
+    let sizeMB = 0;
+    try {
+      const head = await fetch(videoUrl, { method: "HEAD" });
+      const length = head.headers.get("content-length");
+      if (length) sizeMB = Number(length) / (1024 * 1024);
+    } catch {
+      sizeMB = 0;
     }
 
-    // ❌ Si todas las APIs fallaron
-    await conn.sendMessage(m.chat, { 
-        text: "❌ No se pudo obtener el video. Todas las APIs fallaron, intente con *playv2*." 
-    }, { quoted: m });
-    await m.react('❌');
+    const isHeavy = sizeMB > 30;
 
-} catch (e) {
-    console.error(e);
-    await conn.sendMessage(m.chat, { text: "❌ Error inesperado." }, { quoted: m });
+    const finalCaption = `${caption}\n\n📏 *Tamaño:* ${(sizeMB || 0).toFixed(2)} MB${
+      isHeavy ? "\n📁 Enviado como *documento* por superar 30 MB." : ""
+    }`;
+
+    await conn.sendMessage(m.chat, {
+      [isHeavy ? "document" : "video"]: { url: videoUrl },
+      fileName: `${title}.mp4`,
+      mimetype: "video/mp4",
+      caption: finalCaption,
+      jpegThumbnail: thumbnail ? await (await fetch(thumbnail)).buffer() : null
+    }, { quoted: m });
+
+    await m.react('✅');
+
+  } catch (sendErr) {
+    console.error("❌ Error al enviar:", sendErr);
     await m.react('❌');
+    await conn.sendMessage(m.chat, { text: "❌ Error al enviar el video." }, { quoted: m });
+  }
 }
 }
 
