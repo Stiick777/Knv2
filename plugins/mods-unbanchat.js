@@ -8,7 +8,7 @@ await conn.reply(m.chat, '💡 *¡KANBOT HA SIDO DESBANEADO EN ESTE CHAT!*', m, 
 handler.help = ['unbanchat'];
 handler.tags = ['owner'];
 handler.command = ['unbanchat','onkan','desbanchat']
-handler.rowner = true;
+handler.admin = true;
 
 //handler.group = true
 
