@@ -7,6 +7,6 @@ conn.reply(m.chat, `✅ *KanBot Ha Sido Desactivado En Este Chat*`, m, )
 handler.help = ['banchat']
 handler.tags = ['owner']
 handler.command = ['banchat', 'offkan']
-handler.rowner = true;
+handler.admin = true;
 //handler.group = true;
 export default handler
