@@ -16,33 +16,28 @@ export async function before(m, { conn, isAdmin, isBotAdmin }) {
   let bot = global.db.data.settings[this.user.jid] || {};
 
   const isGroupLink = linkRegex.exec(m.text);
-  const grupo = `https://chat.whatsapp.com`;
 
-  // Permitir admins
-  if (isAdmin && chat.antiLink && isGroupLink) {
-    return conn.reply(m.chat, `⚠️ *El anti-link está activo, pero eres admin.*`, m);
+  if (!chat.antiLink || !isGroupLink) return !0; // salir si no hay anti-link o no hay link
+
+  // ✅ Si el link está permitido, se ignora completamente (sin mensajes)
+  if (allowedLinks.some(link => m.text.includes(link))) {
+    return !0;
   }
 
-  if (chat.antiLink && isGroupLink && !isAdmin) {
-    // Permitir solo los enlaces de la lista
-    if (allowedLinks.some(link => m.text.includes(link))) {
-      return !0;
-    }
+  // Permitir admins sin avisar
+  if (isAdmin) return !0;
 
+  if (isBotAdmin) {
     // Ignorar si es el link de este mismo grupo
-    if (isBotAdmin) {
-      const linkThisGroup = `https://chat.whatsapp.com/${await conn.groupInviteCode(m.chat)}`;
-      if (m.text.includes(linkThisGroup)) return !0;
-    }
-
-    if (!isBotAdmin) {
-      return conn.reply(m.chat, `⚡ *No soy admin, no puedo eliminar intrusos*`, m);
-    }
+    const linkThisGroup = `https://chat.whatsapp.com/${await conn.groupInviteCode(m.chat)}`;
+    if (m.text.includes(linkThisGroup)) return !0;
 
     // Eliminar mensaje y expulsar usuario
     await conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: delet } });
     await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove');
     await conn.sendMessage(m.chat, { text: `🚫 Se eliminó a @${m.sender.split('@')[0]} por enviar un enlace prohibido.`, mentions: [m.sender] });
+  } else {
+    return conn.reply(m.chat, `⚡ *No soy admin, no puedo eliminar intrusos*`, m);
   }
 
   return !0;
