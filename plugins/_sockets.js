@@ -9,7 +9,11 @@ const handler = async (m, { conn, args }) => {
   }
 
   const chat = global.db.data.chats[m.chat]
-
+// --- LIMPIAR PRIMARY MUERTO AUTOMÁTICAMENTE ---
+if (chat.primaryBot) {
+  const exist = subBots.find(c => c.user.jid === chat.primaryBot)
+  if (!exist) delete chat.primaryBot
+}
   function dhms(ms) {
     var segundos = Math.floor(ms / 1000)
     var minutos = Math.floor(segundos / 60)
