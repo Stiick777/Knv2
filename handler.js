@@ -233,18 +233,17 @@ command = (command || "").toLowerCase()
 // ======================= COOLDOWN GLOBAL ============================
 if (!global.userCooldown) global.userCooldown = {}; // crear almacenamiento
 
+const sender = m.sender.split("@")[0]; // normalizar sender
 const cooldownTime = 30 * 1000; // 30 segundos
-const userCooldown = global.userCooldown[m.sender];
+const last = global.userCooldown[sender] || 0;
+const now = Date.now();
 
-if (userCooldown && (Date.now() - userCooldown) < cooldownTime) {
-    const tLeft = ((cooldownTime - (Date.now() - userCooldown)) / 1000).toFixed(0);
+if (now - last < cooldownTime) {
+    const tLeft = ((cooldownTime - (now - last)) / 1000).toFixed(0);
     await m.reply(`⏳ Debes esperar *${tLeft} segundos* antes de usar otro comando.`);
-    return; // ← bloquea el comando
+    return;
 }
-
-global.userCooldown[m.sender] = Date.now();
-// ==============================================================
-
+// ====================================================================
 
 const fail = plugin.fail || global.dfail
 const isAccept = plugin.command instanceof RegExp ?
@@ -350,7 +349,11 @@ chat,
 setting
 }
 try {
-await plugin.call(this, m, extra)
+    await plugin.call(this, m, extra)
+
+    // ✅ REGISTRA el tiempo de uso del comando
+    global.userCooldown[sender] = Date.now();
+
 } catch (err) {
 m.error = err
 console.error(err)
