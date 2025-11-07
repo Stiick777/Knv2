@@ -221,6 +221,7 @@ continue
 if (typeof plugin !== "function") {
 continue
 }
+
 if ((usedPrefix = (match[0] || "")[0])) {
 const noPrefix = m.text.replace(usedPrefix, "")
 let [command, ...args] = noPrefix.trim().split(" ").filter(v => v)
@@ -228,6 +229,23 @@ args = args || []
 let _args = noPrefix.trim().split(" ").slice(1)
 let text = _args.join(" ")
 command = (command || "").toLowerCase()
+
+// ======================= COOLDOWN GLOBAL ============================
+if (!global.userCooldown) global.userCooldown = {}; // crear almacenamiento
+
+const cooldownTime = 30 * 1000; // 30 segundos
+const userCooldown = global.userCooldown[m.sender];
+
+if (userCooldown && (Date.now() - userCooldown) < cooldownTime) {
+    const tLeft = ((cooldownTime - (Date.now() - userCooldown)) / 1000).toFixed(0);
+    await m.reply(`⏳ Debes esperar *${tLeft} segundos* antes de usar otro comando.`);
+    return; // ← bloquea el comando
+}
+
+global.userCooldown[m.sender] = Date.now();
+// ==============================================================
+
+
 const fail = plugin.fail || global.dfail
 const isAccept = plugin.command instanceof RegExp ?
 plugin.command.test(command) :
