@@ -230,20 +230,6 @@ let _args = noPrefix.trim().split(" ").slice(1)
 let text = _args.join(" ")
 command = (command || "").toLowerCase()
 
-// ======================= COOLDOWN GLOBAL ============================
-if (!global.userCooldown) global.userCooldown = {}; // crear almacenamiento
-
-const sender = m.sender; // usar JID completo evita colisiones y errores
-const cooldownTime = 30 * 1000; // 30 segundos
-const last = global.userCooldown[sender] || 0;
-const now = Date.now();
-
-if (now - last < cooldownTime) {
-    const tLeft = ((cooldownTime - (now - last)) / 1000).toFixed(0);
-    await m.reply(`⏳ Debes esperar *${tLeft} segundos* antes de usar otro comando.`);
-    return;
-}
-// ====================================================================
 
 const fail = plugin.fail || global.dfail
 const isAccept = plugin.command instanceof RegExp ?
@@ -270,6 +256,23 @@ throw !1
 }
 
 if (!isAccept) continue
+// ======================= COOLDOWN GLOBAL (CORRECTO) ============================
+if (!global.userCooldown) global.userCooldown = {}
+
+const sender = m.sender
+const cooldownTime = 30 * 1000
+const last = global.userCooldown[sender] || 0
+const now = Date.now()
+
+if (now - last < cooldownTime) {
+    const tLeft = ((cooldownTime - (now - last)) / 1000).toFixed(0)
+    await m.reply(`⏳ Debes esperar *${tLeft} segundos* antes de usar otro comando.`)
+    return
+}
+
+// ✅ MARCAR inmediatamente para evitar doble ejecución
+global.userCooldown[sender] = now
+// ====================================================================
 m.plugin = name
 if (isAccept) { global.db.data.users[m.sender].commands = (global.db.data.users[m.sender].commands || 0) + 1 }
 if (chat) {
@@ -351,12 +354,10 @@ setting
 try {
     await plugin.call(this, m, extra)
 
-    // ✅ REGISTRA el tiempo de uso del comando
-    global.userCooldown[sender] = Date.now();
-
 } catch (err) {
-m.error = err
-console.error(err)
+    // ⚠️ Si falla, limpiar cooldown para no bloquear al usuario
+    delete global.userCooldown[sender]
+    console.error(err)
 } finally {
 if (typeof plugin.after === "function") {
 try {
