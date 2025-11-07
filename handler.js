@@ -233,7 +233,7 @@ command = (command || "").toLowerCase()
 // ======================= COOLDOWN GLOBAL ============================
 if (!global.userCooldown) global.userCooldown = {}; // crear almacenamiento
 
-const sender = m.sender.split("@")[0]; // normalizar sender
+const sender = m.sender; // usar JID completo evita colisiones y errores
 const cooldownTime = 30 * 1000; // 30 segundos
 const last = global.userCooldown[sender] || 0;
 const now = Date.now();
