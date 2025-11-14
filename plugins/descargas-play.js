@@ -175,100 +175,144 @@ if (command == 'play2') {
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
 try {
-await m.react('🕓');
-const url = yt_play[0].url;
+    await m.react('🕓');
+    const url = yt_play[0].url;
 
-// 🔹 API 1: Ruby-Core  
-let api1 = await fetch(`https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(url)}`);  
-let res1 = await api1.json();  
+    /* ======================================================
+       🔹 SERVIDOR 1: Zenzxz (720p)
+    ======================================================= */
+    try {
+        let apiZ = await fetch(
+            `https://api.zenzxz.my.id/api/downloader/ytmp4v2?url=${encodeURIComponent(url)}&resolution=720`
+        );
+        let resZ = await apiZ.json();
 
-if (res1.status && res1.download?.url) {  
-    const { metadata, download } = res1;  
+        if (resZ.success && resZ.data?.download_url) {
 
-    await conn.sendMessage(m.chat, {  
-        video: { url: download.url },  
-        caption: `*${metadata.title}*\nAutor: ${metadata.author}\nDuración: ${metadata.duration.timestamp}\nCalidad: ${download.quality}`,  
-        jpegThumbnail: await (await fetch(metadata.thumbnail)).buffer()  
-    }, { quoted: m });  
+            const data = resZ.data;
 
-    await m.react('✅');  
-    return;  
-}  
+            await conn.sendMessage(m.chat, {
+                video: { url: data.download_url },
+                caption: `*${data.title}*\nDuración: ${data.duration}s\nCalidad: ${data.format}`,
+                jpegThumbnail: await (await fetch(data.thumbnail)).buffer()
+            }, { quoted: m });
 
-// 🔹 API 2: Starlight  
-let api2 = await fetch(`https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}`);  
-let res2 = await api2.json();  
+            await m.react('✅');
+            return;
+        }
+    } catch {}
 
-if (res2.url) {  
-    await conn.sendMessage(m.chat, {  
-        video: { url: res2.url },  
-        caption: `*${res2.title}*\nDuración: ${res2.duration}\nAutor: ${res2.creator}`,  
-        jpegThumbnail: await (await fetch(res2.thumbnail)).buffer()  
-    }, { quoted: m });  
 
-    await m.react('✅');  
-    return;  
-}  
 
-// 🔹 API 3: Yupra  
-let api3 = await fetch(`https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`);  
-let res3 = await api3.json();  
+    /* ======================================================
+       🔹 SERVIDOR 2: XYRO (720p)
+    ======================================================= */
+    try {
+        let apiX = await fetch(
+            `https://api.xyro.site/download/youtubemp4?url=${encodeURIComponent(url)}&quality=720`
+        );
+        let resX = await apiX.json();
 
-if (res3.status === 200 && res3.result?.formats?.length > 0) {  
-    const { title, formats } = res3.result;  
-    const video360 = formats.find(f => f.itag === 18) || formats[0];  
+        if (resX.status && resX.result?.download) {
 
-    await conn.sendMessage(m.chat, {  
-        video: { url: video360.url },  
-        caption: `*${title}*\nCalidad: ${video360.qualityLabel || "Desconocida"}`  
-    }, { quoted: m });  
+            const r = resX.result;
 
-    await m.react('✅');  
-    return;  
-}  
+            await conn.sendMessage(m.chat, {
+                video: { url: r.download },
+                caption: `*${r.title}*\nDuración: ${r.duration}s\nCalidad: ${r.quality}p`,
+                jpegThumbnail: await (await fetch(r.thumbnail)).buffer()
+            }, { quoted: m });
 
-// 🔹 API 4: Sylphy  
-let api4 = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(url)}&apikey=sylphy-25c2`);  
-let res4 = await api4.json();  
+            await m.react('✅');
+            return;
+        }
+    } catch {}
 
-if (res4.status && res4.res?.url) {  
-    const { title, url: downloadUrl } = res4.res;  
 
-    await conn.sendMessage(m.chat, {  
-        video: { url: downloadUrl },  
-        caption: `*${title}*`  
-    }, { quoted: m });  
 
-    await m.react('✅');  
-    return;  
-}  
+    /* ======================================================
+       🔹 SERVIDOR 3: Yupra (360p)
+    ======================================================= */
+    try {
+        let apiY = await fetch(
+            `https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`
+        );
+        let resY = await apiY.json();
 
-// 🔹 API 5: Stellar  
-let api5 = await fetch(`https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(url)}&apikey=stellar-53mIXDr2`);  
-let res5 = await api5.json();  
+        if (resY.status === 200 && resY.result?.formats?.length) {
 
-if (res5.status && res5.data?.dl) {  
-    const { title, duration, dl, thumbnail } = res5.data;  
+            let best = resY.result.formats[0];
 
-    await conn.sendMessage(m.chat, {  
-        video: { url: dl },  
-        caption: `*${title}*\nDuración: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} minutos`,  
-        jpegThumbnail: await (await fetch(thumbnail)).buffer()  
-    }, { quoted: m });  
+            await conn.sendMessage(m.chat, {
+                video: { url: best.url },
+                caption: `*${resY.result.title}*\nCalidad: ${best.qualityLabel || best.quality}`,
+            }, { quoted: m });
 
-    await m.react('✅');  
-    return;  
-}  
+            await m.react('✅');
+            return;
+        }
+    } catch {}
 
-// ❌ Si todas las APIs fallaron  
-await conn.sendMessage(m.chat, {   
-    text: "❌ No se pudo obtener el video. Todas las APIs fallaron intente con playv2"   
-}, { quoted: m });  
 
-await m.react('❌');
+
+    /* ======================================================
+       🔹 SERVIDOR 4: Starlight (360p)
+    ======================================================= */
+    try {
+        let apiS = await fetch(
+            `https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}&format=360p`
+        );
+        let resS = await apiS.json();
+
+        if (resS.dl_url) {
+
+            await conn.sendMessage(m.chat, {
+                video: { url: resS.dl_url },
+                caption: `*${resS.title}*\nAutor: ${resS.author}\nCalidad: ${resS.quality}`,
+                jpegThumbnail: await (await fetch(resS.thumbnail)).buffer()
+            }, { quoted: m });
+
+            await m.react('✅');
+            return;
+        }
+    } catch {}
+
+
+
+    /* ======================================================
+       🔹 SERVIDOR 5: Vreden (360 → 1080p)
+       URL: https://api.vreden.my.id/api/v1/download/youtube/video
+    ======================================================= */
+    try {
+        let apiV = await fetch(
+            `https://api.vreden.my.id/api/v1/download/youtube/video?url=${encodeURIComponent(url)}&quality=360`
+        );
+        let resV = await apiV.json();
+
+        if (resV.status && resV.result?.download?.url) {
+
+            const meta = resV.result.metadata;
+            const down = resV.result.download;
+
+            await conn.sendMessage(m.chat, {
+                video: { url: down.url },
+                caption: `*${meta.title}*\nDuración: ${meta.duration.timestamp}\nCalidad: ${down.quality}`,
+                jpegThumbnail: await (await fetch(meta.thumbnail)).buffer()
+            }, { quoted: m });
+
+            await m.react('✅');
+            return;
+        }
+    } catch {}
+
+
+
+    throw '❌ Ningún servidor devolvió resultados.';
 
 } catch (e) {
-
+    console.error(e);
+    await m.react('❌');
+    await m.reply('⚠️ No se pudo descargar el video intente con playv2.');
 }
 
 
