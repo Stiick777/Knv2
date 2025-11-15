@@ -1,77 +1,108 @@
 const handler = async (m, { conn, args }) => {
   if (!args[0]) {
-    return conn.reply(m.chat, '🎈 *Ingresa un link de Facebook*', m, rcanal);
+    return conn.reply(m.chat, '🎈 *Ingresa un link de Facebook*', m);
   }
 
   const facebookRegex = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.watch)\/.+$/;
   if (!facebookRegex.test(args[0])) {
-    return conn.reply(m.chat, '❌ *El enlace proporcionado no es válido.*', m, rcanal);
+    return conn.reply(m.chat, '❌ *El enlace proporcionado no es válido.*', m);
   }
 
-  let res;
   const url = encodeURIComponent(args[0]);
+  let res;
 
   try {
     await m.react('⏳');
 
-    // Intento 1: API principal (Ruby Core)
-    let response = await fetch(`https://ruby-core.vercel.app/api/download/facebook?url=${url}`, {
+    // -----------------------------
+    // 1️⃣ API PRINCIPAL XYRO
+    // -----------------------------
+
+    let response = await fetch(`https://api.xyro.site/download/facebook?url=${url}`, {
       headers: {
         "User-Agent": "Mozilla/5.0",
         "Accept": "application/json",
       },
     });
 
-    if (!response.ok) throw new Error(`RubyCore HTTP ${response.status}`);
-    res = await response.json();
+    if (!response.ok) throw new Error(`XYRO HTTP ${response.status}`);
 
-    // Validar respuesta
-    if (!res || res.true === false || !res.download) {
-      throw new Error('Sin resultados válidos en RubyCore');
+    const json = await response.json();
+
+    if (!json.status || !json.result || json.result.length === 0) {
+      throw new Error("XYRO sin resultados");
     }
 
-  } catch (err) {
-    console.warn('⚠️ Error en la API principal (RubyCore):', err.message);
+    // Ordenar calidad: HD > 540p > 360p > audio
+    const best = json.result.find(x => x.quality.includes("720"))
+               || json.result.find(x => x.quality.includes("540"))
+               || json.result.find(x => x.quality.includes("360"))
+               || json.result[0];
 
-    // Intento 2: API de respaldo (Starlight)
+    res = {
+      title: json.result[0].fileName || "Facebook Video",
+      videoUrl: best.url
+    };
+
+  } catch (e) {
+    console.log("⚠️ Error en API XYRO:", e.message);
+
+    // -----------------------------
+    // 2️⃣ API RESPALDO DELIRIUS
+    // -----------------------------
     try {
       await m.react('🌀');
-      const backup = await fetch(`https://apis-starlights-team.koyeb.app/starlight/facebook?url=${url}`, {
-        headers: { "Accept": "application/json" },
-      });
 
-      if (!backup.ok) throw new Error(`Starlight HTTP ${backup.status}`);
-      res = await backup.json();
+      let response = await fetch(`https://delirius-apiofc.vercel.app/download/facebook?url=${url}`);
 
-      if (!res || (!res.hd && !res.sd)) throw new Error('Sin resultados válidos en Starlight');
-    } catch (backupErr) {
-      console.error('❌ Error en la API de respaldo:', backupErr.message);
+      if (!response.ok) throw new Error(`Delirius HTTP ${response.status}`);
+
+      const json = await response.json();
+
+      if (!json || (!json.urls?.length)) {
+        throw new Error("Delirius sin resultados");
+      }
+
+      const hd = json.urls.find(x => x.hd)?.hd;
+      const sd = json.urls.find(x => x.sd)?.sd;
+
+      res = {
+        title: json.title || "Facebook Video",
+        videoUrl: hd || sd
+      };
+
+      if (!res.videoUrl) throw new Error("No se encontró enlace HD/SD");
+
+    } catch (err2) {
+      console.log("❌ Error en API Delirius:", err2.message);
       await m.react('❌');
-      return conn.reply(m.chat, `❎ *No se pudo obtener el video de ninguna API.*`, m, rcanal);
+      return conn.reply(m.chat, '❎ *No se pudo obtener el video de ninguna API.*', m);
     }
   }
 
-  // Selección de enlace (HD > SD > otro)
-  const videoUrl = res.download || res.hd || res.sd;
-  const title = res.metadata?.title || res.title || "Video de Facebook";
-
+  // -----------------------------
+  // Enviar video
+  // -----------------------------
   try {
     await m.react('📤');
+
     await conn.sendMessage(
       m.chat,
       {
-        video: { url: videoUrl },
-        caption: `🎥 *Facebook Video*\n📌 *Título:* ${title}\n✨ *_By KanBot_*`,
+        video: { url: res.videoUrl },
+        caption: `🎥 *Facebook Video*\n📌 *Título:* ${res.title}\n✨ *_By KanBot_*`,
         fileName: 'facebook_video.mp4',
         mimetype: 'video/mp4',
       },
       { quoted: m }
     );
+
     await m.react('✅');
+
   } catch (err) {
-    console.error('Error al enviar video:', err);
+    console.log("Error al enviar video:", err);
     await m.react('❌');
-    return conn.reply(m.chat, `❌ *Error al enviar el video use /fb2:* ${err.message}`, m, rcanal);
+    return conn.reply(m.chat, `❌ *Error al enviar el video use /fb2:* ${err.message}`, m);
   }
 };
 
