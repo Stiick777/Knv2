@@ -132,7 +132,6 @@ const setting = global.db.data.settings[conn?.user?.jid]
   
 //const isROwner = [...global.owner.map((number) => number)].map(v => v.replace(/[^0-9]/g, "") + "@s.whatsapp.net").includes(m.sender)
 //const isOwner = isROwner || m.fromMe
-const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, "") + "@s.whatsapp.net").includes(m.sender) || user.premium == true
 
   // Lista de owners normalizada
 const ownerNumbers = global.owner.map(v => v.replace(/[^0-9]/g, ""))
@@ -146,6 +145,7 @@ const ownerIds = ownerNumbers.flatMap(num => [
 // Verifica si el sender coincide con algún owner
 const isROwner = ownerIds.includes(m.sender)
 const isOwner = isROwner || m.fromMe
+const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, "") + "@s.whatsapp.net").includes(m.sender) || user.premium == true
 
   
 if (opts["nyimak"])  return
