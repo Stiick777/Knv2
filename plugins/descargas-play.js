@@ -12,14 +12,21 @@ const handler = async (m, {conn, command, args, text, usedPrefix}) => {
 
 
 if (command === 'playp') {
-        if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
+    if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
 
-        await m.react('🕓');
+    await m.react('🕓');
 
-        // Buscar en YouTube
-        const yt_play = await search(args.join(' '));
+    // Buscar en YouTube
+    const yt_play = await search(args.join(' '));
 
-        const texto1 = `
+    // 🚨 Verificar duración antes de enviar mensaje o descargar
+    const duracion = yt_play[0].duration.seconds || 0;
+
+    if (duracion > 3600) {
+        return conn.reply(m.chat, "❗ *El audio es superior a 1h*", m, rcanal);
+    }
+
+    const texto1 = `
 𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊𝚜
 ===========================
 
