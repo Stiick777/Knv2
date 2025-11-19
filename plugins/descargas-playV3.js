@@ -15,6 +15,13 @@ const handler = async (m, { conn, text, command }) => {
     }
 
     const video = res.all[0];
+
+    // 🚨 Verificar duración
+    const duracionSeg = video.duration.seconds || 0;
+    if (duracionSeg > 3600) {
+      return m.reply("❗ *El audio es superior a 1h*");
+    }
+
     const cap = `
 𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊 𝚅𝟸
 ===========================
