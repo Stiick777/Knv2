@@ -11,24 +11,24 @@ const handler = async (m, { conn, text }) => {
     let title, thumbnail, url, filesize, quality, format;
 
     try {
-      // API PRINCIPAL: Ruby Core
-      const rubyUrl = `https://ruby-core.vercel.app/api/download/youtube/mp3?url=${encodeURIComponent(text)}`;
-      const res1 = await fetch(rubyUrl);
-      const data1 = await res1.json();
+      // 🔥 API PRINCIPAL: XYRO
+      const xyroUrl = `https://api.xyro.site/download/youtubemp3?url=${encodeURIComponent(text)}`;
+      const res0 = await fetch(xyroUrl);
+      const data0 = await res0.json();
 
-      if (!data1.status || !data1.download?.url) throw new Error("Ruby Core falló");
+      if (!data0.status || !data0.result?.download) throw new Error("XYRO falló");
 
-      title = data1.metadata.title;
-      thumbnail = data1.metadata.thumbnail;
-      url = data1.download.url;
+      title = data0.result.title;
+      thumbnail = data0.result.thumbnail;
+      url = data0.result.download;
       filesize = "Desconocido";
-      quality = data1.download.quality || "128kbps";
-      format = "mp3";
+      quality = data0.result.quality || "128kbps";
+      format = data0.result.format || "mp3";
 
-    } catch (err1) {
-      console.log("⚠️ Ruby Core falló, usando respaldo Yupra...");
+    } catch (err0) {
+      console.log("⚠️ XYRO falló, usando Yupra…");
       try {
-        // API BACKUP 1: Yupra
+        // BACKUP 1 — Yupra
         const yupraUrl = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(text)}`;
         const res2 = await fetch(yupraUrl);
         const data2 = await res2.json();
@@ -41,10 +41,11 @@ const handler = async (m, { conn, text }) => {
         filesize = `${(data2.result.filesize / 1024 / 1024).toFixed(2)} MB`;
         quality = "128kbps";
         format = "mp3";
+
       } catch (err2) {
-        console.log("⚠️ Yupra falló, usando respaldo Zenzxz...");
+        console.log("⚠️ Yupra falló, usando Zenzxz…");
         try {
-          // API BACKUP 2: Zenzxz
+          // BACKUP 2 — Zenzxz
           const zenzUrl = `https://api.zenzxz.my.id/downloader/ytmp3?url=${encodeURIComponent(text)}`;
           const res3 = await fetch(zenzUrl);
           const data3 = await res3.json();
@@ -57,10 +58,11 @@ const handler = async (m, { conn, text }) => {
           filesize = "Desconocido";
           quality = "128kbps";
           format = "mp3";
+
         } catch (err3) {
-          console.log("⚠️ Zenzxz falló, usando respaldo Sylphy...");
+          console.log("⚠️ Zenzxz falló, usando Sylphy…");
           try {
-            // API BACKUP 3: Sylphy
+            // BACKUP 3 — Sylphy
             const sylphyKey = "sylphy-25c2";
             const sylphyUrl = `https://api.sylphy.xyz/download/ytmp3?url=${encodeURIComponent(text)}&apikey=${sylphyKey}`;
             const res4 = await fetch(sylphyUrl);
@@ -69,9 +71,11 @@ const handler = async (m, { conn, text }) => {
             if (!data4.status || !data4.res?.url) throw new Error("Sylphy falló");
 
             ({ title, thumbnail, url, filesize, quality, format } = data4.res);
+
           } catch (err4) {
-            console.log("⚠️ Sylphy falló, usando respaldo Stellar...");
-            // API BACKUP 4: Stellar
+            console.log("⚠️ Sylphy falló, usando Stellar…");
+
+            // BACKUP 4 — Stellar
             const stellarKey = "stellar-53mIXDr2";
             const stellarUrl = `https://api.stellarwa.xyz/dow/ytmp3?url=${encodeURIComponent(text)}&apikey=${stellarKey}`;
             const res5 = await fetch(stellarUrl);
@@ -90,7 +94,7 @@ const handler = async (m, { conn, text }) => {
       }
     }
 
-    // 🔍 Intentar obtener tamaño real si es "Desconocido"
+    // Calcular tamaño si viene desconocido
     let sizeMB = 0;
     if (filesize === "Desconocido") {
       try {
@@ -106,20 +110,27 @@ const handler = async (m, { conn, text }) => {
 
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
 
-    await conn.sendMessage(m.chat, {
-      image: { url: thumbnail },
-      caption: `🎶 *${title}*\n📦 ${(sizeMB || 0).toFixed(2)} MB\n🎧 ${quality} ${format}`
-    }, { quoted: m });
+    await conn.sendMessage(
+      m.chat,
+      {
+        image: { url: thumbnail },
+        caption: `🎶 *${title}*\n📦 ${(sizeMB || 0).toFixed(2)} MB\n🎧 ${quality} ${format}`
+      },
+      { quoted: m }
+    );
 
-    // 📦 Si pesa más de 10 MB → Enviar como documento
     const isHeavy = sizeMB > 10;
 
-    await conn.sendMessage(m.chat, {
-      [isHeavy ? "document" : "audio"]: { url },
-      mimetype: "audio/mpeg",
-      fileName: `${title}.mp3`,
-      ...(isHeavy && { caption: `📁 Archivo enviado como documento por superar 10MB.` })
-    }, { quoted: m });
+    await conn.sendMessage(
+      m.chat,
+      {
+        [isHeavy ? "document" : "audio"]: { url },
+        mimetype: "audio/mpeg",
+        fileName: `${title}.mp3`,
+        ...(isHeavy && { caption: `📁 Archivo enviado como documento por superar 10MB.` })
+      },
+      { quoted: m }
+    );
 
   } catch (error) {
     console.error(error);
