@@ -424,6 +424,45 @@ async function clearSystemTmp() {
   if (!fs.existsSync(dir)) return false;
 
   try {
+    // 📌 Contar archivos ANTES
+    const before = fs.readdirSync(dir).length;
+
+    fs.readdirSync(dir).forEach(file => {
+      const filePath = path.join(dir, file);
+
+      try {
+        const stats = fs.statSync(filePath);
+
+        // 🔥 Si es carpeta → borrar recursivamente
+        if (stats.isDirectory()) {
+          fs.rmSync(filePath, { recursive: true, force: true });
+        } else {
+          fs.unlinkSync(filePath);
+        }
+
+      } catch {}
+    });
+
+    // 📌 Contar archivos DESPUÉS
+    const after = fs.readdirSync(dir).length;
+
+    // Mostrar resultado
+    console.log(`🧹 TMP limpio → Archivos antes: ${before}, después: ${after}`);
+
+    return true;
+
+  } catch (err) {
+    console.log("❌ Error limpiando /tmp:", err.message);
+    return false;
+  }
+}
+/*
+async function clearSystemTmp() {
+  const dir = '/tmp';
+
+  if (!fs.existsSync(dir)) return false;
+
+  try {
     fs.readdirSync(dir).forEach(file => {
       const filePath = path.join(dir, file);
 
@@ -445,7 +484,7 @@ async function clearSystemTmp() {
   } catch {
     return false;
   }
-}
+}*/
 
 function purgeOldFiles() {
 const directories = [`./${sessions}/`, `./${jadi}/`]
