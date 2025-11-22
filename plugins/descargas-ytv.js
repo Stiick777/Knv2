@@ -1,4 +1,6 @@
-import fetch from 'node-fetch';
+import axios from "axios";
+import fetch from "node-fetch";
+import { fileTypeFromBuffer } from "file-type";
 
 let handler = async (m, { conn, args }) => {
   if (!args[0]) {
@@ -7,18 +9,21 @@ let handler = async (m, { conn, args }) => {
 
   const youtubeLink = args[0];
   const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
+
   if (!youtubeRegex.test(youtubeLink)) {
     return conn.reply(m.chat, `⚠️ Asegúrate de ingresar un enlace *válido* de YouTube.`, m);
   }
 
   try {
-    await m.react('🕓');
+    await m.react("🕓");
 
     let title, downloadUrl, thumbnail, quality;
 
-    // === API 1: Ruby-Core ===
+    // ===== API 1: Ruby-Core =====
     try {
-      const api1 = await fetch(`https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(youtubeLink)}`);
+      const api1 = await fetch(
+        `https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(youtubeLink)}`
+      );
       const res1 = await api1.json();
 
       if (!res1.status || !res1.download?.url) throw new Error("Ruby-Core inválido");
@@ -31,9 +36,11 @@ let handler = async (m, { conn, args }) => {
     } catch (err1) {
       console.warn("Error Ruby-Core:", err1.message);
 
-      // === API 2: Starlight ===
+      // ===== API 2: Starlight =====
       try {
-        const api2 = await fetch(`https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(youtubeLink)}`);
+        const api2 = await fetch(
+          `https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(youtubeLink)}`
+        );
         const res2 = await api2.json();
 
         if (!res2.url || !res2.title) throw new Error("Starlight inválido");
@@ -46,14 +53,17 @@ let handler = async (m, { conn, args }) => {
       } catch (err2) {
         console.warn("Error Starlight:", err2.message);
 
-        // === API 3: Yupra ===
+        // ===== API 3: Yupra =====
         try {
-          const api3 = await fetch(`https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(youtubeLink)}`);
+          const api3 = await fetch(
+            `https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(youtubeLink)}`
+          );
           const res3 = await api3.json();
 
           if (!res3.status || !res3.result?.formats?.length) throw new Error("Yupra inválido");
 
           const video = res3.result.formats.find(f => f.itag === 18) || res3.result.formats[0];
+
           title = res3.result.title;
           downloadUrl = video.url;
           quality = video.qualityLabel;
@@ -62,9 +72,11 @@ let handler = async (m, { conn, args }) => {
         } catch (err3) {
           console.warn("Error Yupra:", err3.message);
 
-          // === API 4: Sylphy ===
+          // ===== API 4: Sylphy =====
           try {
-            const api4 = await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(youtubeLink)}&apikey=sylphy-25c2`);
+            const api4 = await fetch(
+              `https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(youtubeLink)}&apikey=sylphy-25c2`
+            );
             const res4 = await api4.json();
 
             if (!res4.status || !res4.res?.url) throw new Error("Sylphy inválido");
@@ -77,9 +89,11 @@ let handler = async (m, { conn, args }) => {
           } catch (err4) {
             console.warn("Error Sylphy:", err4.message);
 
-            // === API 5: Stellar ===
+            // ===== API 5: Stellar =====
             try {
-              const api5 = await fetch(`https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(youtubeLink)}&apikey=stellar-53mIXDr2`);
+              const api5 = await fetch(
+                `https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(youtubeLink)}&apikey=stellar-53mIXDr2`
+              );
               const res5 = await api5.json();
 
               if (!res5.status || !res5.data?.dl) throw new Error("Stellar inválido");
@@ -92,51 +106,79 @@ let handler = async (m, { conn, args }) => {
             } catch (err5) {
               console.warn("Error Stellar:", err5.message);
               await conn.sendMessage(m.chat, { text: "❌ No se pudo descargar el video. Todas las APIs fallaron." }, { quoted: m });
-              return await m.react('✖️');
+              return await m.react("✖️");
             }
           }
         }
       }
     }
 
-    // 🔍 Detectar tamaño real del archivo
+    // =============================
+    // 🔍 Obtener tamaño real
+    // =============================
     let sizeMB = 0;
     try {
       const head = await fetch(downloadUrl, { method: "HEAD" });
       const length = head.headers.get("content-length");
+
       if (length) sizeMB = Number(length) / (1024 * 1024);
-    } catch (err) {
-      console.warn("No se pudo obtener tamaño del archivo:", err.message);
+    } catch (e) {
+      console.warn("No se pudo obtener el tamaño:", e.message);
     }
 
-    // ✅ Reaccionar éxito
-    await m.react('✅');
+    // =============================
+    //  📥 STREAMING SIN ENOSPC
+    // =============================
 
-    // 📦 Si pesa más de 30 MB, enviar como documento
+    const { data } = await axios.get(downloadUrl, {
+      responseType: "arraybuffer"
+    });
+
+    const buffer = Buffer.from(data);
+    const type = await fileTypeFromBuffer(buffer);
+
+    let thumbBuffer = null;
+    if (thumbnail) {
+      try {
+        const t = await fetch(thumbnail);
+        thumbBuffer = await t.buffer();
+      } catch { }
+    }
+
+    await m.react("✅");
+
     const isHeavy = sizeMB > 30;
 
-    const caption = `🎬 *${title}*\n📏 *Tamaño:* ${(sizeMB || 0).toFixed(2)} MB\n📌 *Calidad:* ${quality}\n\n${
-      isHeavy ? "📁 Enviado como *documento* por superar 30 MB." : "😎 Su video by *KanBot*."
+    const caption = `🎬 *${title}*\n📏 *Tamaño:* ${sizeMB.toFixed(2)} MB\n📌 *Calidad:* ${quality}\n\n${
+      isHeavy ? "📁 Enviado como *documento* porque pesa más de 30 MB." : "😎 Su video by *KanBot*."
     }`;
 
-    await conn.sendMessage(m.chat, {
-      [isHeavy ? "document" : "video"]: { url: downloadUrl },
-      fileName: `${title}.mp4`,
-      mimetype: 'video/mp4',
-      caption,
-      jpegThumbnail: thumbnail ? await (await fetch(thumbnail)).buffer() : null
-    }, { quoted: m });
+    await conn.sendMessage(
+      m.chat,
+      {
+        [isHeavy ? "document" : "video"]: buffer,
+        fileName: `${title}.mp4`,
+        mimetype: type?.mime || "video/mp4",
+        caption,
+        jpegThumbnail: thumbBuffer
+      },
+      { quoted: m }
+    );
 
   } catch (error) {
     console.warn("Error general:", error.message);
-    await m.react('❌');
-    await conn.sendMessage(m.chat, { text: "❌ Error inesperado al procesar el enlace." }, { quoted: m });
+    await m.react("❌");
+    await conn.sendMessage(
+      m.chat,
+      { text: "❌ Error inesperado al procesar el enlace." },
+      { quoted: m }
+    );
   }
 };
 
-handler.tags = ['descargas'];
-handler.help = ['ytv', 'ytmp4'];
-handler.command = ['ytmp4', 'ytvideo', 'ytv'];
+handler.tags = ["descargas"];
+handler.help = ["ytv", "ytmp4"];
+handler.command = ["ytmp4", "ytvideo", "ytv"];
 handler.group = true;
 
 export default handler;
