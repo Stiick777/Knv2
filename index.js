@@ -418,6 +418,35 @@ console.log(chalk.bold.cyanBright(`\n╭» ❍ ${jadi} ❍\n│→ ARCHIVOS NO E
 console.log(chalk.bold.red(`\n╭» ❍ ${jadi} ❍\n│→ OCURRIÓ UN ERROR\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻\n` + err))
 }}
 
+async function clearSystemTmp() {
+  const dir = '/tmp';
+
+  if (!fs.existsSync(dir)) return false;
+
+  try {
+    fs.readdirSync(dir).forEach(file => {
+      const filePath = path.join(dir, file);
+
+      try {
+        const stats = fs.statSync(filePath);
+
+        // 🔥 Si es carpeta → borrar recursivamente
+        if (stats.isDirectory()) {
+          fs.rmSync(filePath, { recursive: true, force: true });
+        } else {
+          fs.unlinkSync(filePath);
+        }
+
+      } catch {}
+    });
+
+    return true;
+
+  } catch {
+    return false;
+  }
+}
+
 function purgeOldFiles() {
 const directories = [`./${sessions}/`, `./${jadi}/`]
 directories.forEach(dir => {
@@ -443,6 +472,20 @@ arguments[0] = ""
 }
 originalConsoleMethod.apply(console, arguments)
 }}
+
+setInterval(async () => {  
+  const result = await clearSystemTmp();
+
+  if (result) {
+    console.log(chalk.bold.cyanBright(
+      `\n╭» ❍ TMP DEL SISTEMA ❍\n│→ ARCHIVOS ELIMINADOS CORRECTAMENTE\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ⌫ ♻`
+    ));
+  } else {
+    console.log(chalk.bold.red(
+      `\n╭» ❍ TMP DEL SISTEMA ❍\n│→ NO SE PUDO LIMPIAR /tmp\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ✘`
+    ));
+  }
+}, 1000 * 60 * 1); // cada 5 minutos
 
 setInterval(async () => {
 if (stopped === 'close' || !conn || !conn.user) return
