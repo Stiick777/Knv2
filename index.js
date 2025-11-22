@@ -485,7 +485,7 @@ setInterval(async () => {
       `\n╭» ❍ TMP DEL SISTEMA ❍\n│→ NO SE PUDO LIMPIAR /tmp\n╰― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ― ✘`
     ));
   }
-}, 1000 * 60 * 1); // cada 5 minutos
+}, 1000 * 60 * 2); // cada 2 minutos
 
 setInterval(async () => {
 if (stopped === 'close' || !conn || !conn.user) return
