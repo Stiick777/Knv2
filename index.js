@@ -448,6 +448,7 @@ async function clearSystemTmp() {
 
     // Mostrar resultado
     console.log(`🧹 TMP limpio → Archivos antes: ${before}, después: ${after}`);
+    console.log("Ruta absoluta de /tmp:", fs.realpathSync('/tmp'));
 
     return true;
 
