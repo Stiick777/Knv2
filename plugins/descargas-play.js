@@ -181,7 +181,197 @@ if (command == 'play2') {
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
+try {
+await m.react('🕓');
+const url = yt_play[0].url;
 
+// ======================================================  
+// ⚙️ FUNCIÓN PARA ENVIAR VIDEO SIN ENOSPC (STREAMING REAL)  
+// ======================================================  
+async function enviarVideo(chat, url, caption, thumbnail, quoted) {  
+    try {  
+        // Obtener tamaño del archivo sin descargarlo  
+        const head = await fetch(url, { method: "HEAD" });  
+        const size = Number(head.headers.get("content-length")) || 0;  
+        const isLarge = size > 10 * 1024 * 1024; // 10MB  
+
+        const stream = await fetch(url).then(r => r.body); // STREAM  
+
+        if (!stream) throw new Error("No se pudo obtener stream");  
+
+        if (isLarge) {  
+            return await conn.sendMessage(  
+                chat,  
+                {  
+                    document: stream,  
+                    mimetype: "video/mp4",  
+                    fileName: "video.mp4",  
+                    caption,  
+                    jpegThumbnail: thumbnail || null  
+                },  
+                { quoted }  
+            );  
+        } else {  
+            return await conn.sendMessage(  
+                chat,  
+                {  
+                    video: stream,  
+                    mimetype: "video/mp4",  
+                    caption,  
+                    jpegThumbnail: thumbnail || null  
+                },  
+                { quoted }  
+            );  
+        }  
+    } catch (err) {  
+        console.log("❌ Error al enviar video (streaming):", err);  
+        return conn.sendMessage(chat, {  
+            text: "⚠️ No pude enviar el video."  
+        });  
+    }  
+}  
+
+/* ======================================================  
+   🔹 SERVIDOR 1: Zenzxz (720p)  
+======================================================= */  
+try {  
+    let apiZ = await fetch(  
+        `https://api.zenzxz.my.id/api/downloader/ytmp4v2?url=${encodeURIComponent(url)}&resolution=720`  
+    );  
+    let resZ = await apiZ.json();  
+
+    if (resZ.success && resZ.data?.download_url) {  
+
+        const data = resZ.data;  
+        const thumb = await (await fetch(data.thumbnail)).buffer();  
+
+        await enviarVideo(  
+            m.chat,  
+            data.download_url,  
+            `*${data.title}*\nDuración: ${data.duration}s\nCalidad: ${data.format}`,  
+            thumb,  
+            m  
+        );  
+
+        await m.react('✅');  
+        return;  
+    }  
+} catch { }  
+
+/* ======================================================  
+   🔹 SERVIDOR 2: XYRO (720p)  
+======================================================= */  
+try {  
+    let apiX = await fetch(  
+        `https://api.xyro.site/download/youtubemp4?url=${encodeURIComponent(url)}&quality=720`  
+    );  
+    let resX = await apiX.json();  
+
+    if (resX.status && resX.result?.download) {  
+
+        const r = resX.result;  
+        const thumb = await (await fetch(r.thumbnail)).buffer();  
+
+        await enviarVideo(  
+            m.chat,  
+            r.download,  
+            `*${r.title}*\nDuración: ${r.duration}s\nCalidad: ${r.quality}p`,  
+            thumb,  
+            m  
+        );  
+
+        await m.react('✅');  
+        return;  
+    }  
+} catch { }  
+
+/* ======================================================  
+   🔹 SERVIDOR 3: Yupra (360p)  
+======================================================= */  
+try {  
+    let apiY = await fetch(  
+        `https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`  
+    );  
+    let resY = await apiY.json();  
+
+    if (resY.status === 200 && resY.result?.formats?.length) {  
+
+        let best = resY.result.formats[0];  
+
+        await enviarVideo(  
+            m.chat,  
+            best.url,  
+            `*${resY.result.title}*\nCalidad: ${best.qualityLabel || best.quality}`,  
+            null,  
+            m  
+        );  
+
+        await m.react('✅');  
+        return;  
+    }  
+} catch { }  
+
+/* ======================================================  
+   🔹 SERVIDOR 4: Starlight (360p)  
+======================================================= */  
+try {  
+    let apiS = await fetch(  
+        `https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}&format=360p`  
+    );  
+    let resS = await apiS.json();  
+
+    if (resS.dl_url) {  
+
+        const thumb = await (await fetch(resS.thumbnail)).buffer();  
+
+        await enviarVideo(  
+            m.chat,  
+            resS.dl_url,  
+            `*${resS.title}*\nAutor: ${resS.author}\nCalidad: ${resS.quality}`,  
+            thumb,  
+            m  
+        );  
+
+        await m.react('✅');  
+        return;  
+    }  
+} catch { }  
+
+/* ======================================================  
+   🔹 SERVIDOR 5: Vreden (360p)  
+======================================================= */  
+try {  
+    let apiV = await fetch(  
+        `https://api.vreden.my.id/api/v1/download/youtube/video?url=${encodeURIComponent(url)}&quality=360`  
+    );  
+    let resV = await apiV.json();  
+
+    if (resV.status && resV.result?.download?.url) {  
+
+        const meta = resV.result.metadata;  
+        const down = resV.result.download;  
+        const thumb = await (await fetch(meta.thumbnail)).buffer();  
+
+        await enviarVideo(  
+            m.chat,  
+            down.url,  
+            `*${meta.title}*\nDuración: ${meta.duration.timestamp}\nCalidad: ${down.quality}`,  
+            thumb,  
+            m  
+        );  
+
+        await m.react('✅');  
+        return;  
+    }  
+} catch { }  
+
+throw '❌ Ningún servidor devolvió resultados.';
+
+} catch (e) {
+console.error(e);
+await m.react('❌');
+await m.reply('⚠️ No se pudo descargar el video, intente con playv2.');
+}
 
 
 
