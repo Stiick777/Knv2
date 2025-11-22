@@ -136,8 +136,7 @@ try {
         audio: { url: downloadUrl },
         mimetype: 'audio/mp4',
         fileName: `${title}.mp3`,
-        ptt: false,
-        tmpfs: true
+        ptt: false
     }, { quoted: m });
 
     await m.react('✅'); // Éxito
@@ -182,9 +181,57 @@ if (command == 'play2') {
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 
+import axios from "axios";
+
 try {
     await m.react('🕓');
     const url = yt_play[0].url;
+
+    // ======================================================
+    // ⚙️ FUNCIÓN PARA ENVIAR VIDEO SIN ENOSPC (STREAMING REAL)
+    // ======================================================
+    async function enviarVideo(chat, url, caption, thumbnail, quoted) {
+        try {
+            // Obtener tamaño del archivo sin descargarlo
+            const head = await fetch(url, { method: "HEAD" });
+            const size = Number(head.headers.get("content-length")) || 0;
+            const isLarge = size > 10 * 1024 * 1024; // 10MB
+
+            const stream = await fetch(url).then(r => r.body); // STREAM
+
+            if (!stream) throw new Error("No se pudo obtener stream");
+
+            if (isLarge) {
+                return await conn.sendMessage(
+                    chat,
+                    {
+                        document: stream,
+                        mimetype: "video/mp4",
+                        fileName: "video.mp4",
+                        caption,
+                        jpegThumbnail: thumbnail || null
+                    },
+                    { quoted }
+                );
+            } else {
+                return await conn.sendMessage(
+                    chat,
+                    {
+                        video: stream,
+                        mimetype: "video/mp4",
+                        caption,
+                        jpegThumbnail: thumbnail || null
+                    },
+                    { quoted }
+                );
+            }
+        } catch (err) {
+            console.log("❌ Error al enviar video (streaming):", err);
+            return conn.sendMessage(chat, {
+                text: "⚠️ No pude enviar el video."
+            });
+        }
+    }
 
     /* ======================================================
        🔹 SERVIDOR 1: Zenzxz (720p)
@@ -198,20 +245,20 @@ try {
         if (resZ.success && resZ.data?.download_url) {
 
             const data = resZ.data;
+            const thumb = await (await fetch(data.thumbnail)).buffer();
 
-            await conn.sendMessage(m.chat, {
-                video: { url: data.download_url },
-                caption: `*${data.title}*\nDuración: ${data.duration}s\nCalidad: ${data.format}`,
-                jpegThumbnail: await (await fetch(data.thumbnail)).buffer(),
-                tmpfs: true
-            }, { quoted: m });
+            await enviarVideo(
+                m.chat,
+                data.download_url,
+                `*${data.title}*\nDuración: ${data.duration}s\nCalidad: ${data.format}`,
+                thumb,
+                m
+            );
 
             await m.react('✅');
             return;
         }
-    } catch {}
-
-
+    } catch { }
 
     /* ======================================================
        🔹 SERVIDOR 2: XYRO (720p)
@@ -225,20 +272,20 @@ try {
         if (resX.status && resX.result?.download) {
 
             const r = resX.result;
+            const thumb = await (await fetch(r.thumbnail)).buffer();
 
-            await conn.sendMessage(m.chat, {
-                video: { url: r.download },
-                caption: `*${r.title}*\nDuración: ${r.duration}s\nCalidad: ${r.quality}p`,
-                jpegThumbnail: await (await fetch(r.thumbnail)).buffer(),
-                tmpfs: true
-            }, { quoted: m });
+            await enviarVideo(
+                m.chat,
+                r.download,
+                `*${r.title}*\nDuración: ${r.duration}s\nCalidad: ${r.quality}p`,
+                thumb,
+                m
+            );
 
             await m.react('✅');
             return;
         }
-    } catch {}
-
-
+    } catch { }
 
     /* ======================================================
        🔹 SERVIDOR 3: Yupra (360p)
@@ -253,18 +300,18 @@ try {
 
             let best = resY.result.formats[0];
 
-            await conn.sendMessage(m.chat, {
-                video: { url: best.url },
-                caption: `*${resY.result.title}*\nCalidad: ${best.qualityLabel || best.quality}`,
-                tmpfs: true
-            }, { quoted: m });
+            await enviarVideo(
+                m.chat,
+                best.url,
+                `*${resY.result.title}*\nCalidad: ${best.qualityLabel || best.quality}`,
+                null,
+                m
+            );
 
             await m.react('✅');
             return;
         }
-    } catch {}
-
-
+    } catch { }
 
     /* ======================================================
        🔹 SERVIDOR 4: Starlight (360p)
@@ -277,23 +324,23 @@ try {
 
         if (resS.dl_url) {
 
-            await conn.sendMessage(m.chat, {
-                video: { url: resS.dl_url },
-                caption: `*${resS.title}*\nAutor: ${resS.author}\nCalidad: ${resS.quality}`,
-                jpegThumbnail: await (await fetch(resS.thumbnail)).buffer(),
-                tmpfs: true
-            }, { quoted: m });
+            const thumb = await (await fetch(resS.thumbnail)).buffer();
+
+            await enviarVideo(
+                m.chat,
+                resS.dl_url,
+                `*${resS.title}*\nAutor: ${resS.author}\nCalidad: ${resS.quality}`,
+                thumb,
+                m
+            );
 
             await m.react('✅');
             return;
         }
-    } catch {}
-
-
+    } catch { }
 
     /* ======================================================
-       🔹 SERVIDOR 5: Vreden (360 → 1080p)
-       URL: https://api.vreden.my.id/api/v1/download/youtube/video
+       🔹 SERVIDOR 5: Vreden (360p)
     ======================================================= */
     try {
         let apiV = await fetch(
@@ -305,27 +352,27 @@ try {
 
             const meta = resV.result.metadata;
             const down = resV.result.download;
+            const thumb = await (await fetch(meta.thumbnail)).buffer();
 
-            await conn.sendMessage(m.chat, {
-                video: { url: down.url },
-                caption: `*${meta.title}*\nDuración: ${meta.duration.timestamp}\nCalidad: ${down.quality}`,
-                jpegThumbnail: await (await fetch(meta.thumbnail)).buffer(),
-                tmpfs: true
-            }, { quoted: m });
+            await enviarVideo(
+                m.chat,
+                down.url,
+                `*${meta.title}*\nDuración: ${meta.duration.timestamp}\nCalidad: ${down.quality}`,
+                thumb,
+                m
+            );
 
             await m.react('✅');
             return;
         }
-    } catch {}
-
-
+    } catch { }
 
     throw '❌ Ningún servidor devolvió resultados.';
 
 } catch (e) {
     console.error(e);
     await m.react('❌');
-    await m.reply('⚠️ No se pudo descargar el video intente con playv2.');
+    await m.reply('⚠️ No se pudo descargar el video, intente con playv2.');
 }
 
 
