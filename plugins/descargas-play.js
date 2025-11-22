@@ -180,200 +180,192 @@ if (command == 'play2') {
 `.trim();
 
     await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
-
 try {
-await m.react('🕓');
-const url = yt_play[0].url;
+    await m.react('🕓');
+    const url = yt_play[0].url;
 
-// ======================================================  
-// ⚙️ FUNCIÓN PARA ENVIAR VIDEO SIN ENOSPC (STREAMING REAL)  
-// ======================================================  
-async function enviarVideo(chat, url, caption, thumbnail, quoted) {  
-    try {  
-        // Obtener tamaño del archivo sin descargarlo  
-        const head = await fetch(url, { method: "HEAD" });  
-        const size = Number(head.headers.get("content-length")) || 0;  
-        const isLarge = size > 10 * 1024 * 1024; // 10MB  
+    // ======================================================
+    // ⚙️ FUNCIÓN PARA ENVIAR VIDEO SEGÚN TAMAÑO
+    // ======================================================
+    async function enviarVideo(chat, url, caption, thumbnail, quoted) {
+        try {
+            const head = await fetch(url, { method: 'HEAD' });
+            const size = head.headers.get('content-length');
 
-        const stream = await fetch(url).then(r => r.body); // STREAM  
+            const isLarge = size && Number(size) > 10 * 1024 * 1024; // 10MB
 
-        if (!stream) throw new Error("No se pudo obtener stream");  
+            if (isLarge) {
+                return conn.sendMessage(chat, {
+                    document: { url },
+                    mimetype: 'video/mp4',
+                    fileName: 'video.mp4',
+                    caption,
+                    jpegThumbnail: thumbnail
+                }, { quoted });
+            } else {
+                return conn.sendMessage(chat, {
+                    video: { url },
+                    caption,
+                    jpegThumbnail: thumbnail
+                }, { quoted });
+            }
+        } catch (err) {
+            // Si falla la verificación de tamaño, enviamos como video normal
+            return conn.sendMessage(chat, {
+                video: { url },
+                caption,
+                jpegThumbnail: thumbnail
+            }, { quoted });
+        }
+    }
 
-        if (isLarge) {  
-            return await conn.sendMessage(  
-                chat,  
-                {  
-                    document: stream,  
-                    mimetype: "video/mp4",  
-                    fileName: "video.mp4",  
-                    caption,  
-                    jpegThumbnail: thumbnail || null  
-                },  
-                { quoted }  
-            );  
-        } else {  
-            return await conn.sendMessage(  
-                chat,  
-                {  
-                    video: stream,  
-                    mimetype: "video/mp4",  
-                    caption,  
-                    jpegThumbnail: thumbnail || null  
-                },  
-                { quoted }  
-            );  
-        }  
-    } catch (err) {  
-        console.log("❌ Error al enviar video (streaming):", err);  
-        return conn.sendMessage(chat, {  
-            text: "⚠️ No pude enviar el video."  
-        });  
-    }  
-}  
 
-/* ======================================================  
-   🔹 SERVIDOR 1: Zenzxz (720p)  
-======================================================= */  
-try {  
-    let apiZ = await fetch(  
-        `https://api.zenzxz.my.id/api/downloader/ytmp4v2?url=${encodeURIComponent(url)}&resolution=720`  
-    );  
-    let resZ = await apiZ.json();  
+    /* ======================================================
+       🔹 SERVIDOR 1: Zenzxz (720p)
+    ======================================================= */
+    try {
+        let apiZ = await fetch(
+            `https://api.zenzxz.my.id/api/downloader/ytmp4v2?url=${encodeURIComponent(url)}&resolution=720`
+        );
+        let resZ = await apiZ.json();
 
-    if (resZ.success && resZ.data?.download_url) {  
+        if (resZ.success && resZ.data?.download_url) {
 
-        const data = resZ.data;  
-        const thumb = await (await fetch(data.thumbnail)).buffer();  
+            const data = resZ.data;
+            const thumb = await (await fetch(data.thumbnail)).buffer();
 
-        await enviarVideo(  
-            m.chat,  
-            data.download_url,  
-            `*${data.title}*\nDuración: ${data.duration}s\nCalidad: ${data.format}`,  
-            thumb,  
-            m  
-        );  
+            await enviarVideo(
+                m.chat,
+                data.download_url,
+                `*${data.title}*\nDuración: ${data.duration}s\nCalidad: ${data.format}`,
+                thumb,
+                m
+            );
 
-        await m.react('✅');  
-        return;  
-    }  
-} catch { }  
+            await m.react('✅');
+            return;
+        }
+    } catch {}
 
-/* ======================================================  
-   🔹 SERVIDOR 2: XYRO (720p)  
-======================================================= */  
-try {  
-    let apiX = await fetch(  
-        `https://api.xyro.site/download/youtubemp4?url=${encodeURIComponent(url)}&quality=720`  
-    );  
-    let resX = await apiX.json();  
 
-    if (resX.status && resX.result?.download) {  
+    /* ======================================================
+       🔹 SERVIDOR 2: XYRO (720p)
+    ======================================================= */
+    try {
+        let apiX = await fetch(
+            `https://api.xyro.site/download/youtubemp4?url=${encodeURIComponent(url)}&quality=720`
+        );
+        let resX = await apiX.json();
 
-        const r = resX.result;  
-        const thumb = await (await fetch(r.thumbnail)).buffer();  
+        if (resX.status && resX.result?.download) {
 
-        await enviarVideo(  
-            m.chat,  
-            r.download,  
-            `*${r.title}*\nDuración: ${r.duration}s\nCalidad: ${r.quality}p`,  
-            thumb,  
-            m  
-        );  
+            const r = resX.result;
+            const thumb = await (await fetch(r.thumbnail)).buffer();
 
-        await m.react('✅');  
-        return;  
-    }  
-} catch { }  
+            await enviarVideo(
+                m.chat,
+                r.download,
+                `*${r.title}*\nDuración: ${r.duration}s\nCalidad: ${r.quality}p`,
+                thumb,
+                m
+            );
 
-/* ======================================================  
-   🔹 SERVIDOR 3: Yupra (360p)  
-======================================================= */  
-try {  
-    let apiY = await fetch(  
-        `https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`  
-    );  
-    let resY = await apiY.json();  
+            await m.react('✅');
+            return;
+        }
+    } catch {}
 
-    if (resY.status === 200 && resY.result?.formats?.length) {  
 
-        let best = resY.result.formats[0];  
+    /* ======================================================
+       🔹 SERVIDOR 3: Yupra (360p)
+    ======================================================= */
+    try {
+        let apiY = await fetch(
+            `https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`
+        );
+        let resY = await apiY.json();
 
-        await enviarVideo(  
-            m.chat,  
-            best.url,  
-            `*${resY.result.title}*\nCalidad: ${best.qualityLabel || best.quality}`,  
-            null,  
-            m  
-        );  
+        if (resY.status === 200 && resY.result?.formats?.length) {
 
-        await m.react('✅');  
-        return;  
-    }  
-} catch { }  
+            let best = resY.result.formats[0];
 
-/* ======================================================  
-   🔹 SERVIDOR 4: Starlight (360p)  
-======================================================= */  
-try {  
-    let apiS = await fetch(  
-        `https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}&format=360p`  
-    );  
-    let resS = await apiS.json();  
+            await enviarVideo(
+                m.chat,
+                best.url,
+                `*${resY.result.title}*\nCalidad: ${best.qualityLabel || best.quality}`,
+                null,
+                m
+            );
 
-    if (resS.dl_url) {  
+            await m.react('✅');
+            return;
+        }
+    } catch {}
 
-        const thumb = await (await fetch(resS.thumbnail)).buffer();  
 
-        await enviarVideo(  
-            m.chat,  
-            resS.dl_url,  
-            `*${resS.title}*\nAutor: ${resS.author}\nCalidad: ${resS.quality}`,  
-            thumb,  
-            m  
-        );  
+    /* ======================================================
+       🔹 SERVIDOR 4: Starlight (360p)
+    ======================================================= */
+    try {
+        let apiS = await fetch(
+            `https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}&format=360p`
+        );
+        let resS = await apiS.json();
 
-        await m.react('✅');  
-        return;  
-    }  
-} catch { }  
+        if (resS.dl_url) {
 
-/* ======================================================  
-   🔹 SERVIDOR 5: Vreden (360p)  
-======================================================= */  
-try {  
-    let apiV = await fetch(  
-        `https://api.vreden.my.id/api/v1/download/youtube/video?url=${encodeURIComponent(url)}&quality=360`  
-    );  
-    let resV = await apiV.json();  
+            const thumb = await (await fetch(resS.thumbnail)).buffer();
 
-    if (resV.status && resV.result?.download?.url) {  
+            await enviarVideo(
+                m.chat,
+                resS.dl_url,
+                `*${resS.title}*\nAutor: ${resS.author}\nCalidad: ${resS.quality}`,
+                thumb,
+                m
+            );
 
-        const meta = resV.result.metadata;  
-        const down = resV.result.download;  
-        const thumb = await (await fetch(meta.thumbnail)).buffer();  
+            await m.react('✅');
+            return;
+        }
+    } catch {}
 
-        await enviarVideo(  
-            m.chat,  
-            down.url,  
-            `*${meta.title}*\nDuración: ${meta.duration.timestamp}\nCalidad: ${down.quality}`,  
-            thumb,  
-            m  
-        );  
 
-        await m.react('✅');  
-        return;  
-    }  
-} catch { }  
+    /* ======================================================
+       🔹 SERVIDOR 5: Vreden (360p)
+    ======================================================= */
+    try {
+        let apiV = await fetch(
+            `https://api.vreden.my.id/api/v1/download/youtube/video?url=${encodeURIComponent(url)}&quality=360`
+        );
+        let resV = await apiV.json();
 
-throw '❌ Ningún servidor devolvió resultados.';
+        if (resV.status && resV.result?.download?.url) {
+
+            const meta = resV.result.metadata;
+            const down = resV.result.download;
+            const thumb = await (await fetch(meta.thumbnail)).buffer();
+
+            await enviarVideo(
+                m.chat,
+                down.url,
+                `*${meta.title}*\nDuración: ${meta.duration.timestamp}\nCalidad: ${down.quality}`,
+                thumb,
+                m
+            );
+
+            await m.react('✅');
+            return;
+        }
+    } catch {}
+
+
+    throw '❌ Ningún servidor devolvió resultados.';
 
 } catch (e) {
-console.error(e);
-await m.react('❌');
-await m.reply('⚠️ No se pudo descargar el video, intente con playv2.');
+    console.error(e);
+    await m.react('❌');
+    await m.reply('⚠️ No se pudo descargar el video, intente con *playv2*.');
 }
-
-
 
 }
 
