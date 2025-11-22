@@ -136,7 +136,8 @@ try {
         audio: { url: downloadUrl },
         mimetype: 'audio/mp4',
         fileName: `${title}.mp3`,
-        ptt: false
+        ptt: false,
+        tmpfs: true
     }, { quoted: m });
 
     await m.react('✅'); // Éxito
@@ -201,7 +202,8 @@ try {
             await conn.sendMessage(m.chat, {
                 video: { url: data.download_url },
                 caption: `*${data.title}*\nDuración: ${data.duration}s\nCalidad: ${data.format}`,
-                jpegThumbnail: await (await fetch(data.thumbnail)).buffer()
+                jpegThumbnail: await (await fetch(data.thumbnail)).buffer(),
+                tmpfs: true
             }, { quoted: m });
 
             await m.react('✅');
@@ -227,7 +229,8 @@ try {
             await conn.sendMessage(m.chat, {
                 video: { url: r.download },
                 caption: `*${r.title}*\nDuración: ${r.duration}s\nCalidad: ${r.quality}p`,
-                jpegThumbnail: await (await fetch(r.thumbnail)).buffer()
+                jpegThumbnail: await (await fetch(r.thumbnail)).buffer(),
+                tmpfs: true
             }, { quoted: m });
 
             await m.react('✅');
@@ -253,6 +256,7 @@ try {
             await conn.sendMessage(m.chat, {
                 video: { url: best.url },
                 caption: `*${resY.result.title}*\nCalidad: ${best.qualityLabel || best.quality}`,
+                tmpfs: true
             }, { quoted: m });
 
             await m.react('✅');
@@ -276,7 +280,8 @@ try {
             await conn.sendMessage(m.chat, {
                 video: { url: resS.dl_url },
                 caption: `*${resS.title}*\nAutor: ${resS.author}\nCalidad: ${resS.quality}`,
-                jpegThumbnail: await (await fetch(resS.thumbnail)).buffer()
+                jpegThumbnail: await (await fetch(resS.thumbnail)).buffer(),
+                tmpfs: true
             }, { quoted: m });
 
             await m.react('✅');
@@ -304,7 +309,8 @@ try {
             await conn.sendMessage(m.chat, {
                 video: { url: down.url },
                 caption: `*${meta.title}*\nDuración: ${meta.duration.timestamp}\nCalidad: ${down.quality}`,
-                jpegThumbnail: await (await fetch(meta.thumbnail)).buffer()
+                jpegThumbnail: await (await fetch(meta.thumbnail)).buffer(),
+                tmpfs: true
             }, { quoted: m });
 
             await m.react('✅');
