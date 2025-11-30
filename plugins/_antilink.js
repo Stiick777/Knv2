@@ -1,4 +1,4 @@
-// Detectar links de grupos y canales (con parámetros al final)
+// Detectar links de grupos y canales
 let linkRegex = /https?:\/\/(?:chat\.whatsapp\.com\/[A-Za-z0-9]+(?:\?[^\s]*)?|whatsapp\.com\/channel\/[A-Za-z0-9]+(?:\?[^\s]*)?)/i;
 
 let allowedLinks = [
@@ -13,32 +13,44 @@ export async function before(m, { conn, isAdmin, isBotAdmin }) {
   let chat = global.db.data.chats[m.chat];
   let delet = m.key.participant;
   let bang = m.key.id;
-  let bot = global.db.data.settings[this.user.jid] || {};
 
-  const isGroupLink = linkRegex.exec(m.text);
+  const isGroupLink = linkRegex.test(m.text);
 
-  if (!chat.antiLink || !isGroupLink) return !0; // salir si no hay anti-link o no hay link
+  // No hay anti-link o no hay link → salir
+  if (!chat.antiLink || !isGroupLink) return !0;
 
-  // ✅ Si el link está permitido, se ignora completamente (sin mensajes)
-  if (allowedLinks.some(link => m.text.includes(link))) {
-    return !0;
-  }
+  // Enlaces permitidos → ignorar
+  if (allowedLinks.some(link => m.text.includes(link))) return !0;
 
-  // Permitir admins sin avisar
+  // SI ES ADMIN → NO HACER NADA
   if (isAdmin) return !0;
 
-  if (isBotAdmin) {
-    // Ignorar si es el link de este mismo grupo
-    const linkThisGroup = `https://chat.whatsapp.com/${await conn.groupInviteCode(m.chat)}`;
-    if (m.text.includes(linkThisGroup)) return !0;
-
-    // Eliminar mensaje y expulsar usuario
-    await conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: delet } });
-    await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove');
-    await conn.sendMessage(m.chat, { text: `🚫 Se eliminó a @${m.sender.split('@')[0]} por enviar un enlace prohibido.`, mentions: [m.sender] });
-  } else {
+  // Verificar si el bot es admin
+  if (!isBotAdmin) {
     return conn.reply(m.chat, `⚡ *No soy admin, no puedo eliminar intrusos*`, m);
   }
+
+  // Verificar si es el enlace del propio grupo
+  const linkThisGroup = `https://chat.whatsapp.com/${await conn.groupInviteCode(m.chat)}`;
+  if (m.text.includes(linkThisGroup)) return !0;
+
+  // Eliminar mensaje
+  await conn.sendMessage(m.chat, {
+    delete: { 
+      remoteJid: m.chat, 
+      fromMe: false, 
+      id: bang, 
+      participant: delet 
+    }
+  });
+
+  // Expulsar al usuario
+  await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove');
+
+  await conn.sendMessage(m.chat, {
+    text: `🚫 Se eliminó a @${m.sender.split('@')[0]} por enviar un enlace prohibido.`,
+    mentions: [m.sender]
+  });
 
   return !0;
 }
