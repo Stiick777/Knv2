@@ -16,21 +16,21 @@ var handler = async (m, { conn, text }) => {
     if (!fs.existsSync('tmp') && tmpExists) fs.mkdirSync('tmp')
 
     // -----------------------------------
-    // 🔍 EXTRAER SOLO ARCHIVOS JS REALES
+    // 🟩 DETECTAR ARCHIVOS JS MODIFICADOS
     // -----------------------------------
     const changedFiles = stdout
       .toString()
       .split('\n')
       .map(line => line.trim())
-      .filter(line => line.match(/\.js$/)) // solo archivos que terminan en .js
-      .map(line => line.split('|')[0].trim()) // obtiene "plugins/file.js"
-      .filter(file => fs.existsSync(file)) // evita archivos inexistentes
-      .map(file => file.replace(/^./, m => m)) // limpio
+      .filter(line => line.match(/plugins\/.*\.js/))       // detecta "plugins/file.js"
+      .map(line => line.match(/plugins\/.*\.js/)[0])       // extrae SOLO "plugins/file.js"
+      .filter(f => fs.existsSync(f))                      // evita inexistentes
+      .map(f => f.trim())
 
     const uniqueFiles = [...new Set(changedFiles)]
 
     // -----------------------------------
-    // 🧪 VALIDACIÓN DE SINTAXIS
+    // 🧪 VALIDAR SINTAXIS
     // -----------------------------------
     let okPlugins = []
     let errorPlugins = []
@@ -38,7 +38,7 @@ var handler = async (m, { conn, text }) => {
     for (let file of uniqueFiles) {
       try {
         delete require.cache[require.resolve('./' + file)]
-        require('./' + file) // prueba de sintaxis
+        require('./' + file)
         okPlugins.push(file)
       } catch (e) {
         errorPlugins.push({
@@ -49,7 +49,7 @@ var handler = async (m, { conn, text }) => {
     }
 
     // -----------------------------------
-    // 📝 CREAR REPORTE
+    // 📝 REPORTE
     // -----------------------------------
     let report = "🛠 *Reporte de actualización*\n\n"
     report += messager + "\n"
@@ -62,8 +62,10 @@ var handler = async (m, { conn, text }) => {
     if (errorPlugins.length === 0) {
       report += `✅ *Se actualizaron correctamente ${okPlugins.length} plugins sin errores de sintaxis.*`
     } else {
-      report += `⚠️ *Se detectaron errores de sintaxis en ${errorPlugins.length} plugin(s):*\n\n`
-      report += errorPlugins.map(e => `❌ *${e.file}*\n   ➤ ${e.error}`).join('\n\n')
+      report += `⚠️ *Se detectaron errores en ${errorPlugins.length} plugin(s):*\n\n`
+      report += errorPlugins
+        .map(e => `❌ *${e.file}*\n   ➤ ${e.error}`)
+        .join('\n\n')
     }
 
     await conn.reply(m.chat, report, m)
