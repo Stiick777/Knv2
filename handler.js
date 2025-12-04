@@ -165,7 +165,7 @@ await delay(time)
 if (m.isBaileys) return
 m.exp += Math.ceil(Math.random() * 10)
 let usedPrefix
-
+/*
 const groupMetadata = m.isGroup ? { ...(conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), ...(((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { participants: ((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || []).map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) }) } : {}
 const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
 const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
@@ -173,7 +173,57 @@ const botGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) == 
 const isRAdmin = userGroup?.admin == "superadmin" || false
 const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
+*/
+  // Obtener metadata y participantes
+const groupMetadata = m.isGroup 
+  ? { 
+      ...(conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), 
+      ...(((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { 
+        participants: ((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || [])
+          .map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) 
+      }) 
+    } 
+  : {}
 
+const participants = ((m.isGroup ? groupMetadata.participants : []) || [])
+  .map(participant => ({
+    id: participant.jid,
+    jid: participant.jid,
+    lid: participant.lid,
+    admin: participant.admin
+  }))
+
+// 🔥 Corrección: decodificar siempre ambos JIDs
+const botJid = conn.decodeJid(conn.user.id || conn.user.jid)
+
+// Usuario que envía
+const userGroup = m.isGroup 
+  ? participants.find(u => conn.decodeJid(u.jid) === m.sender)
+  : {}
+
+// Bot dentro del grupo
+const botGroup = m.isGroup 
+  ? participants.find(u => conn.decodeJid(u.jid) === botJid)
+  : {}
+
+const isRAdmin = userGroup?.admin === "superadmin"
+const isAdmin = isRAdmin || userGroup?.admin === "admin"
+
+// 🔥 Corrección: admin del bot real
+const isBotAdmin = botGroup?.admin === "admin" || botGroup?.admin === "superadmin"
+
+// ---------------------------
+// ✔ PRUEBA RÁPIDA (DEBUG)
+// ---------------------------
+console.log("====== DIAGNÓSTICO ANTI-LINK ======")
+console.log("👤 Usuario que envió mensaje:", m.sender)
+console.log("👤 Usuario admin:", userGroup)
+console.log("🤖 BotJid:", botJid)
+console.log("🤖 BotGroup detectado:", botGroup)
+console.log("📌 Admin del bot según Baileys:", botGroup?.admin)
+console.log("📌 isBotAdmin calculado:", isBotAdmin)
+console.log("Participantes totales:", participants.length)
+console.log("===================================")
 
   
 const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
