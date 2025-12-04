@@ -11,45 +11,82 @@ export async function before(m, { conn, isAdmin, isBotAdmin }) {
   if (!m.isGroup) return !1;
 
   let chat = global.db.data.chats[m.chat];
+  let sender = m.sender;
   let delet = m.key.participant;
   let bang = m.key.id;
 
   const isGroupLink = linkRegex.test(m.text);
 
-  // No hay anti-link o no hay link → salir
   if (!chat.antiLink || !isGroupLink) return !0;
 
-  // Enlaces permitidos → ignorar
   if (allowedLinks.some(link => m.text.includes(link))) return !0;
 
-  // SI ES ADMIN → NO HACER NADA
-  if (isAdmin) return !0;
+  if (isAdmin) return !0; // Administradores no se sancionan
 
-  // Verificar si el bot es admin
-  if (!isBotAdmin) {
-    return conn.reply(m.chat, `⚡ *No soy admin, no puedo eliminar intrusos*`, m);
+  // --- DIAGNÓSTICO REAL DEL GRUPO ---
+  let groupMetadata = await conn.groupMetadata(m.chat);
+  let realAdmins = groupMetadata.participants
+    .filter(p => p.admin !== null)
+    .map(p => p.id);
+
+  let botID = conn.user.id.split(":")[0] + "@s.whatsapp.net";
+  let realBotAdmin = realAdmins.includes(botID);
+
+  // SI EL BOT DICE QUE NO ES ADMIN PERO QUIERES SABER POR QUÉ
+  if (!isBotAdmin || !realBotAdmin) {
+
+    let diagnostico = `
+❗ *DIAGNÓSTICO ANTI-LINK* ❗
+
+📌 *Bot detectó que NO es admin*, pero se verificó:
+
+👤 *Usuario que envió el link:*
+- ${sender}
+
+🤖 *ID del bot detectado:*  
+- ${botID}
+
+👥 *Admins detectados por Baileys:*  
+${realAdmins.map(a => "• " + a).join("\n")}
+
+📌 *isBotAdmin que llega al handler:*  
+- ${isBotAdmin}
+
+📌 *isBotAdmin REAL comprobado desde metadata:*  
+- ${realBotAdmin}
+
+📌 *Mensaje detectado:*  
+"${m.text}"
+
+📌 *Link prohibido detectado:*  
+- Sí (${isGroupLink})
+
+⚠ *Conclusión:* Baileys cree que el bot *NO* es admin.
+    `.trim();
+
+    await conn.sendMessage(m.chat, { text: diagnostico });
+
+    return;
   }
 
-  // Verificar si es el enlace del propio grupo
+  // SI ES ADMIN ENTONCES ACTÚA
   const linkThisGroup = `https://chat.whatsapp.com/${await conn.groupInviteCode(m.chat)}`;
   if (m.text.includes(linkThisGroup)) return !0;
 
-  // Eliminar mensaje
   await conn.sendMessage(m.chat, {
-    delete: { 
-      remoteJid: m.chat, 
-      fromMe: false, 
-      id: bang, 
-      participant: delet 
+    delete: {
+      remoteJid: m.chat,
+      fromMe: false,
+      id: bang,
+      participant: delet
     }
   });
 
-  // Expulsar al usuario
-  await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove');
+  await conn.groupParticipantsUpdate(m.chat, [sender], "remove");
 
   await conn.sendMessage(m.chat, {
-    text: `🚫 Se eliminó a @${m.sender.split('@')[0]} por enviar un enlace prohibido.`,
-    mentions: [m.sender]
+    text: `🚫 Se eliminó a @${sender.split("@")[0]} por enviar un enlace prohibido.`,
+    mentions: [sender]
   });
 
   return !0;
