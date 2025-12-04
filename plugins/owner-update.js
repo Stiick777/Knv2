@@ -1,86 +1,93 @@
-import { execSync } from 'child_process'
-import fs from 'fs'
+// Detectar links de grupos y canales
+let linkRegex = /https?:\/\/(?:chat\.whatsapp\.com\/[A-Za-z0-9]+(?:\?[^\s]*)?|whatsapp\.com\/channel\/[A-Za-z0-9]+(?:\?[^\s]*)?)/i;
 
-var handler = async (m, { conn, text }) => {
-  m.react('🚀')
+let allowedLinks = [
+  "https://chat.whatsapp.com/HDoyT3SlpYzBlpawlWNpKw?mode=ems_copy_c",
+  "https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N"
+];
 
-  try {
-    const tmpExists = fs.existsSync('tmp')
-    const status = execSync('git status --porcelain').toString().trim()
-    if (status) execSync('git stash')
+export async function before(m, { conn, isAdmin, isBotAdmin }) {
+  if (m.isBaileys && m.fromMe) return !0;
+  if (!m.isGroup) return !1;
 
-    const stdout = execSync('git pull --no-rebase' + (m.fromMe && text ? ' ' + text : ''))
-    let messager = stdout.toString()
+  let chat = global.db.data.chats[m.chat];
+  let sender = m.sender;
+  let delet = m.key.participant;
+  let bang = m.key.id;
 
-    if (status) execSync('git stash pop')
-    if (!fs.existsSync('tmp') && tmpExists) fs.mkdirSync('tmp')
+  const isGroupLink = linkRegex.test(m.text);
 
-    // -----------------------------------
-    // 🟩 DETECTAR ARCHIVOS JS MODIFICADOS
-    // -----------------------------------
-    const changedFiles = stdout
-      .toString()
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.match(/plugins\/.*\.js/))       // detecta "plugins/file.js"
-      .map(line => line.match(/plugins\/.*\.js/)[0])       // extrae SOLO "plugins/file.js"
-      .filter(f => fs.existsSync(f))                      // evita inexistentes
-      .map(f => f.trim())
+  if (!chat.antiLink || !isGroupLink) return !0;
 
-    const uniqueFiles = [...new Set(changedFiles)]
+  if (allowedLinks.some(link => m.text.includes(link))) return !0;
 
-    // -----------------------------------
-    // 🧪 VALIDAR SINTAXIS
-    // -----------------------------------
-    let okPlugins = []
-    let errorPlugins = []
+  if (isAdmin) return !0; // Administradores no se sancionan
 
-    for (let file of uniqueFiles) {
-      try {
-        delete require.cache[require.resolve('./' + file)]
-        require('./' + file)
-        okPlugins.push(file)
-      } catch (e) {
-        errorPlugins.push({
-          file,
-          error: e.message.split('\n')[0]
-        })
-      }
-    }
+  // --- DIAGNÓSTICO REAL DEL GRUPO ---
+  let groupMetadata = await conn.groupMetadata(m.chat);
+  let realAdmins = groupMetadata.participants
+    .filter(p => p.admin !== null)
+    .map(p => p.id);
 
-    // -----------------------------------
-    // 📝 REPORTE
-    // -----------------------------------
-    let report = "🛠 *Reporte de actualización*\n\n"
-    report += messager + "\n"
+  let botID = conn.user.id.split(":")[0] + "@s.whatsapp.net";
+  let realBotAdmin = realAdmins.includes(botID);
 
-    if (uniqueFiles.length > 0) {
-      report += `\n📂 *Plugins modificados:* ${uniqueFiles.length}\n`
-      report += uniqueFiles.map(f => `- ${f}`).join('\n') + "\n\n"
-    }
+  // SI EL BOT DICE QUE NO ES ADMIN PERO QUIERES SABER POR QUÉ
+  if (!isBotAdmin || !realBotAdmin) {
 
-    if (errorPlugins.length === 0) {
-      report += `✅ *Se actualizaron correctamente ${okPlugins.length} plugins sin errores de sintaxis.*`
-    } else {
-      report += `⚠️ *Se detectaron errores en ${errorPlugins.length} plugin(s):*\n\n`
-      report += errorPlugins
-        .map(e => `❌ *${e.file}*\n   ➤ ${e.error}`)
-        .join('\n\n')
-    }
+    let diagnostico = `
+❗ *DIAGNÓSTICO ANTI-LINK* ❗
 
-    await conn.reply(m.chat, report, m)
+📌 *Bot detectó que NO es admin*, pero se verificó:
 
-  } catch (error) {
-    console.error(error)
-    let errorMessage = '⚠️ Ocurrió un error inesperado.\n'
-    if (error.message) errorMessage += '⚠️ Mensaje de error: ' + error.message
-    await conn.reply(m.chat, errorMessage, m)
+👤 *Usuario que envió el link:*
+- ${sender}
+
+🤖 *ID del bot detectado:*  
+- ${botID}
+
+👥 *Admins detectados por Baileys:*  
+${realAdmins.map(a => "• " + a).join("\n")}
+
+📌 *isBotAdmin que llega al handler:*  
+- ${isBotAdmin}
+
+📌 *isBotAdmin REAL comprobado desde metadata:*  
+- ${realBotAdmin}
+
+📌 *Mensaje detectado:*  
+"${m.text}"
+
+📌 *Link prohibido detectado:*  
+- Sí (${isGroupLink})
+
+⚠ *Conclusión:* Baileys cree que el bot *NO* es admin.
+    `.trim();
+
+    await conn.sendMessage(m.chat, { text: diagnostico });
+
+    return;
   }
+
+  // SI ES ADMIN ENTONCES ACTÚA
+  const linkThisGroup = `https://chat.whatsapp.com/${await conn.groupInviteCode(m.chat)}`;
+  if (m.text.includes(linkThisGroup)) return !0;
+
+  await conn.sendMessage(m.chat, {
+    delete: {
+      remoteJid: m.chat,
+      fromMe: false,
+      id: bang,
+      participant: delet
+    }
+  });
+
+  await conn.groupParticipantsUpdate(m.chat, [sender], "remove");
+
+  await conn.sendMessage(m.chat, {
+    text: `🚫 Se eliminó a @${sender.split("@")[0]} por enviar un enlace prohibido.`,
+    mentions: [sender]
+  });
+
+  return !0;
 }
-
-handler.help = ['update']
-handler.tags = ['owner']
-handler.command = ['update', 'actualizar', 'up']
-handler.owner = true
-
-export default handler
