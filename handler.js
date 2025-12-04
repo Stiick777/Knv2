@@ -165,7 +165,7 @@ await delay(time)
 if (m.isBaileys) return
 m.exp += Math.ceil(Math.random() * 10)
 let usedPrefix
-/*
+
 const groupMetadata = m.isGroup ? { ...(conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), ...(((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { participants: ((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || []).map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) }) } : {}
 const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
 const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
@@ -173,47 +173,6 @@ const botGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) == 
 const isRAdmin = userGroup?.admin == "superadmin" || false
 const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
-*/
-// Obtener metadata del grupo
-const groupMetadata = m.isGroup
-  ? await conn.groupMetadata(m.chat).catch(_ => ({}))
-  : {}
-
-// Convertir participantes a un formato uniforme
-const participants = (groupMetadata.participants || []).map(p => ({
-  jid: p.id || p.jid,
-  id: p.id || p.jid,
-  lid: p.lid || null,
-  admin: p.admin || null
-}))
-
-// Detectar JIDs del bot correctamente
-let botBase = conn.user?.id?.split(":")[0];
-
-let botJidClassic = botBase + "@s.whatsapp.net";
-let botJidLid = botBase + "@lid";
-
-// Buscar usuario
-const userGroup = m.isGroup
-  ? participants.find(p =>
-      p.jid === m.sender || p.lid === m.sender
-    ) || {}
-  : {}
-
-// Buscar bot en el grupo
-const botGroup = m.isGroup
-  ? participants.find(p =>
-      p.jid === botJidClassic ||
-      p.jid === botJidLid ||
-      p.lid === botJidClassic ||
-      p.lid === botJidLid
-    ) || {}
-  : {}
-
-// Roles correctos
-const isRAdmin = userGroup?.admin === "superadmin"
-const isAdmin = isRAdmin || userGroup?.admin === "admin"
-const isBotAdmin = botGroup?.admin === "admin" || botGroup?.admin === "superadmin"
 
 
   
