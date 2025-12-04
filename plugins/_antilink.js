@@ -17,62 +17,80 @@ export async function before(m, { conn, isAdmin, isBotAdmin }) {
 
   const isGroupLink = linkRegex.test(m.text);
 
+  // No hay anti-link o no contiene un link → salir
   if (!chat.antiLink || !isGroupLink) return !0;
 
+  // Enlaces permitidos → ignorar
   if (allowedLinks.some(link => m.text.includes(link))) return !0;
 
-  if (isAdmin) return !0; // Administradores no se sancionan
+  // Administradores NO reciben sanción
+  if (isAdmin) return !0;
 
-  // --- DIAGNÓSTICO REAL DEL GRUPO ---
+  // ==========================================================
+  //        🔍   VERIFICACIÓN REAL DEL ADMIN DEL BOT
+  // ==========================================================
+
   let groupMetadata = await conn.groupMetadata(m.chat);
   let realAdmins = groupMetadata.participants
     .filter(p => p.admin !== null)
     .map(p => p.id);
 
-  let botID = conn.user.id.split(":")[0] + "@s.whatsapp.net";
-  let realBotAdmin = realAdmins.includes(botID);
+  // Crear ambos posibles JIDs del bot
+  let baseID = conn.user.id.split(":")[0];
+  let botJidClassic = baseID + "@s.whatsapp.net";
+  let botJidLid = baseID + "@lid";
 
-  // SI EL BOT DICE QUE NO ES ADMIN PERO QUIERES SABER POR QUÉ
-  if (!isBotAdmin || !realBotAdmin) {
+  // Verificar admin real (ambos tipos de JID)
+  let realBotAdmin = realAdmins.includes(botJidClassic) || realAdmins.includes(botJidLid);
 
+  // ==========================================================
+  //          🛑  SI EL BOT PIENSA QUE NO ES ADMIN
+  // ==========================================================
+
+  if (!realBotAdmin) {
     let diagnostico = `
 ❗ *DIAGNÓSTICO ANTI-LINK* ❗
 
-📌 *Bot detectó que NO es admin*, pero se verificó:
+⚠ El bot cree que *NO es admin*. Se verifica:
 
 👤 *Usuario que envió el link:*
 - ${sender}
 
-🤖 *ID del bot detectado:*  
-- ${botID}
+🤖 *JID detectado del bot:*  
+• ${botJidClassic}  
+• ${botJidLid}
 
 👥 *Admins detectados por Baileys:*  
 ${realAdmins.map(a => "• " + a).join("\n")}
 
-📌 *isBotAdmin que llega al handler:*  
+📌 *isBotAdmin recibido:*  
 - ${isBotAdmin}
 
-📌 *isBotAdmin REAL comprobado desde metadata:*  
+📌 *isBotAdmin REAL:*  
 - ${realBotAdmin}
 
 📌 *Mensaje detectado:*  
 "${m.text}"
 
 📌 *Link prohibido detectado:*  
-- Sí (${isGroupLink})
+- Sí
 
-⚠ *Conclusión:* Baileys cree que el bot *NO* es admin.
+⚠ *BAILEYS NO MUESTRA AL BOT COMO ADMIN EN ESTE GRUPO.*
     `.trim();
 
     await conn.sendMessage(m.chat, { text: diagnostico });
-
-    return;
+    return !0;
   }
 
-  // SI ES ADMIN ENTONCES ACTÚA
+  // ==========================================================
+  //                🟢  SI EL BOT ES ADMIN
+  // ==========================================================
+
+  // Ignorar si es link del mismo grupo
   const linkThisGroup = `https://chat.whatsapp.com/${await conn.groupInviteCode(m.chat)}`;
   if (m.text.includes(linkThisGroup)) return !0;
 
+  // Eliminar mensaje
   await conn.sendMessage(m.chat, {
     delete: {
       remoteJid: m.chat,
@@ -82,8 +100,10 @@ ${realAdmins.map(a => "• " + a).join("\n")}
     }
   });
 
+  // Expulsar usuario
   await conn.groupParticipantsUpdate(m.chat, [sender], "remove");
 
+  // Aviso final
   await conn.sendMessage(m.chat, {
     text: `🚫 Se eliminó a @${sender.split("@")[0]} por enviar un enlace prohibido.`,
     mentions: [sender]
