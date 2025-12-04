@@ -174,9 +174,9 @@ const isRAdmin = userGroup?.admin == "superadmin" || false
 const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
 */
-  // Obtener metadata del grupo
+// Obtener metadata del grupo
 const groupMetadata = m.isGroup
-  ? await this.groupMetadata(m.chat).catch(_ => ({}))
+  ? await conn.groupMetadata(m.chat).catch(_ => ({}))
   : {}
 
 // Convertir participantes a un formato uniforme
@@ -187,23 +187,34 @@ const participants = (groupMetadata.participants || []).map(p => ({
   admin: p.admin || null
 }))
 
-// Buscar usuario por JID o por LID
+// Detectar JIDs del bot correctamente
+let botBase = conn.user?.id?.split(":")[0];
+
+let botJidClassic = botBase + "@s.whatsapp.net";
+let botJidLid = botBase + "@lid";
+
+// Buscar usuario
 const userGroup = m.isGroup
   ? participants.find(p =>
       p.jid === m.sender || p.lid === m.sender
     ) || {}
   : {}
 
+// Buscar bot en el grupo
 const botGroup = m.isGroup
   ? participants.find(p =>
-      p.jid === this.user.jid || p.lid === this.user.jid
+      p.jid === botJidClassic ||
+      p.jid === botJidLid ||
+      p.lid === botJidClassic ||
+      p.lid === botJidLid
     ) || {}
   : {}
 
-// Roles
+// Roles correctos
 const isRAdmin = userGroup?.admin === "superadmin"
 const isAdmin = isRAdmin || userGroup?.admin === "admin"
 const isBotAdmin = botGroup?.admin === "admin" || botGroup?.admin === "superadmin"
+
 
   
 const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
