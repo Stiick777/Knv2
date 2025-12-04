@@ -165,7 +165,7 @@ await delay(time)
 if (m.isBaileys) return
 m.exp += Math.ceil(Math.random() * 10)
 let usedPrefix
-
+/*
 const groupMetadata = m.isGroup ? { ...(conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), ...(((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { participants: ((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || []).map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) }) } : {}
 const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
 const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
@@ -176,7 +176,36 @@ const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
 console.log("Bot ID normalizado:", conn.decodeJid(conn.user.id))
 console.log("Admins en el grupo:", participants.filter(p => p.admin))
+*/
+  // ======== OBTENER METADATA REAL ========
+const groupMetadata = m.isGroup
+  ? await conn.groupMetadata(m.chat).catch(_ => ({}))
+  : {}
 
+// ======== PARTICIPANTES NORMALIZADOS ========
+const participants = (groupMetadata.participants || []).map(p => ({
+  id: conn.decodeJid(p.id),   // ID REAL del participante
+  admin: p.admin              // 'admin', 'superadmin' o undefined
+}))
+
+// ======== JID DEL BOT NORMALIZADO ========
+const botId = conn.decodeJid(conn.user.id)
+const botGroup = participants.find(p => p.id === botId) || {}
+const isBotAdmin = !!botGroup.admin
+
+// ======== JID DEL USUARIO QUE ESCRIBE ========
+const senderId = conn.decodeJid(m.sender)
+const userGroup = participants.find(u => u.id === senderId) || {}
+
+// ======== ADMIN NORMALIZADO ========
+const isRAdmin = userGroup?.admin === "superadmin"
+const isAdmin = isRAdmin || userGroup?.admin === "admin"
+
+// ======== LOG PARA VERIFICAR ========
+console.log("Bot ID normalizado:", botId)
+console.log("Admins en el grupo:", participants.filter(p => p.admin))
+console.log("isBotAdmin:", isBotAdmin)
+console.log("isAdmin:", isAdmin)
 
 const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
 for (const name in global.plugins) {
