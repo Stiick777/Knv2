@@ -177,36 +177,55 @@ const isBotAdmin = botGroup?.admin || false
 console.log("Bot ID normalizado:", conn.decodeJid(conn.user.id))
 console.log("Admins en el grupo:", participants.filter(p => p.admin))
 */
-  // ======== OBTENER METADATA REAL ========
-const groupMetadata = m.isGroup
-  ? await conn.groupMetadata(m.chat).catch(_ => ({}))
+  // === NORMALIZAR CUALQUIER ID ===
+function normalizeId(id = '') {
+  try {
+    id = conn.decodeJid(id) // Convierte cualquier jid raro
+  } catch {}
+  if (!id) return ''
+  id = String(id).trim()
+  // Si solo viene un número → convertir a JID válido
+  if (/^\d+$/.test(id)) id = id + '@s.whatsapp.net'
+  return id
+}
+
+
+// === OBTENER METADATA REAL DEL GRUPO ===
+const groupMetadata = m.isGroup 
+  ? await conn.groupMetadata(m.chat).catch(_ => ({})) 
   : {}
 
-// ======== PARTICIPANTES NORMALIZADOS ========
+
+// === PARTICIPANTES NORMALIZADOS ===
 const participants = (groupMetadata.participants || []).map(p => ({
-  id: conn.decodeJid(p.id),   // ID REAL del participante
-  admin: p.admin              // 'admin', 'superadmin' o undefined
+  id: normalizeId(p.id),    // <-- ID de verdad
+  admin: p.admin            // 'admin' / 'superadmin' / undefined
 }))
 
-// ======== JID DEL BOT NORMALIZADO ========
-const botId = conn.decodeJid(conn.user.id)
+
+// === OBTENER ID DEL BOT ===
+const botId = normalizeId(conn.user?.id)
 const botGroup = participants.find(p => p.id === botId) || {}
 const isBotAdmin = !!botGroup.admin
 
-// ======== JID DEL USUARIO QUE ESCRIBE ========
-const senderId = conn.decodeJid(m.sender)
-const userGroup = participants.find(u => u.id === senderId) || {}
 
-// ======== ADMIN NORMALIZADO ========
+// === OBTENER ID DEL USUARIO QUE ENVÍA ===
+const senderId = normalizeId(m.sender)
+const userGroup = participants.find(p => p.id === senderId) || {}
+
+
+// === VERIFICACIÓN DE ADMIN ===
 const isRAdmin = userGroup?.admin === "superadmin"
-const isAdmin = isRAdmin || userGroup?.admin === "admin"
+const isAdmin  = isRAdmin || userGroup?.admin === "admin"
 
-// ======== LOG PARA VERIFICAR ========
+
+
+// === LOGS PARA VERIFICACIÓN ===
 console.log("Bot ID normalizado:", botId)
 console.log("Admins en el grupo:", participants.filter(p => p.admin))
 console.log("isBotAdmin:", isBotAdmin)
 console.log("isAdmin:", isAdmin)
-
+  
 const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
 for (const name in global.plugins) {
 const plugin = global.plugins[name]
