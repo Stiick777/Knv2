@@ -174,7 +174,8 @@ const botGroup = participants.find(u => conn.decodeJid(u.id) === botJid) || {}
 const isRAdmin = userGroup?.admin == "superadmin" || false
 const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
-
+console.log("Bot ID normalizado:", conn.decodeJid(conn.user.id))
+console.log("Admins en el grupo:", participants.filter(p => p.admin))
 
 
 const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
