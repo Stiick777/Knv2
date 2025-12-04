@@ -165,7 +165,7 @@ await delay(time)
 if (m.isBaileys) return
 m.exp += Math.ceil(Math.random() * 10)
 let usedPrefix
-/*
+
 const groupMetadata = m.isGroup ? { ...(conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), ...(((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { participants: ((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || []).map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) }) } : {}
 const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
 const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
@@ -176,55 +176,7 @@ const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
 console.log("Bot ID normalizado:", conn.decodeJid(conn.user.id))
 console.log("Admins en el grupo:", participants.filter(p => p.admin))
-*/
-  // === NORMALIZAR CUALQUIER ID ===
-function normalizeId(id = '') {
-  try {
-    id = conn.decodeJid(id) // Convierte cualquier jid raro
-  } catch {}
-  if (!id) return ''
-  id = String(id).trim()
-  // Si solo viene un número → convertir a JID válido
-  if (/^\d+$/.test(id)) id = id + '@s.whatsapp.net'
-  return id
-}
 
-
-// === OBTENER METADATA REAL DEL GRUPO ===
-const groupMetadata = m.isGroup 
-  ? await conn.groupMetadata(m.chat).catch(_ => ({})) 
-  : {}
-
-
-// === PARTICIPANTES NORMALIZADOS ===
-const participants = (groupMetadata.participants || []).map(p => ({
-  id: normalizeId(p.id),    // <-- ID de verdad
-  admin: p.admin            // 'admin' / 'superadmin' / undefined
-}))
-
-
-// === OBTENER ID DEL BOT ===
-const botId = normalizeId(conn.user?.id)
-const botGroup = participants.find(p => p.id === botId) || {}
-const isBotAdmin = !!botGroup.admin
-
-
-// === OBTENER ID DEL USUARIO QUE ENVÍA ===
-const senderId = normalizeId(m.sender)
-const userGroup = participants.find(p => p.id === senderId) || {}
-
-
-// === VERIFICACIÓN DE ADMIN ===
-const isRAdmin = userGroup?.admin === "superadmin"
-const isAdmin  = isRAdmin || userGroup?.admin === "admin"
-
-
-
-// === LOGS PARA VERIFICACIÓN ===
-console.log("Bot ID normalizado:", botId)
-console.log("Admins en el grupo:", participants.filter(p => p.admin))
-console.log("isBotAdmin:", isBotAdmin)
-console.log("isAdmin:", isAdmin)
   
 const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
 for (const name in global.plugins) {
