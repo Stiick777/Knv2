@@ -165,55 +165,18 @@ await delay(time)
 if (m.isBaileys) return
 m.exp += Math.ceil(Math.random() * 10)
 let usedPrefix
-/*
+
 const groupMetadata = m.isGroup ? { ...(conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), ...(((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { participants: ((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || []).map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) }) } : {}
 const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
 const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
-const botGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) == this.user.jid) : {}) || {}
+const botJid = conn.decodeJid(conn.user.id)
+const botGroup = participants.find(u => conn.decodeJid(u.id) === botJid) || {}
 const isRAdmin = userGroup?.admin == "superadmin" || false
 const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
-*/
 
-// Traer metadata una sola vez sin mezclar
-let metadata = (await conn.groupMetadata(m.chat).catch(_ => null)) || {}
-let participants = metadata.participants || []
 
-// Normalizar lista
-participants = participants.map(p => ({
-    id: p.id || p.jid,      // USAR ID REAL
-    admin: p.admin || null
-}))
 
-// Obtener JID del bot
-const botJid = conn.decodeJid(conn.user.id)
-
-// Usuario que escribe
-const userGroup = participants.find(
-    p => conn.decodeJid(p.id) === conn.decodeJid(m.sender)
-)
-
-// Bot en el grupo
-const botGroup = participants.find(
-    p => conn.decodeJid(p.id) === botJid
-)
-
-const isAdmin = userGroup?.admin === "admin" || userGroup?.admin === "superadmin"
-const isBotAdmin = botGroup?.admin === "admin" || botGroup?.admin === "superadmin"
-
-// --------------------
-// PRUEBA RÁPIDA
-// --------------------
-console.log("====== DIAGNÓSTICO ANTI-LINK ======")
-console.log("👤 Usuario que envió mensaje:", m.sender)
-console.log("👤 Usuario admin:", userGroup)
-console.log("🤖 BotJid:", botJid)
-console.log("🤖 BotGroup detectado:", botGroup)
-console.log("📌 Admin del bot según Baileys:", botGroup?.admin)
-console.log("📌 isBotAdmin calculado:", isBotAdmin)
-console.log("Participantes totales:", participants.length)
-console.log("===================================")
-  
 const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
 for (const name in global.plugins) {
 const plugin = global.plugins[name]
