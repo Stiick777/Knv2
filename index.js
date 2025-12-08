@@ -11,7 +11,7 @@ import pino from 'pino'
 import { useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion, Browsers, jidNormalizedUser } from '@whiskeysockets/baileys'
 import { makeWASocket, protoType, serialize } from './lib/simple.js'
 import config from './config.js'
-import { loadDatabase, saveDatabase, DB_PATH } from './lib/db.js'
+import { loadDatabase, saveDatabase, DB_PATH } from './lib/database.js'
 import { watchFile } from 'fs'
 
 const phoneUtil = (libPhoneNumber.PhoneNumberUtil || libPhoneNumber.default?.PhoneNumberUtil).getInstance()
