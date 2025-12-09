@@ -14,125 +14,89 @@ let handler = async (m, { conn, args }) => {
     return conn.reply(m.chat, `⚠️ Asegúrate de ingresar un enlace *válido* de YouTube.`, m);
   }
 
+  await m.react("🕓");
+
+  let title, downloadUrl, thumbnail, quality;
+
+  // ===================================================
+  // ⭐ 1. API PRINCIPAL: YUPRA
+  // ===================================================
   try {
-    await m.react("🕓");
+    const api = await fetch(
+      `https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(youtubeLink)}`
+    );
 
-    let title, downloadUrl, thumbnail, quality;
+    const json = await api.json();
 
-    // ===== API 1: Ruby-Core =====
+    if (!json.success || !json.data?.download_url) throw new Error("Yupra inválido");
+
+    title = json.data.title;
+    downloadUrl = json.data.download_url;
+    thumbnail = json.data.thumbnail;
+    quality = json.data.format;
+
+  } catch (e1) {
+    console.warn("Error YUPRA:", e1.message);
+
+    // ===================================================
+    // ⭐ 2. API SECUNDARIA: AKIRAX
+    // ===================================================
     try {
-      const api1 = await fetch(
-        `https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(youtubeLink)}`
+      const api2 = await fetch(
+        `https://akirax-api.vercel.app/download/ytmp4?url=${encodeURIComponent(youtubeLink)}`
       );
-      const res1 = await api1.json();
 
-      if (!res1.status || !res1.download?.url) throw new Error("Ruby-Core inválido");
+      const json2 = await api2.json();
 
-      title = res1.metadata.title;
-      downloadUrl = res1.download.url;
-      thumbnail = res1.metadata.thumbnail;
-      quality = res1.download.quality;
+      if (!json2.status || !json2.result?.video?.url) throw new Error("Akirax inválido");
 
-    } catch (err1) {
-      console.warn("Error Ruby-Core:", err1.message);
+      title = json2.result.title;
+      downloadUrl = json2.result.video.url;
+      thumbnail = json2.result.thumbnail;
+      quality = json2.result.video.quality;
 
-      // ===== API 2: Starlight =====
+    } catch (e2) {
+      console.warn("Error AKIRAX:", e2.message);
+
+      // ===================================================
+      // ⭐ 3. RESPALDO FINAL: ADONIX
+      // (NO DEVUELVE JSON, SOLO URL DIRECTA)
+      // ===================================================
       try {
-        const api2 = await fetch(
-          `https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(youtubeLink)}`
+        title = "Video descargado";
+        thumbnail = null;
+        quality = "360p";
+
+        downloadUrl =
+          `https://api-adonix.ultraplus.click/download/ytquality?apikey=the.shadow&url=${encodeURIComponent(youtubeLink)}&type=video&quality=360p`;
+
+      } catch (e3) {
+        console.warn("Error ADONIX:", e3.message);
+        await m.react("❌");
+        return conn.sendMessage(
+          m.chat,
+          { text: "❌ No se pudo descargar el video. Todas las APIs fallaron." },
+          { quoted: m }
         );
-        const res2 = await api2.json();
-
-        if (!res2.url || !res2.title) throw new Error("Starlight inválido");
-
-        title = res2.title;
-        downloadUrl = res2.url;
-        thumbnail = res2.thumbnail;
-        quality = res2.type || "Desconocida";
-
-      } catch (err2) {
-        console.warn("Error Starlight:", err2.message);
-
-        // ===== API 3: Yupra =====
-        try {
-          const api3 = await fetch(
-            `https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(youtubeLink)}`
-          );
-          const res3 = await api3.json();
-
-          if (!res3.status || !res3.result?.formats?.length) throw new Error("Yupra inválido");
-
-          const video = res3.result.formats.find(f => f.itag === 18) || res3.result.formats[0];
-
-          title = res3.result.title;
-          downloadUrl = video.url;
-          quality = video.qualityLabel;
-          thumbnail = null;
-
-        } catch (err3) {
-          console.warn("Error Yupra:", err3.message);
-
-          // ===== API 4: Sylphy =====
-          try {
-            const api4 = await fetch(
-              `https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(youtubeLink)}&apikey=sylphy-25c2`
-            );
-            const res4 = await api4.json();
-
-            if (!res4.status || !res4.res?.url) throw new Error("Sylphy inválido");
-
-            title = res4.res.title;
-            downloadUrl = res4.res.url;
-            thumbnail = null;
-            quality = "360p";
-
-          } catch (err4) {
-            console.warn("Error Sylphy:", err4.message);
-
-            // ===== API 5: Stellar =====
-            try {
-              const api5 = await fetch(
-                `https://api.stellarwa.xyz/dow/ytmp4v2?url=${encodeURIComponent(youtubeLink)}&apikey=stellar-53mIXDr2`
-              );
-              const res5 = await api5.json();
-
-              if (!res5.status || !res5.data?.dl) throw new Error("Stellar inválido");
-
-              title = res5.data.title;
-              downloadUrl = res5.data.dl;
-              thumbnail = res5.data.thumbnail;
-              quality = "Desconocida";
-
-            } catch (err5) {
-              console.warn("Error Stellar:", err5.message);
-              await conn.sendMessage(m.chat, { text: "❌ No se pudo descargar el video. Todas las APIs fallaron." }, { quoted: m });
-              return await m.react("✖️");
-            }
-          }
-        }
       }
     }
+  }
 
-    // =============================
-    // 🔍 Obtener tamaño real
-    // =============================
-    let sizeMB = 0;
-    try {
-      const head = await fetch(downloadUrl, { method: "HEAD" });
-      const length = head.headers.get("content-length");
+  // ===================================================
+  // 🔍 OBTENER TAMAÑO REAL
+  // ===================================================
+  let sizeMB = 0;
+  try {
+    const head = await fetch(downloadUrl, { method: "HEAD" });
+    const length = head.headers.get("content-length");
+    if (length) sizeMB = Number(length) / (1024 * 1024);
+  } catch {}
 
-      if (length) sizeMB = Number(length) / (1024 * 1024);
-    } catch (e) {
-      console.warn("No se pudo obtener el tamaño:", e.message);
-    }
-
-    // =============================
-    //  📥 STREAMING SIN ENOSPC
-    // =============================
-
-    const { data } = await axios.get(downloadUrl, {
-      responseType: "arraybuffer"
-    });
+  // ===================================================
+  // 📥 DESCARGA DEL VIDEO
+  // ===================================================
+  try {
+    const { data } = await axios.get(downloadUrl, { responseType: "arraybuffer" });
 
     const buffer = Buffer.from(data);
     const type = await fileTypeFromBuffer(buffer);
@@ -142,7 +106,7 @@ let handler = async (m, { conn, args }) => {
       try {
         const t = await fetch(thumbnail);
         thumbBuffer = await t.buffer();
-      } catch { }
+      } catch {}
     }
 
     await m.react("✅");
@@ -150,7 +114,9 @@ let handler = async (m, { conn, args }) => {
     const isHeavy = sizeMB > 30;
 
     const caption = `🎬 *${title}*\n📏 *Tamaño:* ${sizeMB.toFixed(2)} MB\n📌 *Calidad:* ${quality}\n\n${
-      isHeavy ? "📁 Enviado como *documento* porque pesa más de 30 MB." : "😎 Su video by *KanBot*."
+      isHeavy
+        ? "📁 Enviado como *documento* (pesa más de 30 MB)."
+        : "😎 Su video de YouTube by *KanBot*."
     }`;
 
     await conn.sendMessage(
@@ -165,19 +131,14 @@ let handler = async (m, { conn, args }) => {
       { quoted: m }
     );
 
-  } catch (error) {
-    console.warn("Error general:", error.message);
-    await m.react("❌");
-    await conn.sendMessage(
-      m.chat,
-      { text: "❌ Error inesperado al procesar el enlace." },
-      { quoted: m }
-    );
+  } catch (err) {
+    console.warn("Error al enviar:", err.message);
+    await conn.sendMessage(m.chat, { text: "❌ Error al procesar el archivo final." }, { quoted: m });
   }
 };
 
 handler.tags = ["descargas"];
-handler.help = ["ytv", "ytmp4"];
+handler.help = ["ytmp4", "ytv", "ytvideo"];
 handler.command = ["ytmp4", "ytvideo", "ytv"];
 handler.group = true;
 
