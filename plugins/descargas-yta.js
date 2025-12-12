@@ -8,117 +8,90 @@ const handler = async (m, { conn, text }) => {
 
     await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
 
-    let title, thumbnail, url, filesize, quality, format;
+    let title, thumbnail, url, format = "mp3";
 
+    // ============================================================
+    // 🔥 1️⃣ API PRINCIPAL — Zenzxz
+    // ============================================================
     try {
-      // 🔥 API PRINCIPAL: XYRO
-      const xyroUrl = `https://api.xyro.site/download/youtubemp3?url=${encodeURIComponent(text)}`;
-      const res0 = await fetch(xyroUrl);
-      const data0 = await res0.json();
+      const apiUrl = `https://api.zenzxz.my.id/api/downloader/ytmp3v2?url=${encodeURIComponent(text)}`;
+      const res = await fetch(apiUrl);
+      const json = await res.json();
 
-      if (!data0.status || !data0.result?.download) throw new Error("XYRO falló");
+      if (!json.success || !json.data?.download_url) throw new Error("Zenzxz falló");
 
-      title = data0.result.title;
-      thumbnail = data0.result.thumbnail;
-      url = data0.result.download;
-      filesize = "Desconocido";
-      quality = data0.result.quality || "128kbps";
-      format = data0.result.format || "mp3";
+      title = json.data.title;
+      thumbnail = json.data.thumbnail;
+      url = json.data.download_url;
+      format = json.data.format || "mp3";
 
-    } catch (err0) {
-      console.log("⚠️ XYRO falló, usando Yupra…");
+    } catch (e1) {
+      console.log("⚠️ Zenzxz falló → probando Akirax");
+
+      // ============================================================
+      // 🔄 2️⃣ API RESPALDO — Akirax
+      // ============================================================
       try {
-        // BACKUP 1 — Yupra
-        const yupraUrl = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(text)}`;
-        const res2 = await fetch(yupraUrl);
-        const data2 = await res2.json();
+        const backupUrl = `https://akirax-api.vercel.app/download/ytmp3?url=${encodeURIComponent(text)}`;
+        const res2 = await fetch(backupUrl);
+        const json2 = await res2.json();
 
-        if (data2.status !== 200 || !data2.result?.link) throw new Error("Yupra falló");
+        if (!json2.status || !json2.result?.download) throw new Error("Akirax falló");
 
-        title = data2.result.title;
-        thumbnail = `https://i.ytimg.com/vi/${extractVideoId(text)}/0.jpg`;
-        url = data2.result.link;
-        filesize = `${(data2.result.filesize / 1024 / 1024).toFixed(2)} MB`;
-        quality = "128kbps";
+        title = json2.result.title;
+        thumbnail = json2.result.thumbnail;
+        url = json2.result.download;
         format = "mp3";
 
-      } catch (err2) {
-        console.log("⚠️ Yupra falló, usando Zenzxz…");
-        try {
-          // BACKUP 2 — Zenzxz
-          const zenzUrl = `https://api.zenzxz.my.id/downloader/ytmp3?url=${encodeURIComponent(text)}`;
-          const res3 = await fetch(zenzUrl);
-          const data3 = await res3.json();
+      } catch (e2) {
+        console.log("⚠️ Akirax falló → probando Vreden");
 
-          if (!data3.status || !data3.download_url) throw new Error("Zenzxz falló");
+        // ============================================================
+        // 🟣 3️⃣ ÚLTIMA OPCIÓN — Vreden
+        // ============================================================
+        const vredenUrl = `https://api.vreden.my.id/api/v1/download/youtube/audio?url=${encodeURIComponent(text)}&quality=128`;
 
-          title = data3.title;
-          thumbnail = data3.thumbnail;
-          url = data3.download_url;
-          filesize = "Desconocido";
-          quality = "128kbps";
-          format = "mp3";
+        const res3 = await fetch(vredenUrl);
+        const json3 = await res3.json();
 
-        } catch (err3) {
-          console.log("⚠️ Zenzxz falló, usando Sylphy…");
-          try {
-            // BACKUP 3 — Sylphy
-            const sylphyKey = "sylphy-25c2";
-            const sylphyUrl = `https://api.sylphy.xyz/download/ytmp3?url=${encodeURIComponent(text)}&apikey=${sylphyKey}`;
-            const res4 = await fetch(sylphyUrl);
-            const data4 = await res4.json();
-
-            if (!data4.status || !data4.res?.url) throw new Error("Sylphy falló");
-
-            ({ title, thumbnail, url, filesize, quality, format } = data4.res);
-
-          } catch (err4) {
-            console.log("⚠️ Sylphy falló, usando Stellar…");
-
-            // BACKUP 4 — Stellar
-            const stellarKey = "stellar-53mIXDr2";
-            const stellarUrl = `https://api.stellarwa.xyz/dow/ytmp3?url=${encodeURIComponent(text)}&apikey=${stellarKey}`;
-            const res5 = await fetch(stellarUrl);
-            const data5 = await res5.json();
-
-            if (!data5.status || !data5.data?.dl) throw new Error("Stellar también falló");
-
-            title = data5.data.title;
-            thumbnail = `https://i.ytimg.com/vi/${extractVideoId(text)}/0.jpg`;
-            url = data5.data.dl;
-            filesize = "Desconocido";
-            quality = "128kbps";
-            format = "mp3";
-          }
+        if (!json3.status || !json3.result?.download?.url) {
+          throw new Error("Todas las APIs fallaron");
         }
+
+        title = json3.result.metadata.title;
+        thumbnail = json3.result.metadata.thumbnail;
+        url = json3.result.download.url;
+        format = "mp3";
       }
     }
 
-    // Calcular tamaño si viene desconocido
+    // ============================================================
+    // 📦 Peso del archivo (HEAD)
+    // ============================================================
     let sizeMB = 0;
-    if (filesize === "Desconocido") {
-      try {
-        const head = await fetch(url, { method: "HEAD" });
-        const length = head.headers.get("content-length");
-        if (length) sizeMB = Number(length) / (1024 * 1024);
-      } catch {
-        sizeMB = 0;
-      }
-    } else {
-      sizeMB = parseFloat(filesize);
-    }
+    try {
+      const head = await fetch(url, { method: "HEAD" });
+      const length = head.headers.get("content-length");
+      sizeMB = length ? Number(length) / (1024 * 1024) : 0;
+    } catch { sizeMB = 0; }
 
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
 
+    // ============================================================
+    // 📸 Enviar portada
+    // ============================================================
     await conn.sendMessage(
       m.chat,
       {
         image: { url: thumbnail },
-        caption: `🎶 *${title}*\n📦 ${(sizeMB || 0).toFixed(2)} MB\n🎧 ${quality} ${format}`
+        caption: `🎶 *${title}*\n📦 ${(sizeMB || 0).toFixed(2)} MB\n🎧 ${format.toUpperCase()}`
       },
       { quoted: m }
     );
 
+    // ============================================================
+    // 🎧 Enviar audio / documento si >10MB
+    // ============================================================
     const isHeavy = sizeMB > 10;
 
     await conn.sendMessage(
@@ -145,12 +118,11 @@ handler.group = true;
 
 export default handler;
 
+
+// ============================================================
+// 🔍 Validación de enlace YouTube
+// ============================================================
 function isValidYouTubeUrl(url) {
   const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/;
   return regex.test(url.trim());
-}
-
-function extractVideoId(url) {
-  const match = url.match(/(v=|youtu\.be\/)([\w-]{11})/);
-  return match ? match[2] : null;
 }
