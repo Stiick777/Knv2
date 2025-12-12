@@ -1,5 +1,7 @@
 import { execSync } from 'child_process'
 import fs from 'fs'
+import path from 'path'
+import { pathToFileURL } from 'url'
 
 var handler = async (m, { conn, text }) => {
   m.react('🚀')
@@ -22,50 +24,78 @@ var handler = async (m, { conn, text }) => {
       .toString()
       .split('\n')
       .map(line => line.trim())
-      .filter(line => line.match(/plugins\/.*\.js/))       // detecta "plugins/file.js"
-      .map(line => line.match(/plugins\/.*\.js/)[0])       // extrae SOLO "plugins/file.js"
-      .filter(f => fs.existsSync(f))                      // evita inexistentes
+      .filter(line => line.match(/plugins\/.*\.js/))
+      .map(line => line.match(/plugins\/.*\.js/)[0])
+      .filter(f => fs.existsSync(f))
       .map(f => f.trim())
 
     const uniqueFiles = [...new Set(changedFiles)]
 
     // -----------------------------------
-    // 🧪 VALIDAR SINTAXIS
+    // 🧪 VALIDAR SINTAXIS CON IMPORT()
     // -----------------------------------
     let okPlugins = []
     let errorPlugins = []
 
     for (let file of uniqueFiles) {
       try {
-        delete require.cache[require.resolve('./' + file)]
-        require('./' + file)
+        const fullPath = path.resolve(file)
+        const moduleUrl = pathToFileURL(fullPath).href + '?upd=' + Date.now()
+
+        await import(moduleUrl)   // Verifica sintaxis
+
         okPlugins.push(file)
       } catch (e) {
+        // ------------------------------
+        // EXTRAER LÍNEA DEL ERROR
+        // ------------------------------
+        let line = null
+        let stack = e.stack || ""
+
+        // Detecta líneas tipo: file:///.../plugin.js:45:12
+        let match = stack.match(/(\w:)?\/.*plugins\/.*\.js:(\d+):\d+/)
+
+        if (match && match[2]) {
+          line = match[2]  // número de línea
+        }
+
         errorPlugins.push({
           file,
-          error: e.message.split('\n')[0]
+          error: e.message.split('\n')[0],
+          line: line
         })
       }
     }
 
     // -----------------------------------
-    // 📝 REPORTE
+    // 📝 REPORTE FINAL
     // -----------------------------------
     let report = "🛠 *Reporte de actualización*\n\n"
     report += messager + "\n"
 
     if (uniqueFiles.length > 0) {
       report += `\n📂 *Plugins modificados:* ${uniqueFiles.length}\n`
-      report += uniqueFiles.map(f => `- ${f}`).join('\n') + "\n\n"
+      report += uniqueFiles.map(f => `- ${f}`).join('\n') + "\n"
     }
 
-    if (errorPlugins.length === 0) {
-      report += `✅ *Se actualizaron correctamente ${okPlugins.length} plugins sin errores de sintaxis.*`
-    } else {
-      report += `⚠️ *Se detectaron errores en ${errorPlugins.length} plugin(s):*\n\n`
+    // ✔ Plugins sin errores
+    report += `\n✅ *Plugins correctos:* ${okPlugins.length}\n`
+    if (okPlugins.length > 0) {
+      report += okPlugins.map(p => `   • ${p}`).join('\n') + "\n"
+    }
+
+    // ❌ Plugins con errores
+    if (errorPlugins.length > 0) {
+      report += `\n⚠️ *Errores detectados en ${errorPlugins.length} plugin(s):*\n\n`
       report += errorPlugins
-        .map(e => `❌ *${e.file}*\n   ➤ ${e.error}`)
+        .map(e =>
+          `❌ *${e.file}*\n` +
+          `   ➤ ${e.error}\n` +
+          (e.line ? `   ➤ Línea del error: ${e.line}` : `   ➤ No se pudo detectar la línea`)
+        )
         .join('\n\n')
+    } else {
+      report += `\n🎉 *No se encontraron errores en los plugins.*`
     }
 
     await conn.reply(m.chat, report, m)
