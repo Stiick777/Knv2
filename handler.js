@@ -274,7 +274,7 @@ throw !1
 if (!isAccept) continue
 // ======================= COOLDOWN GLOBAL (CORRECTO) ============================
 if (!global.userCooldown) global.userCooldown = {}
-
+if (isOwner || isROwner) return
 const sender = m.sender
 const cooldownTime = 30 * 1000
 const last = global.userCooldown[sender] || 0
