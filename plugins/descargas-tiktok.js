@@ -22,16 +22,25 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   try {
     m.react('🕒');
 
-    // 1. Intentar como VIDEO
-    const { data: videoData } = await axios.get(`https://apis-starlights-team.koyeb.app/starlight/tiktok?url=${args[0]}`);
+    const apiUrl = `https://akirax-api.vercel.app/download/tiktok?url=${encodeURIComponent(args[0])}`;
+    const { data } = await axios.get(apiUrl);
 
-    // Detectar si es en realidad "foto" (photo mode)
-    if (videoData.duration === 0 || videoData.size === 0) {
-      // 2. Si es foto -> usar endpoint de imágenes
-      const { data: imgData } = await axios.get(`https://apis-starlights-team.koyeb.app/starlight/tiktok-images?url=${args[0]}`);
-      const caption = `*📌 Titulo:* ${imgData.title}\n\n📥 *Descargado exitosamente by KanBot.*`;
+    if (!data.status) {
+      m.react('❌');
+      return conn.reply(m.chat, '*🚫 No se pudo obtener el contenido.*', m);
+    }
 
-      for (const img of imgData.images) {
+    const res = data.result;
+
+    const caption = `
+*👤 Autor:* ${res.author.nickname}
+*🎵 Música:* ${res.music?.title || 'Sin música'}
+📥 *Descargado por KanBot*
+`.trim();
+
+    // 🖼️ SI ES POST DE IMÁGENES
+    if (res.images && Array.isArray(res.images) && res.images.length > 0) {
+      for (const img of res.images) {
         await m.react('📤');
         await conn.sendMessage(
           m.chat,
@@ -43,12 +52,12 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
         );
       }
 
-      // Enviar el audio si existe
-      if (videoData.audio) {
+      // 🎧 Audio si existe
+      if (res.music?.play) {
         await conn.sendMessage(
           m.chat,
           {
-            audio: { url: videoData.audio },
+            audio: { url: res.music.play },
             mimetype: 'audio/mp4',
             ptt: false,
           },
@@ -60,13 +69,12 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
       return;
     }
 
-    // 3. Si es realmente un video
-    const caption = `*🎬 Título:* ${videoData.title || 'Sin título'}\n*📌 Autor:* ${videoData.author?.nickname || 'Desconocido'}\n*🌍 Región:* ${videoData.region || '??'}\n*▶️ Vistas:* ${videoData.views || 0}\n\n📥 *Descargado exitosamente by KanBot.*`;
+    // 🎬 SI ES VIDEO
+    const videoUrl = res.video?.no_watermark || res.video?.watermark;
 
-    const videoUrl = videoData.hd || videoData.nowm || videoData.wm;
     if (!videoUrl) {
       m.react('❌');
-      return conn.reply(m.chat, '*🚫 No se encontró un enlace de video válido.*', m);
+      return conn.reply(m.chat, '*🚫 No se encontró video ni imágenes.*', m);
     }
 
     await m.react('📤');
@@ -79,19 +87,21 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
       { quoted: m }
     );
 
-    // 🚫 Aquí ya no se envía el audio en el caso de video
-
     m.react('✅');
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     m.react('❌');
-    return conn.reply(m.chat, '*🌟 Error al procesar la solicitud. Intente con `/tt2`*', m);
+    return conn.reply(
+      m.chat,
+      '*🌟 Error al procesar el TikTok.*',
+      m
+    );
   }
 };
 
 handler.tags = ['descargas'];
-handler.help = ['tiktok'];
-handler.command = ['tiktok', 'ttdl', 'tiktokdl', 'tiktoknowm', 'tt', 'ttnowm'];
+handler.help = ['tiktok <url>'];
+handler.command = ['tiktok', 'tt', 'ttdl', 'tiktokdl', 'ttnowm'];
 handler.group = true;
 
 export default handler;
