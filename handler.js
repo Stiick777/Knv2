@@ -272,22 +272,25 @@ throw !1
 }
 
 if (!isAccept) continue
-// ======================= COOLDOWN GLOBAL (CORRECTO) ============================
+// ======================= COOLDOWN GLOBAL ============================
 if (!global.userCooldown) global.userCooldown = {}
-if (isOwner || isROwner) return
+
 const sender = m.sender
 const cooldownTime = 30 * 1000
 const last = global.userCooldown[sender] || 0
 const now = Date.now()
 
-if (now - last < cooldownTime) {
-    const tLeft = ((cooldownTime - (now - last)) / 1000).toFixed(0)
-    await m.reply(`⏳ Debes esperar *${tLeft} segundos* antes de usar otro comando.`)
-    return
-}
+// 🚀 SOLO aplicar cooldown si NO es owner
+if (!isOwner && !isROwner) {
+    if (now - last < cooldownTime) {
+        const tLeft = Math.ceil((cooldownTime - (now - last)) / 1000)
+        await m.reply(`⏳ Debes esperar *${tLeft} segundos* antes de usar otro comando.`)
+        return
+    }
 
-// ✅ MARCAR inmediatamente para evitar doble ejecución
-global.userCooldown[sender] = now
+    // marcar cooldown SOLO a usuarios normales
+    global.userCooldown[sender] = now
+}
 // ====================================================================
 m.plugin = name
 if (isAccept) { global.db.data.users[m.sender].commands = (global.db.data.users[m.sender].commands || 0) + 1 }
