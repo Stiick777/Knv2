@@ -45,106 +45,71 @@ if (command === 'playp') {
 
         await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
 try {
-    await m.react('🕓'); // Reacciona mientras procesa
+    await m.react('🕓'); // Procesando
 
     const url = yt_play[0].url;
-
     let title, downloadUrl;
 
-    // --- API Principal: Ruby ---
+    // ─── API PRINCIPAL: AKIRAX ───
     try {
-        const apiUrlRuby = `https://ruby-core.vercel.app/api/download/youtube/mp3?url=${encodeURIComponent(url)}`;
-        const apiResponseRuby = await fetch(apiUrlRuby);
-        const responseRuby = await apiResponseRuby.json();
+        const apiAkirax = `https://akirax-api.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`;
+        const resAkirax = await fetch(apiAkirax);
+        const dataAkirax = await resAkirax.json();
 
-        if (responseRuby.status && responseRuby.download && responseRuby.download.url) {
-            title = responseRuby.metadata.title;
-            downloadUrl = responseRuby.download.url;
+        if (dataAkirax.status && dataAkirax.result?.download) {
+            title = dataAkirax.result.title;
+            downloadUrl = dataAkirax.result.download;
         }
     } catch (e) {
-        console.log('❌ Ruby falló, intentando Yupra...');
+        console.log('❌ Akirax falló, intentando Vreden...');
     }
 
-    // --- Respaldo: Yupra ---
+    // ─── RESPALDO: VREDEN ───
     if (!downloadUrl) {
         try {
-            const apiUrlYupra = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
-            const apiResponseYupra = await fetch(apiUrlYupra);
-            const responseYupra = await apiResponseYupra.json();
+            const apiVreden = `https://api.vreden.my.id/api/v1/download/youtube/audio?url=${encodeURIComponent(url)}&quality=128`;
+            const resVreden = await fetch(apiVreden);
+            const dataVreden = await resVreden.json();
 
-            if (responseYupra.status === 200 && responseYupra.result && responseYupra.result.link) {
-                title = responseYupra.result.title;
-                downloadUrl = responseYupra.result.link;
+            if (
+                dataVreden.status &&
+                dataVreden.result?.download?.status &&
+                dataVreden.result.download.url
+            ) {
+                title = dataVreden.result.metadata.title;
+                downloadUrl = dataVreden.result.download.url;
             }
         } catch (e) {
-            console.log('❌ Yupra falló, intentando Zenzxz...');
+            console.log('❌ Vreden también falló');
         }
     }
 
-    // --- Respaldo: Zenzxz ---
     if (!downloadUrl) {
-        try {
-            const apiUrlZenz = `https://api.zenzxz.my.id/downloader/ytmp3?url=${encodeURIComponent(url)}`;
-            const apiResponseZenz = await fetch(apiUrlZenz);
-            const responseZenz = await apiResponseZenz.json();
-
-            if (responseZenz.status && responseZenz.download_url) {
-                title = responseZenz.title;
-                downloadUrl = responseZenz.download_url;
-            }
-        } catch (e) {
-            console.log('❌ Zenzxz falló, intentando Sylphy...');
-        }
+        throw new Error('No se pudo obtener el audio desde ninguna API.');
     }
 
-    // --- Respaldo: Sylphy ---
-    if (!downloadUrl) {
-        try {
-            const apiUrlSylphy = `https://api.sylphy.xyz/download/ytmp3?url=${encodeURIComponent(url)}&apikey=sylphy-25c2`;
-            const apiResponseSylphy = await fetch(apiUrlSylphy);
-            const responseSylphy = await apiResponseSylphy.json();
-
-            if (responseSylphy.status && responseSylphy.res && responseSylphy.res.url) {
-                title = responseSylphy.res.title;
-                downloadUrl = responseSylphy.res.url;
-            }
-        } catch (e) {
-            console.log('❌ Sylphy falló, intentando Stellar...');
-        }
-    }
-
-    // --- Respaldo: Stellar ---
-    if (!downloadUrl) {
-        try {
-            const apiUrlStellar = `https://api.stellarwa.xyz/dow/ytmp3?url=${encodeURIComponent(url)}&apikey=stellar-53mIXDr2`;
-            const apiResponseStellar = await fetch(apiUrlStellar);
-            const responseStellar = await apiResponseStellar.json();
-
-            if (responseStellar.status && responseStellar.data && responseStellar.data.dl) {
-                title = responseStellar.data.title;
-                downloadUrl = responseStellar.data.dl;
-            }
-        } catch (e) {
-            console.log('❌ Stellar también falló');
-        }
-    }
-
-    if (!downloadUrl) throw new Error('No se pudo obtener el enlace desde ninguna API.');
-
-    // --- Enviar audio ---
-    await conn.sendMessage(m.chat, {
-        audio: { url: downloadUrl },
-        mimetype: 'audio/mp4',
-        fileName: `${title}.mp3`,
-        ptt: false
-    }, { quoted: m });
+    // ─── ENVIAR AUDIO ───
+    await conn.sendMessage(
+        m.chat,
+        {
+            audio: { url: downloadUrl },
+            mimetype: 'audio/mp4',
+            fileName: `${title}.mp3`,
+            ptt: false
+        },
+        { quoted: m }
+    );
 
     await m.react('✅'); // Éxito
 
 } catch (err) {
     await m.react('❌');
     console.error(err);
-    await conn.sendMessage(m.chat, { text: `❌ Error: ${err.message}` }, { quoted: m });
+    await conn.sendMessage(
+        m.chat,
+        { text: `❌ Error: ${err.message}` },
+        { quoted: m }
+    );
 }
 //
     }
