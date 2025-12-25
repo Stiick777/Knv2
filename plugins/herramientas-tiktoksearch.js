@@ -5,6 +5,8 @@ const {
   generateWAMessageContent
 } = (await import("@whiskeysockets/baileys")).default;
 
+const API_KEY = "this-xyz"; // 🔑 tu key
+
 let handler = async (message, { conn, text }) => {
   if (!text) {
     return conn.reply(
@@ -14,7 +16,7 @@ let handler = async (message, { conn, text }) => {
     );
   }
 
-  // 🎥 Crear video en streaming (buffer)
+  // 🎥 Crear video en streaming
   async function createVideoMessage(url) {
     const { data } = await axios.get(url, {
       responseType: "arraybuffer"
@@ -47,10 +49,10 @@ let handler = async (message, { conn, text }) => {
     });
 
     const { data } = await axios.get(
-      `https://api.zenzxz.my.id/api/search/tiktok?query=${encodeURIComponent(text)}`
+      `https://api.stellarwa.xyz/search/tiktok?query=${encodeURIComponent(text)}&key=${API_KEY}`
     );
 
-    if (!data.success || !data.data.length) {
+    if (!data.status || !data.data?.length) {
       throw new Error("No se encontraron resultados");
     }
 
@@ -71,7 +73,7 @@ let handler = async (message, { conn, text }) => {
         header: proto.Message.InteractiveMessage.Header.fromObject({
           title: result.title?.slice(0, 80) || "TikTok Video",
           hasMediaAttachment: true,
-          videoMessage: await createVideoMessage(result.play)
+          videoMessage: await createVideoMessage(result.dl) // ✅ sin watermark
         }),
         nativeFlowMessage:
           proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
