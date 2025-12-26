@@ -134,7 +134,7 @@ try {
     await m.react('❌');
     conn.reply(m.chat, "❌ Error al procesar la descarga.", m);
 }
-                                
+}      
 };
 
 // === Metadatos ===
