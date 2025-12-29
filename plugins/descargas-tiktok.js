@@ -22,23 +22,27 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   try {
     m.react('🕒');
 
-    const apiUrl = `https://akirax-api.vercel.app/download/tiktok?url=${encodeURIComponent(args[0])}`;
+    const apiUrl = `https://api-adonix.ultraplus.click/download/tiktok?apikey=the.shadow&url=${encodeURIComponent(args[0])}`;
     const { data } = await axios.get(apiUrl);
 
-    if (!data.status) {
+    if (!data.status || !data.data) {
       m.react('❌');
       return conn.reply(m.chat, '*🚫 No se pudo obtener el contenido.*', m);
     }
 
-    const res = data.result;
+    const res = data.data;
 
     const caption = `
-*👤 Autor:* ${res.author.nickname}
-*🎵 Música:* ${res.music?.title || 'Sin música'}
+*👤 Autor:* ${res.author?.name || 'Desconocido'}
+*❤️ Likes:* ${res.likes}
+*💬 Comentarios:* ${res.comments}
+*🔁 Compartidos:* ${res.shares}
+*👀 Vistas:* ${res.views}
+
 📥 *Descargado por KanBot*
 `.trim();
 
-    // 🖼️ SI ES POST DE IMÁGENES
+    // 🖼️ POST DE IMÁGENES (Photo Mode)
     if (res.images && Array.isArray(res.images) && res.images.length > 0) {
       for (const img of res.images) {
         await m.react('📤');
@@ -52,42 +56,29 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
         );
       }
 
-      // 🎧 Audio si existe
-      if (res.music?.play) {
-        await conn.sendMessage(
-          m.chat,
-          {
-            audio: { url: res.music.play },
-            mimetype: 'audio/mp4',
-            ptt: false,
-          },
-          { quoted: m }
-        );
-      }
+      m.react('✅');
+      return;
+    }
+
+    // 🎬 VIDEO
+    if (res.video) {
+      await m.react('📤');
+      await conn.sendMessage(
+        m.chat,
+        {
+          video: { url: res.video },
+          caption,
+        },
+        { quoted: m }
+      );
 
       m.react('✅');
       return;
     }
 
-    // 🎬 SI ES VIDEO
-    const videoUrl = res.video?.no_watermark || res.video?.watermark;
+    m.react('❌');
+    return conn.reply(m.chat, '*🚫 No se encontró video ni imágenes.*', m);
 
-    if (!videoUrl) {
-      m.react('❌');
-      return conn.reply(m.chat, '*🚫 No se encontró video ni imágenes.*', m);
-    }
-
-    await m.react('📤');
-    await conn.sendMessage(
-      m.chat,
-      {
-        video: { url: videoUrl },
-        caption,
-      },
-      { quoted: m }
-    );
-
-    m.react('✅');
   } catch (err) {
     console.error(err);
     m.react('❌');
