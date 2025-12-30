@@ -2,22 +2,35 @@ import axios from "axios";
 import { fileTypeFromBuffer } from "file-type";
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {  
-    if (!text) return conn.reply(m.chat, `*💡 Uso Correcto: ${usedPrefix + command} gatos*`, m);  
+    if (!text) {
+        return conn.reply(
+            m.chat,
+            `*💡 Uso Correcto:* ${usedPrefix + command} gatos`,
+            m
+        );
+    }
 
-    await m.react('📌');  
+    await m.react('📌');
 
-    try {  
-        const res = await fetch(`https://api.zenzxz.my.id/api/search/pinterest?query=${encodeURIComponent(text)}`);  
-        const json = await res.json();  
+    try {
+        const url = `https://api.stellarwa.xyz/search/pinterest?query=${encodeURIComponent(text)}&key=this-xyz`;
+        const res = await fetch(url);
+        const json = await res.json();
 
-        if (!json.success || !json.data || !json.data.length) {
-            return conn.reply(m.chat, `❌ No encontré resultados para *${text}*`, m);
+        if (!json.status || !json.data || json.data.length === 0) {
+            return conn.reply(
+                m.chat,
+                `❌ No encontré resultados para *${text}*`,
+                m
+            );
         }
 
-        // Tomar hasta 6 imágenes  
-        const images = json.data.slice(0, 6).map(item => item.directLink);
+        // Tomar hasta 6 imágenes en HD
+        const images = json.data
+            .map(item => item.hd)
+            .filter(Boolean)
+            .slice(0, 6);
 
-        // Función para descargar imagen sin usar disco
         const loadImage = async (url) => {
             const { data } = await axios.get(url, { responseType: "arraybuffer" });
             const buffer = Buffer.from(data);
@@ -26,28 +39,32 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         };
 
         // -----------------------------
-        // 1️⃣ Enviar primera imagen (preview)
+        // 1️⃣ Imagen principal (preview)
         // -----------------------------
         const firstImg = await loadImage(images[0]);
 
-        await conn.sendMessage(m.chat, { 
-            image: firstImg.buffer, 
-            mimetype: firstImg.mime,
-            caption: `📍 Resultado de: *${text}*`, 
-            contextInfo: { 
-                externalAdReply: { 
-                    mediaUrl: images[1] || images[0], 
-                    mediaType: 1, 
-                    thumbnailUrl: images[2] || images[0], 
-                    title: "KanBot V2", 
-                    body: "Aquí están tus imágenes", 
-                    previewType: 0 
-                } 
-            } 
-        }, { quoted: m });
+        await conn.sendMessage(
+            m.chat,
+            {
+                image: firstImg.buffer,
+                mimetype: firstImg.mime,
+                caption: `📍 Resultados de Pinterest\n🔎 *${text}*`,
+                contextInfo: {
+                    externalAdReply: {
+                        title: "KanBot V2",
+                        body: "Búsqueda Pinterest • StellarWA",
+                        mediaType: 1,
+                        mediaUrl: images[1] || images[0],
+                        thumbnailUrl: images[2] || images[0],
+                        previewType: 0
+                    }
+                }
+            },
+            { quoted: m }
+        );
 
         // -----------------------------
-        // 2️⃣ Enviar el resto en streaming
+        // 2️⃣ Enviar el resto
         // -----------------------------
         for (let i = 1; i < images.length; i++) {
             try {
@@ -61,22 +78,26 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
                     { quoted: m }
                 );
             } catch (err) {
-                console.log("Error descargando imagen:", images[i]);
+                console.log("❌ Error descargando:", images[i]);
             }
         }
 
         await m.react('✅');
 
-    } catch (e) {  
-        console.error(e);  
+    } catch (e) {
+        console.error(e);
         await m.react('❌');
-        await conn.reply(m.chat, `❌ Error al buscar imágenes. Inténtalo con /pin2`, m);  
-    }  
-};  
+        await conn.reply(
+            m.chat,
+            `❌ Error al buscar imágenes en Pinterest.`,
+            m
+        );
+    }
+};
 
-handler.help = ['pinterest <query>'];  
-handler.tags = ['buscador'];  
-handler.command = ['pinterest', 'pin', 'pimg'];  
-handler.group = true;  
+handler.help = ['pinterest <texto>'];
+handler.tags = ['buscador'];
+handler.command = ['pinterest', 'pin', 'pimg'];
+handler.group = true;
 
 export default handler;
