@@ -5,8 +5,6 @@ const {
   generateWAMessageContent
 } = (await import("@whiskeysockets/baileys")).default;
 
-const API_KEY = "this-xyz"; // 🔑 tu key
-
 let handler = async (message, { conn, text }) => {
   if (!text) {
     return conn.reply(
@@ -16,7 +14,7 @@ let handler = async (message, { conn, text }) => {
     );
   }
 
-  // 🎥 Crear video en streaming
+  // 🎥 Crear video
   async function createVideoMessage(url) {
     const { data } = await axios.get(url, {
       responseType: "arraybuffer"
@@ -49,23 +47,22 @@ let handler = async (message, { conn, text }) => {
     });
 
     const { data } = await axios.get(
-      `https://api.stellarwa.xyz/search/tiktok?query=${encodeURIComponent(text)}&key=${API_KEY}`
+      `https://api.dorratz.com/v2/tiktok-s?q=${encodeURIComponent(text)}?limit=7`
     );
 
     if (!data.status || !data.data?.length) {
       throw new Error("No se encontraron resultados");
     }
 
-    let searchResults = data.data;
-    shuffleArray(searchResults);
+    let results = data.data;
+    shuffleArray(results);
 
-    let topResults = searchResults.slice(0, 7);
     let cards = [];
 
-    for (let result of topResults) {
+    for (let result of results.slice(0, 7)) {
       cards.push({
         body: proto.Message.InteractiveMessage.Body.fromObject({
-          text: null
+          text: `👤 ${result.author.nickname}\n❤️ ${result.like} | 💬 ${result.coment}`
         }),
         footer: proto.Message.InteractiveMessage.Footer.fromObject({
           text: "TikTok Search"
@@ -73,7 +70,7 @@ let handler = async (message, { conn, text }) => {
         header: proto.Message.InteractiveMessage.Header.fromObject({
           title: result.title?.slice(0, 80) || "TikTok Video",
           hasMediaAttachment: true,
-          videoMessage: await createVideoMessage(result.dl) // ✅ sin watermark
+          videoMessage: await createVideoMessage(result.url)
         }),
         nativeFlowMessage:
           proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
@@ -99,9 +96,7 @@ let handler = async (message, { conn, text }) => {
                 footer: {
                   text: "By ✰ KanBot ✰"
                 },
-                carouselMessage: {
-                  cards
-                }
+                carouselMessage: { cards }
               })
           }
         }
