@@ -14,7 +14,7 @@ let handler = async (message, { conn, text }) => {
     );
   }
 
-  // 🎥 Crear video
+  // 🎥 Crear mensaje de video
   async function createVideoMessage(url) {
     const { data } = await axios.get(url, {
       responseType: "arraybuffer"
@@ -47,7 +47,7 @@ let handler = async (message, { conn, text }) => {
     });
 
     const { data } = await axios.get(
-      `https://api.dorratz.com/v2/tiktok-s?q=${encodeURIComponent(text)}?limit=7`
+      `https://api.siputzx.my.id/api/s/tiktok?query=${encodeURIComponent(text)}`
     );
 
     if (!data.status || !data.data?.length) {
@@ -62,7 +62,7 @@ let handler = async (message, { conn, text }) => {
     for (let result of results.slice(0, 7)) {
       cards.push({
         body: proto.Message.InteractiveMessage.Body.fromObject({
-          text: `👤 ${result.author.nickname}\n❤️ ${result.like} | 💬 ${result.coment}`
+          text: `👤 ${result.author.nickname}\n❤️ ${result.digg_count} | 💬 ${result.comment_count}`
         }),
         footer: proto.Message.InteractiveMessage.Footer.fromObject({
           text: "TikTok Search"
@@ -70,7 +70,7 @@ let handler = async (message, { conn, text }) => {
         header: proto.Message.InteractiveMessage.Header.fromObject({
           title: result.title?.slice(0, 80) || "TikTok Video",
           hasMediaAttachment: true,
-          videoMessage: await createVideoMessage(result.url)
+          videoMessage: await createVideoMessage(result.play)
         }),
         nativeFlowMessage:
           proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
