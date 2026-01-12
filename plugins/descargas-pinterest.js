@@ -13,11 +13,11 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     await m.react('📌');
 
     try {
-        const url = `https://api.stellarwa.xyz/search/pinterest?query=${encodeURIComponent(text)}&key=this-xyz`;
+        const url = `https://api-adonix.ultraplus.click/search/pinterest?apikey=shadow.xyz&q=${encodeURIComponent(text)}`;
         const res = await fetch(url);
         const json = await res.json();
 
-        if (!json.status || !json.data || json.data.length === 0) {
+        if (!json.status || !json.results || json.results.length === 0) {
             return conn.reply(
                 m.chat,
                 `❌ No encontré resultados para *${text}*`,
@@ -25,9 +25,9 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
             );
         }
 
-        // Tomar hasta 6 imágenes en HD
-        const images = json.data
-            .map(item => item.hd)
+        // Tomar hasta 6 imágenes
+        const images = json.results
+            .map(item => item.downloadUrl)
             .filter(Boolean)
             .slice(0, 6);
 
@@ -52,7 +52,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
                 contextInfo: {
                     externalAdReply: {
                         title: "KanBot V2",
-                        body: "Búsqueda Pinterest • StellarWA",
+                        body: "Búsqueda Pinterest • Adonix API",
                         mediaType: 1,
                         mediaUrl: images[1] || images[0],
                         thumbnailUrl: images[2] || images[0],
