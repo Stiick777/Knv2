@@ -16,10 +16,7 @@ let handler = async (message, { conn, text }) => {
 
   // 🎥 Crear mensaje de video
   async function createVideoMessage(url) {
-    const { data } = await axios.get(url, {
-      responseType: "arraybuffer"
-    });
-
+    const { data } = await axios.get(url, { responseType: "arraybuffer" });
     const buffer = Buffer.from(data);
 
     const { videoMessage } = await generateWAMessageContent(
@@ -47,10 +44,10 @@ let handler = async (message, { conn, text }) => {
     });
 
     const { data } = await axios.get(
-      `https://api.siputzx.my.id/api/s/tiktok?query=${encodeURIComponent(text)}`
+      `https://apis-starlights-team.koyeb.app/starlight/tiktoksearch?text=${encodeURIComponent(text)}`
     );
 
-    if (!data.status || !data.data?.length) {
+    if (!data.data || !data.data.length) {
       throw new Error("No se encontraron resultados");
     }
 
@@ -62,7 +59,10 @@ let handler = async (message, { conn, text }) => {
     for (let result of results.slice(0, 7)) {
       cards.push({
         body: proto.Message.InteractiveMessage.Body.fromObject({
-          text: `👤 ${result.author.nickname}\n❤️ ${result.digg_count} | 💬 ${result.comment_count}`
+          text:
+            `👤 ${result.author}\n` +
+            `👁 ${result.views.toLocaleString()} | ❤️ ${result.likes.toLocaleString()}\n` +
+            `💬 ${result.comments.toLocaleString()} | 🔁 ${result.share.toLocaleString()}`
         }),
         footer: proto.Message.InteractiveMessage.Footer.fromObject({
           text: "TikTok Search"
@@ -70,7 +70,7 @@ let handler = async (message, { conn, text }) => {
         header: proto.Message.InteractiveMessage.Header.fromObject({
           title: result.title?.slice(0, 80) || "TikTok Video",
           hasMediaAttachment: true,
-          videoMessage: await createVideoMessage(result.play)
+          videoMessage: await createVideoMessage(result.nowm)
         }),
         nativeFlowMessage:
           proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
