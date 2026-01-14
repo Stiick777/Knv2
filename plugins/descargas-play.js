@@ -48,39 +48,35 @@ try {
     await m.react('🕓'); // Procesando
 
     const url = yt_play[0].url;
-    let title, downloadUrl;
+    let title, downloadUrl, mimetype, fileExt;
 
-    // ─── API PRINCIPAL: AKIRAX ───
+    // ─── API PRINCIPAL: ADONIX ───
     try {
-        const apiAkirax = `https://akirax-api.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`;
-        const resAkirax = await fetch(apiAkirax);
-        const dataAkirax = await resAkirax.json();
+        const apiAdonix = `https://api-adonix.ultraplus.click/download/ytaudio?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
+        const resAdonix = await fetch(apiAdonix);
+        const jsonAdonix = await resAdonix.json();
 
-        if (dataAkirax.status && dataAkirax.result?.download) {
-            title = dataAkirax.result.title;
-            downloadUrl = dataAkirax.result.download;
+        if (jsonAdonix.status && jsonAdonix.data?.url) {
+            title = jsonAdonix.data.title;
+            downloadUrl = jsonAdonix.data.url;
+            mimetype = 'audio/mp4';
+            fileExt = 'm4a';
         }
     } catch (e) {
-        console.log('❌ Akirax falló, intentando Vreden...');
+        console.log('❌ Adonix falló, intentando Yupra...');
     }
 
-    // ─── RESPALDO: VREDEN ───
+    // ─── RESPALDO: YUPRA ───
     if (!downloadUrl) {
-        try {
-            const apiVreden = `https://api.vreden.my.id/api/v1/download/youtube/audio?url=${encodeURIComponent(url)}&quality=128`;
-            const resVreden = await fetch(apiVreden);
-            const dataVreden = await resVreden.json();
+        const apiYupra = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
+        const resYupra = await fetch(apiYupra);
+        const jsonYupra = await resYupra.json();
 
-            if (
-                dataVreden.status &&
-                dataVreden.result?.download?.status &&
-                dataVreden.result.download.url
-            ) {
-                title = dataVreden.result.metadata.title;
-                downloadUrl = dataVreden.result.download.url;
-            }
-        } catch (e) {
-            console.log('❌ Vreden también falló');
+        if (jsonYupra.success && jsonYupra.data?.download_url) {
+            title = jsonYupra.data.title;
+            downloadUrl = jsonYupra.data.download_url;
+            mimetype = 'audio/mpeg';
+            fileExt = 'mp3';
         }
     }
 
@@ -93,8 +89,8 @@ try {
         m.chat,
         {
             audio: { url: downloadUrl },
-            mimetype: 'audio/mp4',
-            fileName: `${title}.mp3`,
+            mimetype,
+            fileName: `${title}.${fileExt}`,
             ptt: false
         },
         { quoted: m }
@@ -184,80 +180,69 @@ try {
         }
     }
 
-    // ======================================================
-    // ⭐ API PRINCIPAL: XYRO
-    // ======================================================
-    try {
-        const response = await axios.post(
-            "https://api.xyro.site/download/youtube",
-            new URLSearchParams({ url }).toString(),
-            {
-                headers: {
-                    "accept": "application/json",
-                    "content-type": "application/x-www-form-urlencoded"
-                }
-            }
-        );
+// ======================================================
+// ⭐ API PRINCIPAL: YUPRA YTMP4
+// ======================================================
+try {
+    await m.react('🕓');
 
-        const json = response.data;
+    const apiYupra = `https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`;
+    const resY = await fetch(apiYupra);
+    const jsonY = await resY.json();
 
-        if (!json.success || !json.medias?.length) {
-            throw new Error("XYRO inválido");
-        }
-
-        const media = json.medias[0];
-        const thumb = json.thumbnail
-            ? await (await fetch(json.thumbnail)).buffer()
-            : null;
-
-        await enviarVideo(
-            m.chat,
-            media.url,
-            `*${json.title}*\nDuración: ${json.duration}s\nCalidad: ${media.qualityLabel || media.label}`,
-            thumb,
-            m
-        );
-
-        await m.react('✅');
-        return;
-
-    } catch (e1) {
-        console.warn("XYRO falló, usando VREDEN");
+    if (!jsonY.success || !jsonY.data?.download_url) {
+        throw new Error('YUPRA inválido');
     }
 
-    // ======================================================
-    // ⭐ RESPALDO: VREDEN (360p)
-    // ======================================================
-    try {
-        const apiV = await fetch(
-            `https://api.vreden.my.id/api/v1/download/youtube/video?url=${encodeURIComponent(url)}&quality=360`
-        );
-        const resV = await apiV.json();
+    const data = jsonY.data;
 
-        if (!resV.status || !resV.result?.download?.url) {
-            throw new Error("VREDEN inválido");
-        }
+    const thumb = data.thumbnail
+        ? await (await fetch(data.thumbnail)).buffer()
+        : null;
 
-        const meta = resV.result.metadata;
-        const down = resV.result.download;
-        const thumb = meta.thumbnail
-            ? await (await fetch(meta.thumbnail)).buffer()
-            : null;
+    await enviarVideo(
+        m.chat,
+        data.download_url,
+        `*${data.title}*\nDuración: ${data.duration}\nCalidad: ${data.format}p`,
+        thumb,
+        m
+    );
 
-        await enviarVideo(
-            m.chat,
-            down.url,
-            `*${meta.title}*\nDuración: ${meta.duration.timestamp}\nCalidad: ${down.quality}`,
-            thumb,
-            m
-        );
+    await m.react('✅');
+    return;
 
-        await m.react('✅');
-        return;
+} catch (e1) {
+    console.warn('❌ YUPRA falló, intentando ADONIX...');
+}
 
-    } catch (e2) {
-        throw '❌ Ningún servidor devolvió resultados.';
+// ======================================================
+// ⭐ RESPALDO: ADONIX (shadow.xyz – 360p)
+// ======================================================
+try {
+    const apiAdonix = `https://api-adonix.ultraplus.click/download/ytquality?apikey=shadow.xyz&url=${encodeURIComponent(url)}&type=video&quality=360p`;
+    const resA = await fetch(apiAdonix);
+    const jsonA = await resA.json();
+
+    if (!jsonA.status || !jsonA.url) {
+        throw new Error('ADONIX inválido');
     }
+
+    await enviarVideo(
+        m.chat,
+        jsonA.url,
+        `*${jsonA.title}*\nCalidad: 360p`,
+        null,
+        m
+    );
+
+    await m.react('✅');
+    return;
+
+} catch (e2) {
+    await m.react('❌');
+    console.error(e2);
+    throw '❌ Ningún servidor devolvió el video.';
+
 
 } catch (e) {
     console.error(e);
