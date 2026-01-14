@@ -242,7 +242,7 @@ try {
     await m.react('❌');
     console.error(e2);
     throw '❌ Ningún servidor devolvió el video.';
-
+}
 
 } catch (e) {
     console.error(e);
@@ -253,9 +253,9 @@ try {
 }
 
 }
-handler.help = ['playp', 'play2'];
+handler.help = ['play', 'play2'];
 handler.tags = ['descargas'];
-handler.command = ['play2', 'playp']
+handler.command = ['play2', 'play']
 handler.group = true;
 export default handler;
 
