@@ -1,4 +1,4 @@
-import axios from 'axios';
+import fetch from 'node-fetch';
 
 const handler = async (m, { conn, args, usedPrefix, command }) => {
   if (!args[0]) {
@@ -18,83 +18,95 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   try {
     m.react('🕒');
 
-    const { data } = await axios.post(
-      'https://api.xyro.site/download/tiktokv1',
-      new URLSearchParams({ url: args[0] }).toString(),
-      {
-        headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
-    );
+    const api = `https://api.yupra.my.id/api/downloader/tiktok?url=${encodeURIComponent(args[0])}`;
+    const res = await fetch(api);
+    const json = await res.json();
 
-    if (!data || !data.video) {
-      m.react('❌');
-      return conn.reply(m.chat, '*🚫 No se pudo obtener el contenido.*', m);
+    if (!json.result?.status) {
+      throw new Error('Respuesta inválida de YUPRA');
     }
 
+    const r = json.result;
+
+    // ─── CAPTION ───
     const caption = `
-*👤 Autor:* ${data.author || 'Desconocido'}
+*👤 Autor:* ${r.author?.nickname || 'Desconocido'}
+*📝 Título:* ${r.title}
+*⏱ Duración:* ${r.duration}
 
 📥 *Descargado por KanBot*
 `.trim();
 
-    // 🖼️ PHOTO MODE (TikTok imágenes)
-    // Cuando el "video" es en realidad audio (mp3)
-    if (data.video.endsWith('.mp3')) {
+    // ─── SELECCIONAR MEJOR VIDEO ───
+    const videoHD =
+      r.data.find(v => v.type === 'nowatermark_hd') ||
+      r.data.find(v => v.type === 'nowatermark') ||
+      r.data.find(v => v.type === 'watermark');
+
+    // ─────────────────────────────
+    // 📸 PHOTO / AUDIO MODE
+    // (cuando TikTok no es video real)
+    // ─────────────────────────────
+    if (!videoHD) {
       await m.react('📤');
 
-      await conn.sendMessage(
-        m.chat,
-        {
-          image: { url: data.thumbnail },
-          caption,
-        },
-        { quoted: m }
-      );
-
-      if (data.audio) {
+      // Enviar cover
+      if (r.cover) {
         await conn.sendMessage(
           m.chat,
           {
-            audio: { url: data.audio },
-            mimetype: 'audio/mp4',
+            image: { url: r.cover },
+            caption,
+          },
+          { quoted: m }
+        );
+      }
+
+      // Enviar audio
+      if (r.music_info?.url) {
+        await conn.sendMessage(
+          m.chat,
+          {
+            audio: { url: r.music_info.url },
+            mimetype: 'audio/mpeg',
             ptt: false,
           },
           { quoted: m }
         );
       }
 
-      m.react('✅');
+      await m.react('✅');
       return;
     }
 
-    // 🎬 VIDEO NORMAL
+    // ─────────────────────────────
+    // 🎬 VIDEO MODE (normal)
+    // ─────────────────────────────
     await m.react('📤');
+
     await conn.sendMessage(
       m.chat,
       {
-        video: { url: data.video },
+        video: { url: videoHD.url },
         caption,
       },
       { quoted: m }
     );
 
-    // 🔊 AUDIO (opcional)
-    if (data.audio) {
+    // 🔊 Audio opcional
+    if (r.music_info?.url) {
       await conn.sendMessage(
         m.chat,
         {
-          audio: { url: data.audio },
-          mimetype: 'audio/mp4',
+          audio: { url: r.music_info.url },
+          mimetype: 'audio/mpeg',
           ptt: false,
         },
         { quoted: m }
       );
     }
 
-    m.react('✅');
+    await m.react('✅');
 
   } catch (err) {
     console.error(err);
