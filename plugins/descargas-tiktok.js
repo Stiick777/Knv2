@@ -20,70 +20,59 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
     const api = `https://api.yupra.my.id/api/downloader/tiktok?url=${encodeURIComponent(args[0])}`;
     const res = await fetch(api);
-    const json = await res.json();
+    if (!res.ok) throw new Error('API no respondió');
 
-    if (!json.result?.status) {
-      throw new Error('Respuesta inválida de YUPRA');
-    }
+    const json = await res.json();
+    if (!json.result?.status) throw new Error('Respuesta inválida');
 
     const r = json.result;
 
-    // ─── CAPTION ───
     const caption = `
 *👤 Autor:* ${r.author?.nickname || 'Desconocido'}
-*📝 Título:* ${r.title}
-*⏱ Duración:* ${r.duration}
+*📝 Título:* ${r.title || 'Sin título'}
+*⏱ Duración:* ${r.duration || 'Desconocida'}
 
 📥 *Descargado por KanBot*
 `.trim();
 
-    // ─── SELECCIONAR MEJOR VIDEO ───
     const videoHD =
-      r.data.find(v => v.type === 'nowatermark_hd') ||
-      r.data.find(v => v.type === 'nowatermark') ||
-      r.data.find(v => v.type === 'watermark');
+      r.data?.find(v => v.type === 'nowatermark_hd') ||
+      r.data?.find(v => v.type === 'nowatermark') ||
+      r.data?.find(v => v.type === 'watermark');
 
-    // ─────────────────────────────
-    // 📸 PHOTO / AUDIO MODE
-    // (cuando TikTok no es video real)
-    // ─────────────────────────────
+    await m.react('📤');
+
+    // ─────── FOTO + AUDIO (slides / fotos) ───────
     if (!videoHD) {
-      await m.react('📤');
-
-      // Enviar cover
       if (r.cover) {
         await conn.sendMessage(
           m.chat,
-          {
-            image: { url: r.cover },
-            caption,
-          },
+          { image: { url: r.cover }, caption },
           { quoted: m }
         );
       }
 
-      // Enviar audio
       if (r.music_info?.url) {
-        await conn.sendMessage(
-          m.chat,
-          {
-            audio: { url: r.music_info.url },
-            mimetype: 'audio/mpeg',
-            ptt: false,
-          },
-          { quoted: m }
-        );
+        try {
+          await conn.sendMessage(
+            m.chat,
+            {
+              audio: { url: r.music_info.url },
+              mimetype: 'audio/mpeg',
+              ptt: false,
+            },
+            { quoted: m }
+          );
+        } catch (e) {
+          console.log('⚠️ Audio no enviado:', e.message);
+        }
       }
 
-      await m.react('✅');
+      m.react('✅');
       return;
     }
 
-    // ─────────────────────────────
-    // 🎬 VIDEO MODE (normal)
-    // ─────────────────────────────
-    await m.react('📤');
-
+    // ─────── VIDEO ───────
     await conn.sendMessage(
       m.chat,
       {
@@ -93,23 +82,28 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
       { quoted: m }
     );
 
-    // 🔊 Audio opcional
+    // Audio opcional (NO debe romper el flujo)
     if (r.music_info?.url) {
-      await conn.sendMessage(
-        m.chat,
-        {
-          audio: { url: r.music_info.url },
-          mimetype: 'audio/mpeg',
-          ptt: false,
-        },
-        { quoted: m }
-      );
+      try {
+        await conn.sendMessage(
+          m.chat,
+          {
+            audio: { url: r.music_info.url },
+            mimetype: 'audio/mpeg',
+            ptt: false,
+          },
+          { quoted: m }
+        );
+      } catch (e) {
+        console.log('⚠️ Audio no enviado:', e.message);
+      }
     }
 
-    await m.react('✅');
+    m.react('✅');
+    return;
 
   } catch (err) {
-    console.error(err);
+    console.error('❌ TikTok Error:', err);
     m.react('❌');
     return conn.reply(
       m.chat,
