@@ -24,67 +24,39 @@ let handler = async (m, { conn, args }) => {
 
   await m.react("🕓");
 
-  let title, downloadUrl, thumbnail, quality;
+  let title, downloadUrl, duration, views;
 
   // ===================================================
-  // ⭐ API PRINCIPAL: XYRO
+  // ⭐ API ÚNICA: ADONIX
   // ===================================================
   try {
-    const response = await axios.post(
-      "https://api.xyro.site/download/youtube",
-      new URLSearchParams({ url: youtubeLink }).toString(),
+    const { data } = await axios.get(
+      `https://api-adonix.ultraplus.click/download/ytvideo`,
       {
-        headers: {
-          "accept": "application/json",
-          "content-type": "application/x-www-form-urlencoded"
+        params: {
+          apikey: "shadow.xyz",
+          url: youtubeLink
         }
       }
     );
 
-    const json = response.data;
-
-    if (!json.success || !json.medias?.length) {
-      throw new Error("XYRO inválido");
+    if (!data.status || !data.data?.url) {
+      throw new Error("Respuesta inválida de Adonix");
     }
 
-    const media = json.medias[0]; // 👈 primer resultado
+    title = data.data.title;
+    downloadUrl = data.data.url;
+    duration = data.data.duration;
+    views = data.data.vistas;
 
-    title = json.title || "Video de YouTube";
-    downloadUrl = media.url;
-    thumbnail = json.thumbnail;
-    quality = media.qualityLabel || media.label || "Desconocida";
-
-  } catch (e1) {
-    console.warn("Error XYRO:", e1.message);
-
-    // ===================================================
-    // ⭐ RESPALDO: VREDEN
-    // ===================================================
-    try {
-      const api2 = await fetch(
-        `https://api.vreden.my.id/api/v1/download/youtube/video?url=${encodeURIComponent(youtubeLink)}&quality=360`
-      );
-
-      const json2 = await api2.json();
-
-      if (!json2.status || !json2.result?.download?.url) {
-        throw new Error("VREDEN inválido");
-      }
-
-      title = json2.result.metadata.title;
-      downloadUrl = json2.result.download.url;
-      thumbnail = json2.result.metadata.thumbnail;
-      quality = json2.result.download.quality;
-
-    } catch (e2) {
-      console.error("Error VREDEN:", e2.message);
-      await m.react("❌");
-      return conn.sendMessage(
-        m.chat,
-        { text: "❌ No se pudo descargar el video. Todas las APIs fallaron." },
-        { quoted: m }
-      );
-    }
+  } catch (err) {
+    console.error("Error Adonix:", err.message);
+    await m.react("❌");
+    return conn.sendMessage(
+      m.chat,
+      { text: "❌ No se pudo descargar el video con la API Adonix." },
+      { quoted: m }
+    );
   }
 
   // ===================================================
@@ -108,21 +80,14 @@ let handler = async (m, { conn, args }) => {
     const buffer = Buffer.from(data);
     const type = await fileTypeFromBuffer(buffer);
 
-    let thumbBuffer = null;
-    if (thumbnail) {
-      try {
-        const t = await fetch(thumbnail);
-        thumbBuffer = await t.buffer();
-      } catch {}
-    }
-
     await m.react("✅");
 
     const isHeavy = sizeMB > 30;
 
     const caption = `🎬 *${title}*
+⏱️ *Duración:* ${duration}
+👁️ *Vistas:* ${views.toLocaleString()}
 📏 *Tamaño:* ${sizeMB.toFixed(2)} MB
-📌 *Calidad:* ${quality}
 
 ${isHeavy
         ? "📁 Enviado como *documento* (más de 30 MB)."
@@ -135,8 +100,7 @@ ${isHeavy
         [isHeavy ? "document" : "video"]: buffer,
         fileName: `${title}.mp4`,
         mimetype: type?.mime || "video/mp4",
-        caption,
-        jpegThumbnail: thumbBuffer
+        caption
       },
       { quoted: m }
     );
