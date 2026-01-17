@@ -1,52 +1,71 @@
-import fetch from 'node-fetch'
-import FormData from 'form-data'
+import fetch from "node-fetch";
+import crypto from "crypto";
+import { FormData, Blob } from "formdata-node";
+import { fileTypeFromBuffer } from "file-type";
 
-const LOLHUMAN_APIKEY = '8fdb6bf3e9d527f7a6476f4b'
-
-// Subir imagen a telegra.ph
-async function uploadImage(buffer) {
-  const form = new FormData()
-  form.append('file', buffer, 'image.webp')
-
-  const res = await fetch('https://telegra.ph/upload', {
-    method: 'POST',
-    body: form
-  })
-
-  const data = await res.json()
-  if (!data[0]?.src) throw new Error('Error al subir imagen')
-
-  return 'https://telegra.ph' + data[0].src
-}
+const LOLHUMAN_APIKEY = '8fdb6bf3e9d527f7a6476f4b';
 
 let handler = async (m, { conn, usedPrefix, command }) => {
-  const notStickerMessage = `❌ Responde a un *sticker* con *${usedPrefix + command}*`
+  const q = m.quoted || m;
+  const mime = (q.msg || q).mimetype || '';
 
-  const q = m.quoted || m
-  const mime = q.mimetype || q.mediaType || ''
+  if (!/webp/.test(mime)) {
+    return m.reply(`❌ Responde a un *sticker* con *${usedPrefix + command}*`);
+  }
 
-  if (!/webp/.test(mime)) return m.reply(notStickerMessage)
+  await m.react('🕛');
 
   try {
-    const media = await q.download()
+    // 1. Descargar sticker
+    const media = await q.download();
 
-    // 1. Subir sticker
-    const imgUrl = await uploadImage(media)
+    // 2. Subir a Catbox
+    const imgUrl = await catbox(media);
 
-    // 2. Convertir con lolhuman
-    const apiUrl = `https://api.lolhuman.xyz/api/convert/topng?apikey=${LOLHUMAN_APIKEY}&img=${encodeURIComponent(imgUrl)}`
+    // 3. Convertir con Lolhuman
+    const apiUrl = `https://api.lolhuman.xyz/api/convert/topng?apikey=${LOLHUMAN_APIKEY}&img=${encodeURIComponent(imgUrl)}`;
 
-    // 3. Enviar imagen
-    await conn.sendFile(m.chat, apiUrl, 'sticker.png', null, m)
+    // 4. Enviar imagen
+    await conn.sendFile(m.chat, apiUrl, 'sticker.png', null, m);
 
+    await m.react('✅');
   } catch (e) {
-    console.error(e)
-    m.reply('❌ Error al convertir el sticker a imagen')
+    console.error(e);
+    await m.react('❌');
+    m.reply('❌ Error al convertir el sticker a imagen');
   }
+};
+
+handler.help = ['toimg (reply)'];
+handler.tags = ['transformador'];
+handler.command = ['toimg', 'img', 'jpg'];
+handler.group = true;
+
+export default handler;
+
+/* =======================
+   CATBOX UPLOADER
+======================= */
+
+async function catbox(content) {
+  const { ext, mime } = (await fileTypeFromBuffer(content)) || {};
+  if (!ext || !mime) throw new Error('No se pudo detectar el tipo de archivo');
+
+  const blob = new Blob([content.toArrayBuffer()], { type: mime });
+  const formData = new FormData();
+  const randomName = crypto.randomBytes(5).toString("hex");
+
+  formData.append("reqtype", "fileupload");
+  formData.append("fileToUpload", blob, `${randomName}.${ext}`);
+
+  const response = await fetch("https://catbox.moe/user/api.php", {
+    method: "POST",
+    body: formData,
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
+    },
+  });
+
+  return await response.text();
 }
-
-handler.help = ['toimg (reply)']
-handler.tags = ['transformador']
-handler.command = ['toimg', 'img', 'jpg']
-
-export default handler
