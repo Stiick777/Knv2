@@ -22,17 +22,26 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     // 2. Subir a Catbox
     const imgUrl = await catbox(media);
 
-    // 3. Convertir con Lolhuman
+    // 3. Llamar API lolhuman (BINARIO)
     const apiUrl = `https://api.lolhuman.xyz/api/convert/topng?apikey=${LOLHUMAN_APIKEY}&img=${encodeURIComponent(imgUrl)}`;
 
-    // 4. Enviar imagen
-    await conn.sendFile(m.chat, apiUrl, 'sticker.png', null, m);
+    const res = await fetch(apiUrl);
+    const buffer = await res.buffer();
+
+    // 4. Enviar imagen real
+    await conn.sendFile(
+      m.chat,
+      buffer,
+      'sticker.png',
+      null,
+      m
+    );
 
     await m.react('✅');
   } catch (e) {
     console.error(e);
     await m.react('❌');
-    m.reply('❌ Error al convertir el sticker a imagen');
+    m.reply('❌ Error al convertir el sticker');
   }
 };
 
@@ -49,14 +58,14 @@ export default handler;
 
 async function catbox(content) {
   const { ext, mime } = (await fileTypeFromBuffer(content)) || {};
-  if (!ext || !mime) throw new Error('No se pudo detectar el tipo de archivo');
+  if (!ext || !mime) throw new Error('No se pudo detectar el archivo');
 
   const blob = new Blob([content.toArrayBuffer()], { type: mime });
   const formData = new FormData();
-  const randomName = crypto.randomBytes(5).toString("hex");
+  const name = crypto.randomBytes(5).toString("hex");
 
   formData.append("reqtype", "fileupload");
-  formData.append("fileToUpload", blob, `${randomName}.${ext}`);
+  formData.append("fileToUpload", blob, `${name}.${ext}`);
 
   const response = await fetch("https://catbox.moe/user/api.php", {
     method: "POST",
