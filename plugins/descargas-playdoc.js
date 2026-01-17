@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'
+/*import fetch from 'node-fetch'
 import yts from 'yt-search'
 
 const handler = async (m, { conn, command, args, text }) => {
@@ -157,3 +157,4 @@ function secondString(seconds) {
     const s = seconds % 60;
     return `${h}h ${m}m ${s}s`;
 }
+*/
