@@ -27,7 +27,7 @@ await conn.reply(m.chat, yaemori, m, fake)
 handler.help = ['botreglas']
 handler.tags = ['main']
 handler.command = ['botreglas', 'op', 'reglasdelbot', 'reglasbot', 'reglas']
-handler.private = true 
+
  
 export default handler
 
