@@ -14,7 +14,7 @@ para tener a Kanbot en tu grupo se debe tener en cuenta estos requerimientos y r
  │> *NO* llamadas al Bot
  │> *NO* privados al Bot
  
- │> si tienen alguna duda o problemas con el bot oficial contacte al propietario de KanBot usando /owner o /
+ │> si tienen alguna duda o problemas con el bot oficial contacte al propietario de KanBot usando /owner o /ofcc
  
  
  ∆ *_Gracias por preferir a kanBot_* ∆
