@@ -6,16 +6,16 @@ let yaemori = ` Hola 👋
 
 para tener a Kanbot en tu grupo se debe tener en cuenta estos requerimientos y reglas:
 
- │> El grupo debe tener como minimo 200 participantes
+ │> El grupo debe tener como minimo 100 participantes
  │> Si eliminan el bot *NO* se volvera a agregar
  │> Si hay demasiado spam o cosas indevidas el Bot saldra automáticamente
  │> Si no se usa el Bot también se saldrá y no se volverá agregar
  │> Se agrega 1 grupo por persona y 1 bot por grupo
  │> *NO* llamadas al Bot
+ │> *NO* privados al Bot
  
- │> si tienen alguna duda o problemas con el bot oficial contacte al propietario de KanBot
+ │> si tienen alguna duda o problemas con el bot oficial contacte al propietario de KanBot usando /owner o /
  
- > si cumple y acepta las reglas y los requerimientos envie su link al wa.me/526645011701
  
  ∆ *_Gracias por preferir a kanBot_* ∆
  
