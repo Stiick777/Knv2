@@ -284,7 +284,7 @@ const now = Date.now()
 if (!isOwner && !isROwner) {
     if (now - last < cooldownTime) {
         const tLeft = Math.ceil((cooldownTime - (now - last)) / 1000)
-        await m.reply(`⏳ Debes esperar *${tLeft} segundos* antes de usar otro comando.`)
+        await m.reply(`⏳ Debes esperar *${tLeft} segundos* antes de usar otro comando *EVITEMOS EL SPAM*.`)
         return
     }
 
