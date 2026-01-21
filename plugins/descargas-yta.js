@@ -8,72 +8,35 @@ const handler = async (m, { conn, text }) => {
 
     await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
 
-    let title, thumbnail, url, format = "mp3";
-
     // ============================================================
-    // 🔥 1️⃣ API PRINCIPAL — Zenzxz
+    // 🔥 API ÚNICA — YUPRA
     // ============================================================
-    try {
-      const apiUrl = `https://api.zenzxz.my.id/api/downloader/ytmp3v2?url=${encodeURIComponent(text)}`;
-      const res = await fetch(apiUrl);
-      const json = await res.json();
+    const apiUrl = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(text)}`;
+    const res = await fetch(apiUrl);
+    const json = await res.json();
 
-      if (!json.success || !json.data?.download_url) throw new Error("Zenzxz falló");
-
-      title = json.data.title;
-      thumbnail = json.data.thumbnail;
-      url = json.data.download_url;
-      format = json.data.format || "mp3";
-
-    } catch (e1) {
-      console.log("⚠️ Zenzxz falló → probando Akirax");
-
-      // ============================================================
-      // 🔄 2️⃣ API RESPALDO — Akirax
-      // ============================================================
-      try {
-        const backupUrl = `https://akirax-api.vercel.app/download/ytmp3?url=${encodeURIComponent(text)}`;
-        const res2 = await fetch(backupUrl);
-        const json2 = await res2.json();
-
-        if (!json2.status || !json2.result?.download) throw new Error("Akirax falló");
-
-        title = json2.result.title;
-        thumbnail = json2.result.thumbnail;
-        url = json2.result.download;
-        format = "mp3";
-
-      } catch (e2) {
-        console.log("⚠️ Akirax falló → probando Vreden");
-
-        // ============================================================
-        // 🟣 3️⃣ ÚLTIMA OPCIÓN — Vreden
-        // ============================================================
-        const vredenUrl = `https://api.vreden.my.id/api/v1/download/youtube/audio?url=${encodeURIComponent(text)}&quality=128`;
-
-        const res3 = await fetch(vredenUrl);
-        const json3 = await res3.json();
-
-        if (!json3.status || !json3.result?.download?.url) {
-          throw new Error("Todas las APIs fallaron");
-        }
-
-        title = json3.result.metadata.title;
-        thumbnail = json3.result.metadata.thumbnail;
-        url = json3.result.download.url;
-        format = "mp3";
-      }
+    if (!json.success || !json.data?.download_url) {
+      throw new Error("La API de Yupra falló");
     }
 
+    const {
+      title,
+      thumbnail,
+      download_url: url,
+      format = "mp3"
+    } = json.data;
+
     // ============================================================
-    // 📦 Peso del archivo (HEAD)
+    // 📦 Tamaño del archivo (HEAD)
     // ============================================================
     let sizeMB = 0;
     try {
       const head = await fetch(url, { method: "HEAD" });
       const length = head.headers.get("content-length");
       sizeMB = length ? Number(length) / (1024 * 1024) : 0;
-    } catch { sizeMB = 0; }
+    } catch {
+      sizeMB = 0;
+    }
 
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
 
@@ -90,7 +53,7 @@ const handler = async (m, { conn, text }) => {
     );
 
     // ============================================================
-    // 🎧 Enviar audio / documento si >10MB
+    // 🎧 Enviar audio / documento
     // ============================================================
     const isHeavy = sizeMB > 10;
 
@@ -100,7 +63,7 @@ const handler = async (m, { conn, text }) => {
         [isHeavy ? "document" : "audio"]: { url },
         mimetype: "audio/mpeg",
         fileName: `${title}.mp3`,
-        ...(isHeavy && { caption: `📁 Archivo enviado como documento por superar 10MB.` })
+        ...(isHeavy && { caption: "📁 Archivo enviado como documento por superar 10MB." })
       },
       { quoted: m }
     );
@@ -117,7 +80,6 @@ handler.tags = ['descargas'];
 handler.group = true;
 
 export default handler;
-
 
 // ============================================================
 // 🔍 Validación de enlace YouTube
