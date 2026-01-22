@@ -24,37 +24,37 @@ let handler = async (m, { conn, args }) => {
 
   await m.react("🕓");
 
-  let title, downloadUrl, duration, views;
+  let title, downloadUrl, duration, views, quality;
 
   // ===================================================
-  // ⭐ API ÚNICA: ADONIX
+  // ⭐ API ÚNICA: YUPRA
   // ===================================================
   try {
     const { data } = await axios.get(
-      `https://api-adonix.ultraplus.click/download/ytvideo`,
+      `https://api.yupra.my.id/api/downloader/ytmp4`,
       {
         params: {
-          apikey: "shadow.xyz",
           url: youtubeLink
         }
       }
     );
 
-    if (!data.status || !data.data?.url) {
-      throw new Error("Respuesta inválida de Adonix");
+    if (!data.success || !data.data?.download_url) {
+      throw new Error("Respuesta inválida de Yupra");
     }
 
-    title = data.data.title;
-    downloadUrl = data.data.url;
-    duration = data.data.duration;
-    views = data.data.vistas;
+    title = data.data.title || "video";
+    downloadUrl = data.data.download_url;
+    quality = data.data.format || "720";
+    duration = data.data.duration || "Desconocida";
+    views = 0; // Yupra no proporciona vistas
 
   } catch (err) {
-    console.error("Error Adonix:", err.message);
+    console.error("Error Yupra:", err.message);
     await m.react("❌");
     return conn.sendMessage(
       m.chat,
-      { text: "❌ No se pudo descargar el video con la API Adonix." },
+      { text: "❌ No se pudo descargar el video con la API Yupra." },
       { quoted: m }
     );
   }
@@ -85,8 +85,8 @@ let handler = async (m, { conn, args }) => {
     const isHeavy = sizeMB > 30;
 
     const caption = `🎬 *${title}*
+🎞️ *Calidad:* ${quality}p
 ⏱️ *Duración:* ${duration}
-👁️ *Vistas:* ${views.toLocaleString()}
 📏 *Tamaño:* ${sizeMB.toFixed(2)} MB
 
 ${isHeavy
