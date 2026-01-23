@@ -2,9 +2,9 @@ import fs from 'fs'
 import path from 'path'
 import fetch from 'node-fetch'
 import ffmpeg from 'fluent-ffmpeg'
-import ffmpegPath from 'ffmpeg-static'
 
-ffmpeg.setFfmpegPath(ffmpegPath)
+// Opcional: si ffmpeg está en el PATH, esto NO es obligatorio
+// ffmpeg.setFfmpegPath('/usr/bin/ffmpeg')
 
 let handler = m => m
 
@@ -20,7 +20,7 @@ handler.all = async function (m) {
       const buffer = await res.arrayBuffer()
       fs.writeFileSync(tmpMp3, Buffer.from(buffer))
 
-      // 2️⃣ Convertir a OGG OPUS (nota de voz)
+      // 2️⃣ Convertir a OGG OPUS (nota de voz real)
       await new Promise((resolve, reject) => {
         ffmpeg(tmpMp3)
           .audioCodec('libopus')
@@ -31,14 +31,14 @@ handler.all = async function (m) {
           .save(tmpOgg)
       })
 
-      // 3️⃣ Enviar como PTT real
+      // 3️⃣ Enviar como PTT
       await this.sendMessage(m.chat, {
         audio: fs.readFileSync(tmpOgg),
         mimetype: 'audio/ogg; codecs=opus',
         ptt: true
       }, { quoted: m })
 
-      // 4️⃣ Limpiar archivos temporales
+      // 4️⃣ Limpiar temporales
       fs.unlinkSync(tmpMp3)
       fs.unlinkSync(tmpOgg)
 
