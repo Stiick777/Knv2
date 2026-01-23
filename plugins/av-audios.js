@@ -1,7 +1,10 @@
 import fs from 'fs'
 import path from 'path'
-import { exec } from 'child_process'
 import fetch from 'node-fetch'
+import ffmpeg from 'fluent-ffmpeg'
+import ffmpegPath from 'ffmpeg-static'
+
+ffmpeg.setFfmpegPath(ffmpegPath)
 
 let handler = m => m
 
@@ -14,25 +17,28 @@ handler.all = async function (m) {
 
       // 1️⃣ Descargar MP3
       const res = await fetch(audioMsg[message])
-      const buffer = await res.buffer()
-      fs.writeFileSync(tmpMp3, buffer)
+      const buffer = await res.arrayBuffer()
+      fs.writeFileSync(tmpMp3, Buffer.from(buffer))
 
-      // 2️⃣ Convertir a OGG OPUS (nota de voz real)
+      // 2️⃣ Convertir a OGG OPUS (nota de voz)
       await new Promise((resolve, reject) => {
-        exec(
-          `ffmpeg -y -i "${tmpMp3}" -vn -c:a libopus -b:a 64k "${tmpOgg}"`,
-          (err) => err ? reject(err) : resolve()
-        )
+        ffmpeg(tmpMp3)
+          .audioCodec('libopus')
+          .audioBitrate('64k')
+          .format('ogg')
+          .on('end', resolve)
+          .on('error', reject)
+          .save(tmpOgg)
       })
 
-      // 3️⃣ Enviar como PTT
+      // 3️⃣ Enviar como PTT real
       await this.sendMessage(m.chat, {
         audio: fs.readFileSync(tmpOgg),
         mimetype: 'audio/ogg; codecs=opus',
         ptt: true
       }, { quoted: m })
 
-      // 4️⃣ Limpiar basura
+      // 4️⃣ Limpiar archivos temporales
       fs.unlinkSync(tmpMp3)
       fs.unlinkSync(tmpOgg)
 
