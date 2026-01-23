@@ -35,23 +35,31 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 📥 *Descargado por KanBot*
 `.trim();
 
+    // Buscar video normal
     const videoHD =
       r.data?.find(v => v.type === 'nowatermark_hd') ||
       r.data?.find(v => v.type === 'nowatermark') ||
       r.data?.find(v => v.type === 'watermark');
 
+    // Buscar fotos (slides)
+    const photos = r.data?.filter(v => v.type === 'photo') || [];
+
     await m.react('📤');
 
-    // ─────── FOTO + AUDIO (slides / fotos) ───────
-    if (!videoHD) {
-      if (r.cover) {
+    // ─────── FOTOS (slides reales) ───────
+    if (photos.length > 0) {
+      for (let i = 0; i < photos.length; i++) {
         await conn.sendMessage(
           m.chat,
-          { image: { url: r.cover }, caption },
+          {
+            image: { url: photos[i].url },
+            caption: i === 0 ? caption : undefined, // solo caption en la primera
+          },
           { quoted: m }
         );
       }
 
+      // Enviar audio si existe
       if (r.music_info?.url) {
         try {
           await conn.sendMessage(
@@ -73,34 +81,38 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     }
 
     // ─────── VIDEO ───────
-    await conn.sendMessage(
-      m.chat,
-      {
-        video: { url: videoHD.url },
-        caption,
-      },
-      { quoted: m }
-    );
+    if (videoHD) {
+      await conn.sendMessage(
+        m.chat,
+        {
+          video: { url: videoHD.url },
+          caption,
+        },
+        { quoted: m }
+      );
 
-    // Audio opcional (NO debe romper el flujo)
-    if (r.music_info?.url) {
-      try {
-        await conn.sendMessage(
-          m.chat,
-          {
-            audio: { url: r.music_info.url },
-            mimetype: 'audio/mpeg',
-            ptt: false,
-          },
-          { quoted: m }
-        );
-      } catch (e) {
-        console.log('⚠️ Audio no enviado:', e.message);
+      // Audio opcional
+      if (r.music_info?.url) {
+        try {
+          await conn.sendMessage(
+            m.chat,
+            {
+              audio: { url: r.music_info.url },
+              mimetype: 'audio/mpeg',
+              ptt: false,
+            },
+            { quoted: m }
+          );
+        } catch (e) {
+          console.log('⚠️ Audio no enviado:', e.message);
+        }
       }
+
+      m.react('✅');
+      return;
     }
 
-    m.react('✅');
-    return;
+    throw new Error('No se encontró video ni fotos');
 
   } catch (err) {
     console.error('❌ TikTok Error:', err);
