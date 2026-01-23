@@ -3,26 +3,25 @@ import path from 'path'
 import fetch from 'node-fetch'
 import ffmpeg from 'fluent-ffmpeg'
 
-// Opcional: si ffmpeg está en el PATH, esto NO es obligatorio
-// ffmpeg.setFfmpegPath('/usr/bin/ffmpeg')
-
 let handler = m => m
 
 handler.all = async function (m) {
   for (const message in audioMsg) {
     if (new RegExp(`^${message}$`, 'i').test(m.text)) {
 
-      const tmpMp3 = path.join(process.cwd(), `tmp_${Date.now()}.mp3`)
-      const tmpOgg = tmpMp3.replace('.mp3', '.ogg')
+      const tmpOgg = path.join(process.cwd(), `tmp_${Date.now()}.ogg`)
 
-      // 1️⃣ Descargar MP3
+      // 1️⃣ Descargar como stream (NO guardar mp3)
       const res = await fetch(audioMsg[message])
-      const buffer = await res.arrayBuffer()
-      fs.writeFileSync(tmpMp3, Buffer.from(buffer))
+      if (!res.ok) throw 'Error al descargar audio'
 
-      // 2️⃣ Convertir a OGG OPUS (nota de voz real)
+      const stream = res.body
+
+      // 2️⃣ Convertir directo a OGG OPUS
       await new Promise((resolve, reject) => {
-        ffmpeg(tmpMp3)
+        ffmpeg(stream)
+          .inputFormat('mp3')        // 👈 CLAVE
+          .noVideo()
           .audioCodec('libopus')
           .audioBitrate('64k')
           .format('ogg')
@@ -31,17 +30,14 @@ handler.all = async function (m) {
           .save(tmpOgg)
       })
 
-      // 3️⃣ Enviar como PTT
+      // 3️⃣ Enviar como nota de voz
       await this.sendMessage(m.chat, {
         audio: fs.readFileSync(tmpOgg),
         mimetype: 'audio/ogg; codecs=opus',
         ptt: true
       }, { quoted: m })
 
-      // 4️⃣ Limpiar temporales
-      fs.unlinkSync(tmpMp3)
       fs.unlinkSync(tmpOgg)
-
       break
     }
   }
