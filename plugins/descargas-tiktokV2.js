@@ -5,52 +5,68 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     m.react('❌');
     return conn.reply(
       m.chat,
-      `☁️ Ingrese un enlace de video de TikTok.\n\n💌 Ejemplo: _${usedPrefix + command} https://vt.tiktok.com/ZS29uaYEv/_`,
+      `☁️ Ingrese un enlace de TikTok.\n\n💌 Ejemplo:\n_${usedPrefix + command} https://vt.tiktok.com/ZS29uaYEv/_`,
       m
     );
   }
 
   if (!/(?:https?:\/\/)?(?:www|vm|vt|tiktok)\.com\/[^\s]+/gi.test(args[0])) {
     m.react('❌');
-    return conn.reply(
-      m.chat,
-      `☁️ Ingrese un enlace válido de TikTok.\n\n💌 Ejemplo: _${usedPrefix + command} https://vt.tiktok.com/ZS29uaYEv/_`,
-      m
-    );
+    return conn.reply(m.chat, '🚫 Enlace de TikTok no válido.', m);
   }
 
   try {
     m.react('🕒');
 
-    // 📌 USANDO TU API YUPRA
-    const { data } = await axios.get(`https://api.yupra.my.id/api/downloader/tiktok?url=${encodeURIComponent(args[0])}`);
+    const { data } = await axios.get(
+      `https://api.vreden.my.id/api/v1/download/tiktok?url=${encodeURIComponent(args[0])}`
+    );
 
-    if (!data.status || !data.result?.status) {
+    if (!data.status || !data.result) {
       m.react('❌');
-      return conn.reply(m.chat, '🚩 Error al procesar el contenido.', m);
+      return conn.reply(m.chat, '🚩 Error al obtener el contenido.', m);
     }
 
     const info = data.result;
 
     const caption = `🎬 *Descripción:* ${info.title || 'Sin descripción'}
 👤 *Autor:* ${info.author?.nickname || 'Desconocido'}
-📌 *Región:* ${info.region || 'Desconocida'}
+🌎 *Región:* ${info.region || 'N/A'}
 
-📥 *Contenido descargado exitosamente por KanBot.*`;
+📥 *Descargado por KanBot*`;
 
-    // 📌 BUSCAMOS video sin marca de agua primero
-    const noWm = info.data.find(x => x.type === "nowatermark")?.url;
-    const hd = info.data.find(x => x.type === "nowatermark_hd")?.url;
-    const wm = info.data.find(x => x.type === "watermark")?.url;
+    // ===============================
+    // 📸 MODO FOTOS (Photo Mode)
+    // ===============================
+    if (info.durations === 0 && info.data?.[0]?.type === 'photo') {
+      for (const img of info.data) {
+        await conn.sendMessage(
+          m.chat,
+          {
+            image: { url: img.url },
+            caption
+          },
+          { quoted: m }
+        );
+      }
 
-    const videoUrl = hd || noWm || wm;
+      m.react('✅');
+      return;
+    }
+
+    // ===============================
+    // 🎥 MODO VIDEO
+    // ===============================
+    const videoHD = info.data.find(v => v.type === 'nowatermark_hd')?.url;
+    const videoSD = info.data.find(v => v.type === 'nowatermark')?.url;
+
+    const videoUrl = videoHD || videoSD;
 
     if (!videoUrl) {
       m.react('❌');
-      return conn.reply(m.chat, '*🚫 No se encontró un video descargable.*', m);
+      return conn.reply(m.chat, '🚫 No se encontró video descargable.', m);
     }
 
-    await m.react('📤');
     await conn.sendMessage(
       m.chat,
       {
@@ -60,14 +76,13 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
       { quoted: m }
     );
 
-    // 📌 Enviar música si está disponible
+    // 🎵 Enviar audio si existe
     if (info.music_info?.url) {
       await conn.sendMessage(
         m.chat,
         {
           audio: { url: info.music_info.url },
-          mimetype: 'audio/mp4',
-          ptt: false
+          mimetype: 'audio/mp4'
         },
         { quoted: m }
       );
@@ -75,15 +90,15 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
     m.react('✅');
 
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     m.react('❌');
-    return conn.reply(m.chat, '🌟 Error al procesar la solicitud. Intente más tarde.', m);
+    conn.reply(m.chat, '🌟 Error al procesar TikTok.', m);
   }
 };
 
 handler.tags = ['descargas'];
-handler.help = ['tiktok2'];
+handler.help = ['tiktok2 <url>'];
 handler.command = ['tiktok2', 'tt2', 'ttdl2'];
 handler.group = true;
 
