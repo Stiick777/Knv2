@@ -276,7 +276,7 @@ if (!isAccept) continue
 if (!global.userCooldown) global.userCooldown = {}
 
 const sender = m.sender
-const cooldownTime = 30 * 1000
+const cooldownTime = 60 * 1000
 const last = global.userCooldown[sender] || 0
 const now = Date.now()
 
