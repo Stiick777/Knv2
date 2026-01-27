@@ -259,21 +259,21 @@ try {
 }
 
 // ======================================================
-// ⭐ RESPALDO: ADONIX (shadow.xyz – 360p)
+// ⭐ RESPALDO: ADONIX (shadow.xyz – video)
 // ======================================================
 try {
-    const apiAdonix = `https://api-adonix.ultraplus.click/download/ytquality?apikey=shadow.xyz&url=${encodeURIComponent(url)}&type=video&quality=360p`;
+    const apiAdonix = `https://api-adonix.ultraplus.click/download/ytvideo?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
     const resA = await fetch(apiAdonix);
     const jsonA = await resA.json();
 
-    if (!jsonA.status || !jsonA.url) {
+    if (!jsonA.status || !jsonA.data?.url) {
         throw new Error('ADONIX inválido');
     }
 
     await enviarVideo(
         m.chat,
-        jsonA.url,
-        `*${jsonA.title}*\nCalidad: 360p`,
+        jsonA.data.url,
+        `*${jsonA.data.title}*\nServidor: Adonix`,
         null,
         m
     );
