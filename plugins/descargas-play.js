@@ -52,18 +52,21 @@ try {
 
     // ─── API PRINCIPAL: ADONIX ───
     try {
-        const apiAdonix = `https://api-adonix.ultraplus.click/download/ytaudio?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
-        const resAdonix = await fetch(apiAdonix);
-        const jsonAdonix = await resAdonix.json();
+    const apiAdonix = `https://api-adonix.ultraplus.click/download/ytaudio?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
+    const resAdonix = await fetch(apiAdonix);
+    const jsonAdonix = await resAdonix.json();
 
-        if (jsonAdonix.status && jsonAdonix.data?.url) {
-            title = jsonAdonix.data.title;
-            downloadUrl = jsonAdonix.data.url;
-            mimetype = 'audio/mp4';
-            fileExt = 'm4a';
-        }
-    } catch (e) {
-        console.log('❌ Adonix falló, intentando Yupra...');
+    if (jsonAdonix.status === true && jsonAdonix.data?.url) {
+        title = jsonAdonix.data.title;
+        downloadUrl = jsonAdonix.data.url;
+        mimetype = 'audio/mp4';
+        fileExt = 'm4a';
+    } else {
+        throw 'Respuesta inválida de Adonix';
+    }
+
+} catch (e) {
+    console.log('❌ Adonix falló, intentando Yupra...');
     }
 
     // ─── RESPALDO: YUPRA ───
