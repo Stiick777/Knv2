@@ -48,32 +48,23 @@ try {
     await m.react('🕓');
 
     const url = yt_play[0].url;
-    let title = '';
+    let title = 'audio';
     let downloadUrl = '';
-    let mimetype = 'audio/mpeg';
-    let fileExt = 'mp3';
+    const mimetype = 'audio/mpeg';
+    const fileExt = 'mp3';
 
     // ─────────────────────────────
-    // 🥇 ÚNICA API: YUPRA
+    // 🥇 API YUPRA (YTMP3)
     // ─────────────────────────────
-    try {
-        const apiYupra = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
-        const resYupra = await fetch(apiYupra);
-        const jsonYupra = await resYupra.json();
+    const apiYupra = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
+    const resYupra = await fetch(apiYupra);
+    const jsonYupra = await resYupra.json();
 
-        if (jsonYupra.success === true && jsonYupra.data?.download_url) {
-            title = jsonYupra.data.title;
-            downloadUrl = jsonYupra.data.download_url;
-        }
-    } catch (e) {
-        console.log('❌ Yupra falló');
-    }
-
-    // ─────────────────────────────
-    // ❌ SI FALLA YUPRA
-    // ─────────────────────────────
-    if (!downloadUrl) {
-        throw new Error('No se pudo obtener el audio');
+    if (jsonYupra.success && jsonYupra.data?.download_url) {
+        title = jsonYupra.data.title || title;
+        downloadUrl = jsonYupra.data.download_url;
+    } else {
+        throw new Error('Respuesta inválida de Yupra');
     }
 
     // ─────────────────────────────
