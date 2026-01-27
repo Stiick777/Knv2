@@ -17,34 +17,33 @@ const handler = async (m, { conn, args }) => {
   let result;
 
   // ===================================================
-  // ⭐ API ÚNICA: STARLIGHT
+  // ⭐ API: ADONIX FACEBOOK
   // ===================================================
   try {
-    const api = await fetch(
-      `https://apis-starlights-team.koyeb.app/starlight/facebook?url=${encodeURIComponent(args[0])}`,
-      {
-        headers: {
-          "User-Agent": "Mozilla/5.0",
-          "Accept": "application/json"
-        }
+    const apiUrl = `https://api-adonix.ultraplus.click/download/facebook?apikey=shadow.xyz&url=${encodeURIComponent(args[0])}`;
+
+    const res = await fetch(apiUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json"
       }
-    );
+    });
 
-    const json = await api.json();
+    const json = await res.json();
 
-    if (!json.hd && !json.sd) {
-      throw new Error("Sin enlaces HD ni SD");
+    if (!json.status || !json.result?.hd && !json.result?.sd) {
+      throw new Error("No se encontraron enlaces de video");
     }
 
     result = {
-      title: json.title || "Facebook Video",
-      thumbnail: json.thumbnail,
-      duration: Math.floor((json.duration_ms || 0) / 1000),
-      videoUrl: json.hd || json.sd
+      title: json.result.title || "Facebook Video",
+      thumbnail: json.result.thumbnail,
+      duration: json.result.duration || "Desconocida",
+      videoUrl: json.result.hd || json.result.sd
     };
 
   } catch (err) {
-    console.error("❌ Error Starlight:", err.message);
+    console.error("❌ Error Adonix:", err.message);
     await m.react("❌");
     return conn.reply(
       m.chat,
@@ -77,7 +76,7 @@ const handler = async (m, { conn, args }) => {
         fileName: "facebook_video.mp4",
         caption: `🎥 *Facebook Video*
 📌 *Título:* ${result.title}
-⏱️ *Duración:* ${result.duration}s
+⏱️ *Duración:* ${result.duration}
 ✨ *_By KanBot_*`
       },
       { quoted: m }
