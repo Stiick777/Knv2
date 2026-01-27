@@ -48,46 +48,86 @@ try {
     await m.react('🕓'); // Procesando
 
     const url = yt_play[0].url;
-    let title, downloadUrl, mimetype, fileExt;
+    let title = '';
+    let downloadUrl = '';
+    let mimetype = '';
+    let fileExt = '';
 
-    // ─── API PRINCIPAL: ADONIX ───
+    // ─────────────────────────────
+    // 🥇 API PRINCIPAL: ADONIX
+    // ─────────────────────────────
     try {
-    const apiAdonix = `https://api-adonix.ultraplus.click/download/ytaudio?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
-    const resAdonix = await fetch(apiAdonix);
-    const jsonAdonix = await resAdonix.json();
+        const apiAdonix = `https://api-adonix.ultraplus.click/download/ytaudio?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
+        const resAdonix = await fetch(apiAdonix);
 
-    if (jsonAdonix.status === true && jsonAdonix.data?.url) {
-        title = jsonAdonix.data.title;
-        downloadUrl = jsonAdonix.data.url;
-        mimetype = 'audio/mp4';
-        fileExt = 'm4a';
-    } else {
-        throw 'Respuesta inválida de Adonix';
+        // ❌ HTTP error (403, 404, 429, etc)
+        if (!resAdonix.ok) {
+            throw new Error(`Adonix HTTP ${resAdonix.status}`);
+        }
+
+        let jsonAdonix;
+        try {
+            jsonAdonix = await resAdonix.json();
+        } catch {
+            throw new Error('JSON inválido de Adonix');
+        }
+
+        if (jsonAdonix.status === true && jsonAdonix.data?.url) {
+            title = jsonAdonix.data.title;
+            downloadUrl = jsonAdonix.data.url;
+            mimetype = 'audio/mp4';
+            fileExt = 'm4a';
+        } else {
+            throw new Error('Respuesta inválida de Adonix');
+        }
+
+    } catch (err) {
+        console.log('❌ Adonix falló:', err.message);
     }
 
-} catch (e) {
-    console.log('❌ Adonix falló, intentando Yupra...');
-    }
-
-    // ─── RESPALDO: YUPRA ───
+    // ─────────────────────────────
+    // 🥈 RESPALDO: YUPRA
+    // ─────────────────────────────
     if (!downloadUrl) {
-        const apiYupra = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
-        const resYupra = await fetch(apiYupra);
-        const jsonYupra = await resYupra.json();
+        try {
+            const apiYupra = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
+            const resYupra = await fetch(apiYupra);
 
-        if (jsonYupra.success && jsonYupra.data?.download_url) {
-            title = jsonYupra.data.title;
-            downloadUrl = jsonYupra.data.download_url;
-            mimetype = 'audio/mpeg';
-            fileExt = 'mp3';
+            if (!resYupra.ok) {
+                throw new Error(`Yupra HTTP ${resYupra.status}`);
+            }
+
+            let jsonYupra;
+            try {
+                jsonYupra = await resYupra.json();
+            } catch {
+                throw new Error('JSON inválido de Yupra');
+            }
+
+            if (jsonYupra.success === true && jsonYupra.data?.download_url) {
+                title = jsonYupra.data.title;
+                downloadUrl = jsonYupra.data.download_url;
+                mimetype = 'audio/mpeg';
+                fileExt = 'mp3';
+            } else {
+                throw new Error('Respuesta inválida de Yupra');
+            }
+
+        } catch (err) {
+            console.log('❌ Yupra falló:', err.message);
         }
     }
 
+    // ─────────────────────────────
+    // ❌ SI AMBAS FALLAN
+    // ─────────────────────────────
     if (!downloadUrl) {
         throw new Error('No se pudo obtener el audio desde ninguna API.');
     }
 
-    // ─── ENVIAR AUDIO ───
+    // ─────────────────────────────
+    // 📤 ENVIAR AUDIO
+    // ─────────────────────────────
     await conn.sendMessage(
         m.chat,
         {
@@ -109,7 +149,7 @@ try {
         { text: `❌ Error: ${err.message}` },
         { quoted: m }
     );
-}
+                }
 //
     }
 
