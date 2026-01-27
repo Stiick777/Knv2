@@ -57,7 +57,7 @@ try {
     // ─────────────────────────────
     // 🥇 API STELLARWA (YTMP3)
     // ─────────────────────────────
-    const apiStellar = `https://api.stellarwa.xyz/dl/ytmp3?url=${encodeURIComponent(url)}&key=stellar-dP3DsRKh`;
+    const apiStellar = `https://api.stellarwa.xyz/dl/ytmp3?url=${encodeURIComponent(url)}&key=Yuki-WaBot`;
     const resStellar = await fetch(apiStellar);
     const jsonStellar = await resStellar.json();
 
