@@ -44,6 +44,7 @@ if (command === 'play') {
 `.trim();
 
         await conn.sendFile(m.chat, yt_play[0].thumbnail, 'error.jpg', texto1, m, null);
+
 try {
     await m.react('🕓');
 
@@ -54,17 +55,54 @@ try {
     const fileExt = 'mp3';
 
     // ─────────────────────────────
-    // 🥇 API YUPRA (YTMP3)
+    // 🥇 API PRINCIPAL: YUPRA
     // ─────────────────────────────
-    const apiYupra = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
-    const resYupra = await fetch(apiYupra);
-    const jsonYupra = await resYupra.json();
+    try {
+        const apiYupra = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
 
-    if (jsonYupra.success && jsonYupra.data?.download_url) {
-        title = jsonYupra.data.title || title;
-        downloadUrl = jsonYupra.data.download_url;
-    } else {
-        throw new Error('Respuesta inválida de Yupra');
+        const resYupra = await fetch(apiYupra, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                'Accept': 'application/json'
+            },
+            timeout: 20000
+        });
+
+        const jsonYupra = await resYupra.json();
+
+        if (jsonYupra.success && jsonYupra.data?.download_url) {
+            title = jsonYupra.data.title || title;
+            downloadUrl = jsonYupra.data.download_url;
+        } else {
+            throw 'Yupra sin link';
+        }
+    } catch (e) {
+        console.log('❌ Yupra bloqueó o falló');
+    }
+
+    // ─────────────────────────────
+    // 🥈 FALLBACK: LOLHUMAN
+    // ─────────────────────────────
+    if (!downloadUrl) {
+        try {
+            const lolApi = `https://api.lolhuman.xyz/api/ytaudio2?apikey=${lolkeysapi}&url=${url}`;
+            const resLol = await fetch(lolApi);
+            const jsonLol = await resLol.json();
+
+            if (jsonLol.status === 200 && jsonLol.result?.link) {
+                title = jsonLol.result.title;
+                downloadUrl = jsonLol.result.link;
+            }
+        } catch (e) {
+            console.log('❌ Lolhuman falló');
+        }
+    }
+
+    // ─────────────────────────────
+    // ❌ SI TODO FALLA
+    // ─────────────────────────────
+    if (!downloadUrl) {
+        throw new Error('No se pudo obtener el audio');
     }
 
     // ─────────────────────────────
