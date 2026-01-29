@@ -66,24 +66,24 @@ try {
             title = jsonStellar.data.title || title;
             downloadUrl = jsonStellar.data.dl;
         } else {
-            throw new Error('Stellar sin data válida');
+            throw new Error('Stellar sin datos válidos');
         }
 
     } catch (e) {
-        console.log('⚠️ Stellar falló, usando API de respaldo...');
+        console.log('⚠️ Stellar falló, usando API Faa...');
 
         // ─────────────────────────────
-        // 🥈 API ADONIX (RESPALDO)
+        // 🥈 API FAA (RESPALDO)
         // ─────────────────────────────
-        const apiBackup = `https://api-adonix.ultraplus.click/download/ytaudio?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
-        const resBackup = await fetch(apiBackup);
-        const jsonBackup = await resBackup.json();
+        const apiFaa = `https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(url)}`;
+        const resFaa = await fetch(apiFaa);
+        const jsonFaa = await resFaa.json();
 
-        if (jsonBackup.status && jsonBackup.data?.url) {
-            title = jsonBackup.data.title || title;
-            downloadUrl = jsonBackup.data.url;
+        if (jsonFaa.status && jsonFaa.result?.mp3) {
+            title = jsonFaa.result.title || title;
+            downloadUrl = jsonFaa.result.mp3;
         } else {
-            throw new Error('La API de respaldo también falló');
+            throw new Error('Faa también falló');
         }
     }
 
