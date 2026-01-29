@@ -55,17 +55,36 @@ try {
     const fileExt = 'mp3';
 
     // ─────────────────────────────
-    // 🥇 API STELLARWA (YTMP3)
+    // 🥇 API STELLARWA (PRINCIPAL)
     // ─────────────────────────────
-    const apiStellar = `https://api.stellarwa.xyz/dl/ytmp3?url=${encodeURIComponent(url)}&key=Yuki-WaBot`;
-    const resStellar = await fetch(apiStellar);
-    const jsonStellar = await resStellar.json();
+    try {
+        const apiStellar = `https://api.stellarwa.xyz/dl/ytmp3?url=${encodeURIComponent(url)}&key=Yuki-WaBot`;
+        const resStellar = await fetch(apiStellar);
+        const jsonStellar = await resStellar.json();
 
-    if (jsonStellar.status && jsonStellar.data?.dl) {
-        title = jsonStellar.data.title || title;
-        downloadUrl = jsonStellar.data.dl;
-    } else {
-        throw new Error('Respuesta inválida de StellarWA');
+        if (jsonStellar.status && jsonStellar.data?.dl) {
+            title = jsonStellar.data.title || title;
+            downloadUrl = jsonStellar.data.dl;
+        } else {
+            throw new Error('Stellar sin data válida');
+        }
+
+    } catch (e) {
+        console.log('⚠️ Stellar falló, usando API de respaldo...');
+
+        // ─────────────────────────────
+        // 🥈 API ADONIX (RESPALDO)
+        // ─────────────────────────────
+        const apiBackup = `https://api-adonix.ultraplus.click/download/ytaudio?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
+        const resBackup = await fetch(apiBackup);
+        const jsonBackup = await resBackup.json();
+
+        if (jsonBackup.status && jsonBackup.data?.url) {
+            title = jsonBackup.data.title || title;
+            downloadUrl = jsonBackup.data.url;
+        } else {
+            throw new Error('La API de respaldo también falló');
+        }
     }
 
     // ─────────────────────────────
@@ -92,7 +111,7 @@ try {
         { text: '❌ Error al descargar el audio' },
         { quoted: m }
     );
-        }
+}
 //
     }
 
