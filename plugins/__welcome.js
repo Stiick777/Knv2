@@ -1,4 +1,4 @@
-import fs from 'fs'
+/*import fs from 'fs'
 import { WAMessageStubType } from '@whiskeysockets/baileys'
 
 async function generarBienvenida({ conn, userId, groupMetadata, chat }) {
@@ -57,6 +57,111 @@ rcanal.contextInfo.mentionedJid = mentions
 await conn.sendMessage(m.chat, { image: { url: pp }, caption, ...rcanal }, { quoted: null })
 try { fs.unlinkSync(img) } catch {}
 }}
+
+export { generarBienvenida, generarDespedida }
+export default handler
+*/
+import fs from 'fs'
+
+async function generarBienvenida({ conn, userId, groupMetadata, chat }) {
+  const username = `@${userId.split('@')[0]}`
+  const pp = await conn.profilePictureUrl(userId, 'image')
+    .catch(() => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg')
+
+  const fecha = new Date().toLocaleDateString('es-ES', {
+    timeZone: 'America/Mexico_City',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+
+  const desc = groupMetadata.desc?.toString() || 'Sin descripción'
+
+  const caption = `╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
+¡Bienvenido/a, ✰ ${username}
+A ${groupMetadata.subject}
+● ${fecha}
+╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
+
+Esperamos que disfrutes tu estancia en el grupo.
+*_Recuerda leer la descripción_*
+🥀*ੈ✩‧₊˚༺☆༻*ੈ✩˚🍁`
+
+  return { pp, caption, mentions: [userId] }
+}
+
+async function generarDespedida({ conn, userId, groupMetadata }) {
+  const username = `@${userId.split('@')[0]}`
+  const pp = await conn.profilePictureUrl(userId, 'image')
+    .catch(() => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg')
+
+  const fecha = new Date().toLocaleDateString('es-ES', {
+    timeZone: 'America/Mexico_City',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+
+  const caption = `╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
+¡Adiós, ✰ ${username}
+DE ${groupMetadata.subject}
+● ${fecha}
+╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
+
+Gracias por haber estado con nosotros.
+🥀*ੈ✩‧₊˚༺☆༻*ੈ✩˚🍁`
+
+  return { pp, caption, mentions: [userId] }
+}
+
+let handler = m => m
+
+handler.before = async function (m, { conn, groupMetadata }) {
+  if (!m.isGroup || !m.messageStubType) return true
+
+  const chat = global.db.data.chats[m.chat]
+  if (!chat?.welcome) return true
+
+  const userId = m.messageStubParameters?.[0]
+  if (!userId) return true
+
+  // 🔎 DEBUG (déjalo si quieres)
+  // console.log('STUB:', m.messageStubType, m.messageStubParameters)
+
+  // ➕ BIENVENIDA
+  if ([27, 32].includes(m.messageStubType)) {
+    const { pp, caption, mentions } = await generarBienvenida({
+      conn,
+      userId,
+      groupMetadata,
+      chat
+    })
+
+    await conn.sendMessage(m.chat, {
+      image: { url: pp },
+      caption,
+      mentions
+    })
+  }
+
+  // ➖ DESPEDIDA
+  if ([28, 29].includes(m.messageStubType)) {
+    const { pp, caption, mentions } = await generarDespedida({
+      conn,
+      userId,
+      groupMetadata,
+      chat
+    })
+
+    await conn.sendMessage(m.chat, {
+      image: { url: pp },
+      caption,
+      mentions
+    })
+  }
+
+  return true
+}
 
 export { generarBienvenida, generarDespedida }
 export default handler
