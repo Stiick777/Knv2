@@ -3,27 +3,35 @@ import fetch from "node-fetch";
 const handler = async (m, { conn, text }) => {
   try {
     if (!text || !isValidYouTubeUrl(text)) {
-      return conn.reply(m.chat, '⚠️ Proporciona un *enlace válido de YouTube*.', m);
+      return conn.reply(
+        m.chat,
+        '⚠️ Proporciona un *enlace válido de YouTube*.',
+        m
+      );
     }
 
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
+    await conn.sendMessage(m.chat, {
+      react: { text: '⏳', key: m.key }
+    });
 
     // ============================================================
-    // 🔥 API ÚNICA — YUPRA
+    // 🔥 API ÚNICA — ADONIX (AUDIO)
     // ============================================================
-    const apiUrl = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(text)}`;
+    const apiUrl =
+      `https://api-adonix.ultraplus.click/download/ytaudio` +
+      `?apikey=shadow.xyz&url=${encodeURIComponent(text)}`;
+
     const res = await fetch(apiUrl);
     const json = await res.json();
 
-    if (!json.success || !json.data?.download_url) {
-      throw new Error("La API de Yupra falló");
+    if (!json.status || !json.data?.url) {
+      throw new Error("La API de Adonix falló");
     }
 
     const {
-      title,
+      title = "audio",
       thumbnail,
-      download_url: url,
-      format = "mp3"
+      url
     } = json.data;
 
     // ============================================================
@@ -38,19 +46,23 @@ const handler = async (m, { conn, text }) => {
       sizeMB = 0;
     }
 
-    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+    await conn.sendMessage(m.chat, {
+      react: { text: '✅', key: m.key }
+    });
 
     // ============================================================
     // 📸 Enviar portada
     // ============================================================
-    await conn.sendMessage(
-      m.chat,
-      {
-        image: { url: thumbnail },
-        caption: `🎶 *${title}*\n📦 ${(sizeMB || 0).toFixed(2)} MB\n🎧 ${format.toUpperCase()}`
-      },
-      { quoted: m }
-    );
+    if (thumbnail) {
+      await conn.sendMessage(
+        m.chat,
+        {
+          image: { url: thumbnail },
+          caption: `🎶 *${title}*\n📦 ${sizeMB.toFixed(2)} MB\n🎧 MP3`
+        },
+        { quoted: m }
+      );
+    }
 
     // ============================================================
     // 🎧 Enviar audio / documento
@@ -63,13 +75,15 @@ const handler = async (m, { conn, text }) => {
         [isHeavy ? "document" : "audio"]: { url },
         mimetype: "audio/mpeg",
         fileName: `${title}.mp3`,
-        ...(isHeavy && { caption: "📁 Archivo enviado como documento por superar 10MB." })
+        ...(isHeavy && {
+          caption: "📁 Archivo enviado como documento por superar 10 MB."
+        })
       },
       { quoted: m }
     );
 
   } catch (error) {
-    console.error(error);
+    console.error("Error YTMP3:", error.message);
     return m.reply(`⚠️ Error: ${error.message}`);
   }
 };
@@ -85,6 +99,7 @@ export default handler;
 // 🔍 Validación de enlace YouTube
 // ============================================================
 function isValidYouTubeUrl(url) {
-  const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/;
+  const regex =
+    /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/;
   return regex.test(url.trim());
 }
