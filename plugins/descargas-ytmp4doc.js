@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 
 let handler = async (m, { conn: star, args }) => {
-  if (!args || !args[0]) 
+  if (!args || !args[0])
     return star.reply(
       m.chat,
       '💣 _*Ingresa el enlace del video de YouTube junto al comando.*_\n\n`Ejemplo:`\n> *!ytmp4doc* https://youtube.com/watch?v=qHDJSRlNhVs',
@@ -9,29 +9,39 @@ let handler = async (m, { conn: star, args }) => {
       rcanal
     );
 
-  if (!args[0].match(/youtu/gi)) 
-    return star.reply(m.chat, '❌ Verifica que el enlace sea de YouTube.', m, rcanal)
-      .then(() => m.react('✖️'));
+  if (!args[0].match(/youtu/gi))
+    return star.reply(
+      m.chat,
+      '❌ Verifica que el enlace sea de YouTube.',
+      m,
+      rcanal
+    ).then(() => m.react('✖️'));
 
   await m.react('🕓');
 
   try {
-    let url = args[0];
+    const url = args[0];
 
-    // === API YUPRA ===
-    let res = await fetch(
-      `https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`
-    );
-    let json = await res.json();
+    // ===================================================
+    // 🔥 API ADONIX — VIDEO
+    // ===================================================
+    const apiUrl =
+      `https://api-adonix.ultraplus.click/download/ytvideo` +
+      `?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
 
-    if (!json.success || !json.data?.download_url)
-      throw new Error('Respuesta inválida de Yupra');
+    const res = await fetch(apiUrl);
+    const json = await res.json();
 
-    let title = json.data.title || 'video';
-    let download_url = json.data.download_url;
-    let quality = json.data.format || 'MP4';
+    if (!json.status || !json.data?.url)
+      throw new Error('Respuesta inválida de Adonix');
 
-    // === Mensaje de espera ===
+    const title = json.data.title || 'video';
+    const download_url = json.data.url;
+    const quality = '720'; // la API no especifica calidad
+
+    // ===================================================
+    // ⏳ Mensaje de espera
+    // ===================================================
     let txt = '`🅓🅞🅒🅢 🅥➋ - 🅚🅐🅝🅑🅞🅣`\n\n';
     txt += `🍁 *Título*: ${title}\n`;
     txt += `🎞️ *Calidad*: ${quality}p\n\n`;
@@ -39,7 +49,9 @@ let handler = async (m, { conn: star, args }) => {
 
     await star.reply(m.chat, txt, m);
 
-    // === Enviar video como documento ===
+    // ===================================================
+    // 📦 Enviar video como documento
+    // ===================================================
     await star.sendMessage(
       m.chat,
       {
@@ -51,10 +63,10 @@ let handler = async (m, { conn: star, args }) => {
       { quoted: m }
     );
 
-    return await m.react('✅');
+    await m.react('✅');
 
   } catch (e) {
-    console.error('Error Yupra:', e.message);
+    console.error('Error Adonix:', e.message);
     await m.react('✖️');
     return star.reply(
       m.chat,
