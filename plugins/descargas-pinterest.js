@@ -2,11 +2,13 @@ import axios from "axios";
 import fetch from "node-fetch";
 import { fileTypeFromBuffer } from "file-type";
 
+const MAX_IMAGES = 6;
+
 const handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) {
     return conn.reply(
       m.chat,
-      `*💡 Uso Correcto:* ${usedPrefix + command} rayo`,
+      `*💡 Uso Correcto:* ${usedPrefix + command} gato`,
       m
     );
   }
@@ -14,11 +16,12 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
   await m.react("📌");
 
   try {
-    const url = `https://api.zenzxz.my.id/api/search/pinterest?query=${encodeURIComponent(text)}`;
-    const res = await fetch(url);
+    // 🔥 API Faa Pinterest
+    const apiUrl = `https://api-faa.my.id/faa/pinterest?q=${encodeURIComponent(text)}`;
+    const res = await fetch(apiUrl);
     const json = await res.json();
 
-    if (!json.success || !json.data || json.data.length === 0) {
+    if (!json.status || !json.result || json.result.length === 0) {
       return conn.reply(
         m.chat,
         `❌ No encontré resultados para *${text}*`,
@@ -26,21 +29,20 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       );
     }
 
-    // Tomar hasta 6 imágenes
-    const images = json.data
-      .map(item => item.directLink)
-      .filter(Boolean)
-      .slice(0, 6);
+    const images = json.result.slice(0, MAX_IMAGES);
 
     const loadImage = async (url) => {
       const { data } = await axios.get(url, { responseType: "arraybuffer" });
       const buffer = Buffer.from(data);
       const type = await fileTypeFromBuffer(buffer);
-      return { buffer, mime: type?.mime || "image/jpeg" };
+      return {
+        buffer,
+        mime: type?.mime || "image/jpeg"
+      };
     };
 
     // -----------------------------
-    // 1️⃣ Imagen principal (preview)
+    // 1️⃣ Imagen principal
     // -----------------------------
     const firstImg = await loadImage(images[0]);
 
@@ -53,7 +55,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         contextInfo: {
           externalAdReply: {
             title: "KanBot",
-            body: "Pinterest Search • Zenzxz API",
+            body: "Pinterest Search • Faa API",
             mediaType: 1,
             mediaUrl: images[0],
             thumbnailUrl: images[1] || images[0],
@@ -65,7 +67,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     );
 
     // -----------------------------
-    // 2️⃣ Enviar el resto
+    // 2️⃣ Resto de imágenes
     // -----------------------------
     for (let i = 1; i < images.length; i++) {
       try {
@@ -78,7 +80,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
           },
           { quoted: m }
         );
-      } catch {
+      } catch (err) {
         console.log("❌ Error descargando imagen:", images[i]);
       }
     }
