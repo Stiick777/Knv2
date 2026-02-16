@@ -158,7 +158,6 @@ try {
         try {
             const head = await fetch(url, { method: 'HEAD' });
             const size = head.headers.get('content-length');
-
             const isLarge = size && Number(size) > 10 * 1024 * 1024; // 10MB
 
             if (isLarge) {
@@ -185,74 +184,64 @@ try {
         }
     }
 
-// ======================================================
-// ⭐ API PRINCIPAL: YUPRA YTMP4
-// ======================================================
-try {
-    await m.react('🕓');
+    // ======================================================
+    // ⭐ API PRINCIPAL: FAA
+    // ======================================================
 
-    const apiYupra = `https://api.yupra.my.id/api/downloader/ytmp4?url=${encodeURIComponent(url)}`;
-    const resY = await fetch(apiYupra);
-    const jsonY = await resY.json();
+    try {
+        const apiFaa = `https://api-faa.my.id/faa/ytmp4?url=${encodeURIComponent(url)}`;
+        const resF = await fetch(apiFaa);
+        const jsonF = await resF.json();
 
-    if (!jsonY.success || !jsonY.data?.download_url) {
-        throw new Error('YUPRA inválido');
+        if (!jsonF.status || !jsonF.result?.download_url) {
+            throw new Error('FAA inválida');
+        }
+
+        await enviarVideo(
+            m.chat,
+            jsonF.result.download_url,
+            `🎬 *Video descargado correctamente*\nFormato: ${jsonF.result.format}\nServidor: Faa`,
+            null,
+            m
+        );
+
+        await m.react('✅');
+        return;
+
+    } catch (e1) {
+        console.warn('❌ FAA falló, usando respaldo Nexevo...');
     }
 
-    const data = jsonY.data;
+    // ======================================================
+    // 🔁 RESPALDO: NEXEVO
+    // ======================================================
 
-    const thumb = data.thumbnail
-        ? await (await fetch(data.thumbnail)).buffer()
+    const apiNexevo = `https://nexevo-api.vercel.app/download/y2?url=${encodeURIComponent(url)}`;
+    const resN = await fetch(apiNexevo);
+    const jsonN = await resN.json();
+
+    if (!jsonN.status || !jsonN.result?.url) {
+        throw new Error('NEXEVO inválida');
+    }
+
+    const thumb = jsonN.result.info?.thumbnail
+        ? await (await fetch(jsonN.result.info.thumbnail)).buffer()
         : null;
 
     await enviarVideo(
         m.chat,
-        data.download_url,
-        `*${data.title}*\nDuración: ${data.duration}\nCalidad: ${data.format}p`,
+        jsonN.result.url,
+        `🎬 *Video descargado correctamente*\nCalidad: ${jsonN.result.quality}p\nServidor: Nexevo`,
         thumb,
         m
     );
 
     await m.react('✅');
-    return;
-
-} catch (e1) {
-    console.warn('❌ YUPRA falló, intentando ADONIX...');
-}
-
-// ======================================================
-// ⭐ RESPALDO: ADONIX (shadow.xyz – video)
-// ======================================================
-try {
-    const apiAdonix = `https://api-adonix.ultraplus.click/download/ytvideo?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
-    const resA = await fetch(apiAdonix);
-    const jsonA = await resA.json();
-
-    if (!jsonA.status || !jsonA.data?.url) {
-        throw new Error('ADONIX inválido');
-    }
-
-    await enviarVideo(
-        m.chat,
-        jsonA.data.url,
-        `*${jsonA.data.title}*\nServidor: Adonix`,
-        null,
-        m
-    );
-
-    await m.react('✅');
-    return;
-
-} catch (e2) {
-    await m.react('❌');
-    console.error(e2);
-    throw '❌ Ningún servidor devolvió el video.';
-}
 
 } catch (e) {
     console.error(e);
     await m.react('❌');
-    await m.reply('⚠️ No se pudo descargar el video, intente con *playv2*.');
+    await m.reply('⚠️ No se pudo descargar el video desde ningún servidor intente playv2.');
 }
 
 }
