@@ -17,10 +17,10 @@ const handler = async (m, { conn, args }) => {
   let result;
 
   // ===================================================
-  // ⭐ API: ADONIX FACEBOOK
+  // ⭐ API: DELIRIUS FACEBOOK
   // ===================================================
   try {
-    const apiUrl = `https://api-adonix.ultraplus.click/download/facebook?apikey=shadow.xyz&url=${encodeURIComponent(args[0])}`;
+    const apiUrl = `https://api.delirius.store/download/facebook?url=${encodeURIComponent(args[0])}`;
 
     const res = await fetch(apiUrl, {
       headers: {
@@ -31,19 +31,24 @@ const handler = async (m, { conn, args }) => {
 
     const json = await res.json();
 
-    if (!json.status || !json.result?.hd && !json.result?.sd) {
+    if (!json.urls || !Array.isArray(json.urls)) {
       throw new Error("No se encontraron enlaces de video");
     }
 
+    // Prioriza HD si está disponible
+    const videoData = json.urls.find(v => v.hd) || json.urls.find(v => v.sd);
+
+    if (!videoData) {
+      throw new Error("No hay calidad disponible");
+    }
+
     result = {
-      title: json.result.title || "Facebook Video",
-      thumbnail: json.result.thumbnail,
-      duration: json.result.duration || "Desconocida",
-      videoUrl: json.result.hd || json.result.sd
+      title: json.title || "Facebook Video",
+      videoUrl: videoData.hd || videoData.sd
     };
 
   } catch (err) {
-    console.error("❌ Error Adonix:", err.message);
+    console.error("❌ Error Delirius:", err.message);
     await m.react("❌");
     return conn.reply(
       m.chat,
@@ -76,7 +81,6 @@ const handler = async (m, { conn, args }) => {
         fileName: "facebook_video.mp4",
         caption: `🎥 *Facebook Video*
 📌 *Título:* ${result.title}
-⏱️ *Duración:* ${result.duration}
 ✨ *_By KanBot_*`
       },
       { quoted: m }
