@@ -21,23 +21,42 @@ let handler = async (m, { conn: star, args }) => {
 
   try {
     const url = args[0];
+    let title = "video";
+    let download_url;
+    let quality = "360";
 
     // ===================================================
-    // 🔥 API ADONIX — VIDEO
+    // ⭐ API PRINCIPAL: FAA
     // ===================================================
-    const apiUrl =
-      `https://api-adonix.ultraplus.click/download/ytvideo` +
-      `?apikey=shadow.xyz&url=${encodeURIComponent(url)}`;
+    try {
+      const apiFaa = `https://api-faa.my.id/faa/ytmp4?url=${encodeURIComponent(url)}`;
+      const resF = await fetch(apiFaa);
+      const jsonF = await resF.json();
 
-    const res = await fetch(apiUrl);
-    const json = await res.json();
+      if (!jsonF.status || !jsonF.result?.download_url)
+        throw new Error('FAA inválida');
 
-    if (!json.status || !json.data?.url)
-      throw new Error('Respuesta inválida de Adonix');
+      download_url = jsonF.result.download_url;
+      quality = jsonF.result.format || "mp4";
+      title = "Video";
 
-    const title = json.data.title || 'video';
-    const download_url = json.data.url;
-    const quality = '720'; // la API no especifica calidad
+    } catch (e1) {
+      console.warn("❌ FAA falló, usando respaldo Nexevo...");
+
+      // ===================================================
+      // 🔁 RESPALDO: NEXEVO
+      // ===================================================
+      const apiNexevo = `https://nexevo-api.vercel.app/download/y2?url=${encodeURIComponent(url)}`;
+      const resN = await fetch(apiNexevo);
+      const jsonN = await resN.json();
+
+      if (!jsonN.status || !jsonN.result?.url)
+        throw new Error('Nexevo inválida');
+
+      download_url = jsonN.result.url;
+      quality = jsonN.result.quality || "360";
+      title = jsonN.result.info?.title || "Video";
+    }
 
     // ===================================================
     // ⏳ Mensaje de espera
@@ -66,7 +85,7 @@ let handler = async (m, { conn: star, args }) => {
     await m.react('✅');
 
   } catch (e) {
-    console.error('Error Adonix:', e.message);
+    console.error('Error descarga:', e.message);
     await m.react('✖️');
     return star.reply(
       m.chat,
