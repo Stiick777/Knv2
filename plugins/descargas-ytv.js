@@ -24,38 +24,56 @@ let handler = async (m, { conn, args }) => {
 
   await m.react("🕓");
 
-  let title, downloadUrl, quality;
+  let title = "video";
+  let downloadUrl;
+  let quality = "360";
 
   // ===================================================
-  // ⭐ API ÚNICA: ADONIX
+  // ⭐ API PRINCIPAL: FAA
   // ===================================================
   try {
     const { data } = await axios.get(
-      "https://api-adonix.ultraplus.click/download/ytvideo",
-      {
-        params: {
-          apikey: "shadow.xyz",
-          url: youtubeLink
-        }
-      }
+      "https://api-faa.my.id/faa/ytmp4",
+      { params: { url: youtubeLink } }
     );
 
-    if (!data.status || !data.data?.url) {
-      throw new Error("Respuesta inválida de Adonix");
+    if (!data.status || !data.result?.download_url) {
+      throw new Error("Respuesta inválida de FAA");
     }
 
-    title = data.data.title || "video";
-    downloadUrl = data.data.url;
-    quality = "720"; // la API no especifica calidad
+    downloadUrl = data.result.download_url;
+    quality = data.result.format || "mp4";
+    title = "Video";
 
   } catch (err) {
-    console.error("Error Adonix:", err.message);
-    await m.react("❌");
-    return conn.sendMessage(
-      m.chat,
-      { text: "❌ No se pudo descargar el video con la API Adonix." },
-      { quoted: m }
-    );
+    console.warn("❌ FAA falló, usando respaldo Nexevo...");
+
+    // ===================================================
+    // 🔁 RESPALDO: NEXEVO
+    // ===================================================
+    try {
+      const { data } = await axios.get(
+        "https://nexevo-api.vercel.app/download/y2",
+        { params: { url: youtubeLink } }
+      );
+
+      if (!data.status || !data.result?.url) {
+        throw new Error("Respuesta inválida de Nexevo");
+      }
+
+      downloadUrl = data.result.url;
+      quality = data.result.quality || "360";
+      title = data.result.info?.title || "Video";
+
+    } catch (err2) {
+      console.error("Error Nexevo:", err2.message);
+      await m.react("❌");
+      return conn.sendMessage(
+        m.chat,
+        { text: "❌ No se pudo descargar el video desde ningún servidor." },
+        { quoted: m }
+      );
+    }
   }
 
   // ===================================================
@@ -88,9 +106,9 @@ let handler = async (m, { conn, args }) => {
 📏 *Tamaño:* ${sizeMB.toFixed(2)} MB
 
 ${isHeavy
-      ? "📁 Enviado como *documento* (más de 30 MB)."
-      : "😎 Video descargado por *KanBot*."
-    }`;
+        ? "📁 Enviado como *documento* (más de 30 MB)."
+        : "😎 Video descargado por *KanBot*."
+      }`;
 
     await conn.sendMessage(
       m.chat,
