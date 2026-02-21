@@ -4,7 +4,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     if (!text) {
         return conn.reply(
             m.chat,
-            `*Ingrese el nombre de la canción 🎶*\n\n> *Ejemplo:*\n> _${usedPrefix + command} pollo_`,
+            `*Ingrese el nombre de la canción 🎶*\n\n> *Ejemplo:*\n> _${usedPrefix + command} Hola remix_`,
             m
         );
     }
@@ -12,37 +12,35 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     try {
         await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
 
-        const query = encodeURIComponent(text);
-        const url = `https://api.zenzxz.my.id/api/tools/lirik?title=${query}`;
-
+        const url = `https://api.delirius.store/search/lyrics?query=${encodeURIComponent(text)}`;
         const res = await fetch(url);
         const json = await res.json();
 
-        if (!json.success || !json.data?.result?.length) {
+        if (!json.status || !json.data) {
             throw new Error('No se encontraron resultados');
         }
 
-        // 👉 Primer resultado
-        const song = json.data.result[0];
+        const song = json.data;
 
-        const title = song.trackName || song.name;
-        const artist = song.artistName || 'Desconocido';
-        const album = song.albumName || 'Desconocido';
-        const lyrics = song.plainLyrics?.trim();
+        const title = song.title || 'Desconocido';
+        const artists = song.artists || 'Desconocido';
+        const album = song.album || 'Desconocido';
+        const duration = song.duration || '-';
+        const lyrics = song.lyrics?.trim();
 
         if (!lyrics) {
             throw new Error('Letra no disponible');
         }
 
         const msg = 
-`*\`【 Lʏʀɪᴄꜱ Sᴇᴀʀᴄʜ 】\`*
+`*\`【 LYRICS SEARCH 】\`*
 
-> *❀ Título:* _${title}_
-> *❀ Artista:* _${artist}_
-> *❀ Álbum:* _${album}_
-> *_✯ Fuente: zenzxz.my.id_*
+🎵 *Título:* ${title}
+👤 *Artista(s):* ${artists}
+💽 *Álbum:* ${album}
+⏱ *Duración:* ${duration}
 
-*ꕤ Letra:*
+📜 *Letra:*
 
 ${lyrics}`;
 
