@@ -23,19 +23,28 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     m.react('🕒');
 
     const { data } = await axios.get(
-      `https://delirius-apiofc.vercel.app/download/pinterestdl?url=${args[0]}`
+      `https://api.delirius.store/download/pinterestdl?url=${encodeURIComponent(args[0])}`
     );
 
-    if (!data.status) {
+    if (!data.status || !data.data) {
       m.react('❌');
-      return conn.reply(m.chat, '*🚩 Error al procesar el enlace de Pinterest.*', m);
+      return conn.reply(m.chat, '*🚩 No se pudo procesar el enlace de Pinterest.*', m);
     }
 
     const info = data.data;
-    const caption = `*📌 Título:* ${info.title || 'Sin título'}\n*📝 Descripción:* ${info.description || 'Sin descripción'}\n*👤 Autor:* ${info.author_name || 'Desconocido'} (${info.username})\n*📅 Subido:* ${info.upload || '-'}\n\n📥 *Descargado exitosamente by KanBot.*`;
+
+    const caption = `*📌 Título:* ${info.title || 'Sin título'}
+*📝 Descripción:* ${info.description || 'Sin descripción'}
+*👤 Autor:* ${info.author_name || 'Desconocido'} (${info.username || ''})
+*📅 Subido:* ${info.upload || '-'}
+💬 *Comentarios:* ${info.comments ?? 0}
+❤️ *Likes:* ${info.likes ?? 0}
+
+📥 *Descargado exitosamente.*`;
+
+    await m.react('📤');
 
     if (info.download.type === 'video') {
-      await m.react('📤');
       await conn.sendMessage(
         m.chat,
         {
@@ -45,7 +54,6 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
         { quoted: m }
       );
     } else if (info.download.type === 'image') {
-      await m.react('📤');
       await conn.sendMessage(
         m.chat,
         {
@@ -54,9 +62,12 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
         },
         { quoted: m }
       );
+    } else {
+      return conn.reply(m.chat, '⚠️ Tipo de archivo no soportado.', m);
     }
 
     m.react('✅');
+
   } catch (error) {
     console.error(error);
     m.react('❌');
