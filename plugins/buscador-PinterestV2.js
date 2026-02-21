@@ -4,7 +4,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     await m.react('🔍');
 
     try {
-        const res = await fetch(`https://delirius-apiofc.vercel.app/search/pinterest?text=${encodeURIComponent(text)}`);
+        const res = await fetch(`https://api.delirius.store/search/pinterest?text=${encodeURIComponent(text)}`);
         const json = await res.json();
 
         if (!json.status || !json.results || !json.results.length) {
@@ -13,28 +13,33 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
         const images = json.results.slice(0, 6);
 
+        // Enviar primera imagen con preview
         await conn.sendMessage(m.chat, {
             image: { url: images[0] },
-            caption: `📍 Resultado de: *${text}*`,
+            caption: `📌 Resultado de Pinterest\n🔎 Búsqueda: *${text}*`,
             contextInfo: {
                 externalAdReply: {
-                    mediaUrl: images[0],
-                    mediaType: 1,
-                    thumbnailUrl: images[1] || images[0],
                     title: 'Imagen de Pinterest',
-                    body: 'Fuente: delirius-apiofc.vercel.app',
-                    previewType: 0
+                    body: 'Fuente: api.delirius.store',
+                    mediaType: 1,
+                    mediaUrl: images[0],
+                    thumbnailUrl: images[0],
+                    previewType: 0,
+                    renderLargerThumbnail: true
                 }
             }
-        });
+        }, { quoted: m });
 
-        await Promise.all(images.slice(1).map(url => conn.sendFile(m.chat, url, 'image.jpg', '', m)));
+        // Enviar las demás imágenes
+        for (let url of images.slice(1)) {
+            await conn.sendFile(m.chat, url, 'pinterest.jpg', '', m);
+        }
 
         await m.react('✅');
 
     } catch (e) {
         console.error(e);
-        await conn.reply(m.chat, `❌ Error al buscar imágenes. Intenta más tarde.\n\n*Error:* ${e.message}`, m);
+        await conn.reply(m.chat, `❌ Error al buscar imágenes.\n\n*Error:* ${e.message}`, m);
     }
 };
 
