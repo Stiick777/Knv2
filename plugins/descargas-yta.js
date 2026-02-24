@@ -74,4 +74,32 @@ const handler = async (m, { conn, text }) => {
       {
         [isHeavy ? "document" : "audio"]: { url: mp3 },
         mimetype: "audio/mpeg",
-        fileName:
+        fileName: `${title}.mp3`,
+        ...(isHeavy && {
+          caption: "📁 Archivo enviado como documento por superar 10 MB."
+        })
+      },
+      { quoted: m }
+    );
+
+  } catch (error) {
+    console.error("Error YTMP3:", error.message);
+    return m.reply(`⚠️ Error: ${error.message}`);
+  }
+};
+
+handler.command = ['ytmp3', 'yta'];
+handler.help = ['ytmp3 <url>'];
+handler.tags = ['descargas'];
+handler.group = true;
+
+export default handler;
+
+// ============================================================
+// 🔍 Validación de enlace YouTube
+// ============================================================
+function isValidYouTubeUrl(url) {
+  const regex =
+    /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/;
+  return regex.test(url.trim());
+}
