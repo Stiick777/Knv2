@@ -55,22 +55,25 @@ try {
     const fileExt = 'mp3';
 
     // ─────────────────────────────
-    // 🥇 API STELLARWA (PRINCIPAL)
+    // 🥇 API ANABOT (PRINCIPAL)
     // ─────────────────────────────
     try {
-        const apiStellar = `https://api.stellarwa.xyz/dl/ytmp3?url=${encodeURIComponent(url)}&key=Yuki-WaBot`;
-        const resStellar = await fetch(apiStellar);
-        const jsonStellar = await resStellar.json();
+        const apiAnabot = `https://anabot.my.id/api/download/ytmp3?url=${encodeURIComponent(url)}&apikey=freeApikey`;
+        const resAnabot = await fetch(apiAnabot);
+        const jsonAnabot = await resAnabot.json();
 
-        if (jsonStellar.status && jsonStellar.data?.dl) {
-            title = jsonStellar.data.title || title;
-            downloadUrl = jsonStellar.data.dl;
+        if (
+            jsonAnabot.success &&
+            jsonAnabot.data?.result?.urls
+        ) {
+            title = jsonAnabot.data.result.metadata?.title || title;
+            downloadUrl = jsonAnabot.data.result.urls;
         } else {
-            throw new Error('Stellar sin datos válidos');
+            throw new Error('Anabot sin datos válidos');
         }
 
     } catch (e) {
-        console.log('⚠️ Stellar falló, usando API Faa...');
+        console.log('⚠️ Anabot falló, usando API Faa...');
 
         // ─────────────────────────────
         // 🥈 API FAA (RESPALDO)
