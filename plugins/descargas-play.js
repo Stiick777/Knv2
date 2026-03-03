@@ -55,38 +55,35 @@ try {
     const fileExt = 'mp3';
 
     // ─────────────────────────────
-    // 🥇 API ANABOT (PRINCIPAL)
+    // 🥇 API ADONIX (PRINCIPAL)
     // ─────────────────────────────
     try {
-        const apiAnabot = `https://anabot.my.id/api/download/ytmp3?url=${encodeURIComponent(url)}&apikey=freeApikey`;
-        const resAnabot = await fetch(apiAnabot);
-        const jsonAnabot = await resAnabot.json();
+        const apiAdonix = `https://api-adonix.ultraplus.click/download/ytaudio?apikey=Yuki-WaBot&url=${encodeURIComponent(url)}`;
+        const resAdonix = await fetch(apiAdonix);
+        const jsonAdonix = await resAdonix.json();
 
-        if (
-            jsonAnabot.success &&
-            jsonAnabot.data?.result?.urls
-        ) {
-            title = jsonAnabot.data.result.metadata?.title || title;
-            downloadUrl = jsonAnabot.data.result.urls;
+        if (jsonAdonix.status && jsonAdonix.data?.url) {
+            title = jsonAdonix.data.title || title;
+            downloadUrl = jsonAdonix.data.url;
         } else {
-            throw new Error('Anabot sin datos válidos');
+            throw new Error('Adonix sin datos válidos');
         }
 
     } catch (e) {
-        console.log('⚠️ Anabot falló, usando API Faa...');
+        console.log('⚠️ Adonix falló, usando Sylphy...');
 
         // ─────────────────────────────
-        // 🥈 API FAA (RESPALDO)
+        // 🥈 API SYLPHY (RESPALDO)
         // ─────────────────────────────
-        const apiFaa = `https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(url)}`;
-        const resFaa = await fetch(apiFaa);
-        const jsonFaa = await resFaa.json();
+        const apiSylphy = `https://sylphy.xyz/download/v2/ytmp3?url=${encodeURIComponent(url)}&api_key=sylphy-nKG7fdy`;
+        const resSylphy = await fetch(apiSylphy);
+        const jsonSylphy = await resSylphy.json();
 
-        if (jsonFaa.status && jsonFaa.result?.mp3) {
-            title = jsonFaa.result.title || title;
-            downloadUrl = jsonFaa.result.mp3;
+        if (jsonSylphy.status && jsonSylphy.result?.dl_url) {
+            title = jsonSylphy.result.title || title;
+            downloadUrl = jsonSylphy.result.dl_url;
         } else {
-            throw new Error('Faa también falló');
+            throw new Error('Sylphy también falló');
         }
     }
 
