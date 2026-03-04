@@ -55,36 +55,17 @@ try {
     const fileExt = 'mp3';
 
     // ─────────────────────────────
-    // 🥇 API ADONIX (PRINCIPAL)
+    // 🎵 API FAA (ÚNICA)
     // ─────────────────────────────
-    try {
-        const apiAdonix = `https://api-adonix.ultraplus.click/download/ytaudio?apikey=Yuki-WaBot&url=${encodeURIComponent(url)}`;
-        const resAdonix = await fetch(apiAdonix);
-        const jsonAdonix = await resAdonix.json();
+    const apiFaa = `https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(url)}`;
+    const resFaa = await fetch(apiFaa);
+    const jsonFaa = await resFaa.json();
 
-        if (jsonAdonix.status && jsonAdonix.data?.url) {
-            title = jsonAdonix.data.title || title;
-            downloadUrl = jsonAdonix.data.url;
-        } else {
-            throw new Error('Adonix sin datos válidos');
-        }
-
-    } catch (e) {
-        console.log('⚠️ Adonix falló, usando Sylphy...');
-
-        // ─────────────────────────────
-        // 🥈 API SYLPHY (RESPALDO)
-        // ─────────────────────────────
-        const apiSylphy = `https://sylphy.xyz/download/v2/ytmp3?url=${encodeURIComponent(url)}&api_key=sylphy-nKG7fdy`;
-        const resSylphy = await fetch(apiSylphy);
-        const jsonSylphy = await resSylphy.json();
-
-        if (jsonSylphy.status && jsonSylphy.result?.dl_url) {
-            title = jsonSylphy.result.title || title;
-            downloadUrl = jsonSylphy.result.dl_url;
-        } else {
-            throw new Error('Sylphy también falló');
-        }
+    if (jsonFaa.status && jsonFaa.result?.mp3) {
+        title = jsonFaa.result.title || title;
+        downloadUrl = jsonFaa.result.mp3;
+    } else {
+        throw new Error('API Faa sin datos válidos');
     }
 
     // ─────────────────────────────
