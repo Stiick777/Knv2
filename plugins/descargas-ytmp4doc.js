@@ -21,49 +21,28 @@ let handler = async (m, { conn: star, args }) => {
 
   try {
     const url = args[0];
-    let title = "video";
-    let download_url;
-    let quality = "360";
 
     // ===================================================
-    // ⭐ API PRINCIPAL: FAA
+    // ⭐ ÚNICA API: STARLIGHT
     // ===================================================
-    try {
-      const apiFaa = `https://api-faa.my.id/faa/ytmp4?url=${encodeURIComponent(url)}`;
-      const resF = await fetch(apiFaa);
-      const jsonF = await resF.json();
+    const apiUrl = `https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}&format=360p`;
 
-      if (!jsonF.status || !jsonF.result?.download_url)
-        throw new Error('FAA inválida');
+    const res = await fetch(apiUrl);
+    const json = await res.json();
 
-      download_url = jsonF.result.download_url;
-      quality = jsonF.result.format || "mp4";
-      title = "Video";
+    if (!json?.dl_url)
+      throw new Error('Respuesta inválida de Starlight');
 
-    } catch (e1) {
-      console.warn("❌ FAA falló, usando respaldo Nexevo...");
-
-      // ===================================================
-      // 🔁 RESPALDO: NEXEVO
-      // ===================================================
-      const apiNexevo = `https://nexevo-api.vercel.app/download/y2?url=${encodeURIComponent(url)}`;
-      const resN = await fetch(apiNexevo);
-      const jsonN = await resN.json();
-
-      if (!jsonN.status || !jsonN.result?.url)
-        throw new Error('Nexevo inválida');
-
-      download_url = jsonN.result.url;
-      quality = jsonN.result.quality || "360";
-      title = jsonN.result.info?.title || "Video";
-    }
+    const title = json.title || "video";
+    const quality = json.quality || "360p";
+    const download_url = json.dl_url;
 
     // ===================================================
     // ⏳ Mensaje de espera
     // ===================================================
     let txt = '`🅓🅞🅒🅢 🅥➋ - 🅚🅐🅝🅑🅞🅣`\n\n';
     txt += `🍁 *Título*: ${title}\n`;
-    txt += `🎞️ *Calidad*: ${quality}p\n\n`;
+    txt += `🎞️ *Calidad*: ${quality}\n\n`;
     txt += `> *Se está enviando su video, por favor espere*`;
 
     await star.reply(m.chat, txt, m);
@@ -89,7 +68,7 @@ let handler = async (m, { conn: star, args }) => {
     await m.react('✖️');
     return star.reply(
       m.chat,
-      '❌ _*No se pudo descargar el video. Intenta más tarde.*_',
+      '❌ _*No se pudo descargar el video desde el servidor Starlight.*_',
       m,
       rcanal
     );
