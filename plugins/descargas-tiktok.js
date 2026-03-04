@@ -5,7 +5,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     m.react('❌');
     return conn.reply(
       m.chat,
-      `*☁️ Ingrese un enlace de TikTok.*\n\n*💌 Ejemplo:* _${usedPrefix + command} https://vt.tiktok.com/ZS5SJjDJr/_`,
+      `*☁️ Ingrese un enlace de TikTok.*\n\n*💌 Ejemplo:* _${usedPrefix + command} https://vt.tiktok.com/xxxxx/_`,
       m
     );
   }
@@ -18,12 +18,16 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   try {
     m.react('🕒');
 
-    const api = `https://api.yupra.my.id/api/downloader/tiktok?url=${encodeURIComponent(args[0])}`;
+    const api = `https://api.vreden.my.id/api/v1/download/tiktok?url=${encodeURIComponent(args[0])}`;
     const res = await fetch(api);
+
     if (!res.ok) throw new Error('API no respondió');
 
     const json = await res.json();
-    if (!json.result?.status) throw new Error('Respuesta inválida');
+
+    if (!json.status || !json.result) {
+      throw new Error('Respuesta inválida');
+    }
 
     const r = json.result;
 
@@ -35,31 +39,36 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 📥 *Descargado por KanBot*
 `.trim();
 
-    // Buscar video normal
-    const videoHD =
-      r.data?.find(v => v.type === 'nowatermark_hd') ||
-      r.data?.find(v => v.type === 'nowatermark') ||
-      r.data?.find(v => v.type === 'watermark');
+    const data = r.data || [];
 
-    // Buscar fotos (slides)
-    const photos = r.data?.filter(v => v.type === 'photo') || [];
+    // ==============================
+    // 🎥 VIDEO (prioridad HD)
+    // ==============================
+    const video =
+      data.find(v => v.type === 'nowatermark_hd') ||
+      data.find(v => v.type === 'nowatermark');
+
+    // ==============================
+    // 🖼 FOTOS (slides)
+    // ==============================
+    const photos = data.filter(v => v.type === 'photo');
 
     await m.react('📤');
 
-    // ─────── FOTOS (slides reales) ───────
+    // ───────── FOTOS ─────────
     if (photos.length > 0) {
       for (let i = 0; i < photos.length; i++) {
         await conn.sendMessage(
           m.chat,
           {
             image: { url: photos[i].url },
-            caption: i === 0 ? caption : undefined, // solo caption en la primera
+            caption: i === 0 ? caption : undefined,
           },
           { quoted: m }
         );
       }
 
-      // Enviar audio si existe
+      // 🎵 Audio
       if (r.music_info?.url) {
         try {
           await conn.sendMessage(
@@ -80,18 +89,18 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
       return;
     }
 
-    // ─────── VIDEO ───────
-    if (videoHD) {
+    // ───────── VIDEO ─────────
+    if (video) {
       await conn.sendMessage(
         m.chat,
         {
-          video: { url: videoHD.url },
+          video: { url: video.url },
           caption,
         },
         { quoted: m }
       );
 
-      // Audio opcional
+      // 🎵 Audio opcional
       if (r.music_info?.url) {
         try {
           await conn.sendMessage(
