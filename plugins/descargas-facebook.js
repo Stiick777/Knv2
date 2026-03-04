@@ -17,38 +17,46 @@ const handler = async (m, { conn, args }) => {
   let result;
 
   // ===================================================
-  // ⭐ API: DELIRIUS FACEBOOK
+  // ⭐ API: ANABOT FACEBOOK
   // ===================================================
   try {
-    const apiUrl = `https://api.delirius.store/download/facebook?url=${encodeURIComponent(args[0])}`;
+    const apiUrl = `https://anabot.my.id/api/download/facebook?url=${encodeURIComponent(args[0])}&apikey=freeApikey`;
 
-    const res = await fetch(apiUrl, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-        "Accept": "application/json"
-      }
-    });
+    const response = await fetch(apiUrl);
+    const json = await response.json();
 
-    const json = await res.json();
-
-    if (!json.urls || !Array.isArray(json.urls)) {
-      throw new Error("No se encontraron enlaces de video");
+    if (!json.success || !json.data?.result?.api?.mediaItems) {
+      throw new Error("No se encontraron medios");
     }
 
-    // Prioriza HD si está disponible
-    const videoData = json.urls.find(v => v.hd) || json.urls.find(v => v.sd);
+    const mediaItems = json.data.result.api.mediaItems;
 
-    if (!videoData) {
-      throw new Error("No hay calidad disponible");
+    // Filtrar solo videos
+    const videos = mediaItems.filter(item => item.type === "Video");
+
+    if (!videos.length) {
+      throw new Error("No hay videos disponibles");
     }
+
+    // Prioridad de calidad
+    const qualityOrder = ["1080p", "720p", "540p", "360p"];
+
+    let selectedVideo;
+    for (let quality of qualityOrder) {
+      selectedVideo = videos.find(v => v.mediaRes === quality);
+      if (selectedVideo) break;
+    }
+
+    // Si no encuentra por resolución, toma el primero
+    if (!selectedVideo) selectedVideo = videos[0];
 
     result = {
-      title: json.title || "Facebook Video",
-      videoUrl: videoData.hd || videoData.sd
+      title: json.data.result.api.title || "Facebook Video",
+      videoUrl: selectedVideo.mediaUrl
     };
 
   } catch (err) {
-    console.error("❌ Error Delirius:", err.message);
+    console.error("❌ Error Anabot:", err.message);
     await m.react("❌");
     return conn.reply(
       m.chat,
