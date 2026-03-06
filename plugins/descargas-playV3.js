@@ -56,4 +56,35 @@ else resolve()
 })
 })
 
-const finalAudio
+const finalAudio = fs.readFileSync(output)
+
+await conn.sendMessage(
+m.chat,
+{
+audio: finalAudio,
+mimetype:'audio/mpeg',
+fileName:`${title}.mp3`,
+ptt:false
+},
+{ quoted:m }
+)
+
+fs.unlinkSync(input)
+fs.unlinkSync(output)
+
+await m.react('✔️')
+
+}catch(e){
+
+console.error(e)
+m.reply('⚠️ Error procesando el audio')
+
+}
+
+}
+
+handler.help = ['play <texto>']
+handler.tags = ['descargas']
+handler.command = ['play']
+
+export default handler
