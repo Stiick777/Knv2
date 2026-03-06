@@ -22,26 +22,23 @@ const handler = async (m, { conn, text }) => {
       { quoted: m }
     )
 
-    // 📥 Descargar audio con headers
-    const audioRes = await fetch(v.download, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-        "Accept": "*/*",
-        "Referer": "https://www.youtube.com/"
-      }
-    })
-
-    const buffer = await audioRes.buffer()
-
     await conn.sendMessage(
       m.chat,
       {
-        audio: buffer,
+        audio: { url: v.download },
         mimetype: 'audio/mpeg',
         fileName: `${v.title}.mp3`,
         ptt: false
       },
-      { quoted: m }
+      {
+        quoted: m,
+        fetchOptions: {
+          headers: {
+            "User-Agent": "Mozilla/5.0",
+            "Referer": "https://youtube.com/"
+          }
+        }
+      }
     )
 
     await m.react('✔️')
