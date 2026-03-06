@@ -13,30 +13,26 @@ const handler = async (m, { conn, text }) => {
 
     const v = data.result
 
-    const caption = `
-╭─〔 YOUTUBE PLAY 〕
-│
-├ Título: ${v.title}
-├ Autor: ${v.author.name}
-├ Duración: ${v.timestamp}
-│
-╰ Enviando audio...
-`.trim()
-
     await conn.sendMessage(
       m.chat,
       {
         image: { url: v.thumbnail },
-        caption
+        caption: `🎵 *${v.title}*\n👤 ${v.author.name}\n⏱ ${v.timestamp}`
       },
       { quoted: m }
     )
 
-    // 📥 descargar audio primero
-    const audio = await fetch(v.download)
-    const buffer = await audio.buffer()
+    // 📥 Descargar audio con headers
+    const audioRes = await fetch(v.download, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "*/*",
+        "Referer": "https://www.youtube.com/"
+      }
+    })
 
-    // 🎵 enviar audio
+    const buffer = await audioRes.buffer()
+
     await conn.sendMessage(
       m.chat,
       {
@@ -52,11 +48,11 @@ const handler = async (m, { conn, text }) => {
 
   } catch (e) {
     console.error(e)
-    m.reply(`⚠️ Error al descargar el audio\n\n${e.message}`)
+    m.reply(`⚠️ Error:\n${e.message}`)
   }
 }
 
-handler.help = ['play <canción>']
+handler.help = ['play <texto>']
 handler.tags = ['descargas']
 handler.command = ['play']
 
