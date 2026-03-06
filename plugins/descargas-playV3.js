@@ -1,59 +1,80 @@
 import fetch from 'node-fetch'
 
 const handler = async (m, { conn, text }) => {
-  if (!text) return m.reply('*Ingresa el nombre de la canción*')
-  await m.react('🕓')
 
-  try {
+if (!text) return m.reply('*Ingresa el nombre de la canción*')
+await m.react('🕓')
 
-    const res = await fetch(`https://api-faa.my.id/faa/ytplay?query=${encodeURIComponent(text)}`)
-    const data = await res.json()
+try {
 
-    if (!data.status) return m.reply('❌ No se encontraron resultados')
+const api = `https://api-faa.my.id/faa/ytplay?query=${encodeURIComponent(text)}`
 
-    const { title, mp3, thumbnail, duration, views, author } = data.result
+const res = await fetch(api, {
+headers: {
+'User-Agent': 'Mozilla/5.0',
+'Accept': 'application/json'
+}
+})
 
-    const cap = `
-𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙿𝚕𝚊𝚢
-===========================
-> *Título:* ${title}
-> *Autor:* ${author}
-> *Duración:* ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}
-> *Vistas:* ${views.toLocaleString()}
+const data = await res.json()
 
-*🚀 Enviando audio...*
-===========================
-✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
+if (!data.status) return m.reply('❌ No se encontraron resultados')
+
+const { title, mp3, thumbnail, duration, views, author } = data.result
+
+const minutos = Math.floor(duration / 60)
+const segundos = (duration % 60).toString().padStart(2,'0')
+
+const cap = `
+🎵 *YouTube Play*
+━━━━━━━━━━━━━━━
+📀 *Título:* ${title}
+👤 *Autor:* ${author}
+⏱ *Duración:* ${minutos}:${segundos}
+👁 *Vistas:* ${views.toLocaleString()}
+
+🚀 Enviando audio...
 `.trim()
 
-    // 📷 Enviar info con miniatura
-    await conn.sendMessage(
-      m.chat,
-      {
-        image: { url: thumbnail },
-        caption: cap
-      },
-      { quoted: m }
-    )
+// enviar info con miniatura
+await conn.sendMessage(
+m.chat,
+{
+image: { url: thumbnail },
+caption: cap
+},
+{ quoted: m }
+)
 
-    // 🎵 Enviar audio correctamente
-    await conn.sendMessage(
-      m.chat,
-      {
-        audio: { url: mp3 },
-        mimetype: 'audio/mpeg',
-        fileName: `${title}.mp3`,
-        ptt: false
-      },
-      { quoted: m }
-    )
+// descargar audio en buffer
+const audioBuffer = await (await fetch(mp3, {
+headers: {
+'User-Agent': 'Mozilla/5.0'
+}
+})).buffer()
 
-    await m.react('✔️')
+// enviar audio
+await conn.sendMessage(
+m.chat,
+{
+audio: audioBuffer,
+mimetype: 'audio/mpeg',
+fileName: `${title}.mp3`,
+ptt: false
+},
+{ quoted: m }
+)
 
-  } catch (error) {
-    console.error(error)
-    m.reply('⚠️ Error al descargar el audio')
-  }
+await m.react('✔️')
+
+} catch (error) {
+
+console.error(error)
+
+m.reply('⚠️ Error al descargar el audio')
+
+}
+
 }
 
 handler.help = ['play <texto>']
