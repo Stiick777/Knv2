@@ -1,46 +1,52 @@
 import fetch from 'node-fetch'
 
 const handler = async (m, { conn, text }) => {
-  if (!text) return m.reply('*Ingresa el nombre de lo que quieres buscar*')
+  if (!text) return m.reply('*Ingresa el nombre de la canción*')
   await m.react('🕓')
 
   try {
 
-    const api = await fetch(`https://api.zenzxz.my.id/download/youtube?q=${encodeURIComponent(text)}&type=mp3&quality=360`)
-    const data = await api.json()
+    const res = await fetch(`https://api-faa.my.id/faa/ytplay?query=${encodeURIComponent(text)}`)
+    const data = await res.json()
 
-    if (!data.status) return m.reply('❌ No se pudo encontrar el audio')
+    if (!data.status) return m.reply('❌ No se encontraron resultados')
+
+    const { title, mp3, thumbnail, duration, views, author } = data.result
 
     const cap = `
-𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙳𝚎𝚜𝚌𝚊𝚛𝚐𝚊
+𝚈𝚘𝚞𝚝𝚞𝚋𝚎 𝙿𝚕𝚊𝚢
 ===========================
-> *Título:* ${data.result.title}
-> *Autor:* ${data.result.author}
-> *Calidad:* ${data.result.quality}
+> *Título:* ${title}
+> *Autor:* ${author}
+> *Duración:* ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}
+> *Vistas:* ${views.toLocaleString()}
 
 *🚀 Enviando audio...*
 ===========================
 ✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰
 `.trim()
 
-    await conn.sendFile(
+    // 📷 Enviar info con miniatura
+    await conn.sendMessage(
       m.chat,
-      data.result.thumbnail,
-      "thumbnail.jpg",
-      cap,
-      m
+      {
+        image: { url: thumbnail },
+        caption: cap
+      },
+      { quoted: m }
     )
-await conn.sendMessage(
-  m.chat,
-  {
-    audio: { url: data.result.download },
-    mimetype: 'audio/mpeg',
-    fileName: data.result.filename,
-    ptt: false
-  },
-  { quoted: m }
-)
-    
+
+    // 🎵 Enviar audio correctamente
+    await conn.sendMessage(
+      m.chat,
+      {
+        audio: { url: mp3 },
+        mimetype: 'audio/mpeg',
+        fileName: `${title}.mp3`,
+        ptt: false
+      },
+      { quoted: m }
+    )
 
     await m.react('✔️')
 
