@@ -1,4 +1,6 @@
 import fetch from 'node-fetch'
+import fs from 'fs'
+import { exec } from 'child_process'
 
 const handler = async (m, { conn, text }) => {
 
@@ -33,10 +35,10 @@ const cap = `
 ⏱ *Duración:* ${minutos}:${segundos}
 👁 *Vistas:* ${views.toLocaleString()}
 
-🚀 Enviando audio...
+🚀 Procesando audio...
 `.trim()
 
-// enviar info con miniatura
+// enviar miniatura
 await conn.sendMessage(
 m.chat,
 {
@@ -46,24 +48,41 @@ caption: cap
 { quoted: m }
 )
 
-// descargar audio en buffer
-const audioBuffer = await (await fetch(mp3, {
-headers: {
-'User-Agent': 'Mozilla/5.0'
-}
-})).buffer()
+// descargar audio
+const audioBuffer = await (await fetch(mp3)).buffer()
+
+const input = `./tmp_${Date.now()}.mp3`
+const output = `./tmp_${Date.now()}_fix.mp3`
+
+fs.writeFileSync(input, audioBuffer)
+
+// convertir con ffmpeg
+await new Promise((resolve, reject) => {
+exec(`ffmpeg -y -i "${input}" -vn -ar 44100 -ac 2 -b:a 192k "${output}"`,
+(err) => {
+if (err) reject(err)
+else resolve()
+})
+})
+
+// leer audio convertido
+const finalAudio = fs.readFileSync(output)
 
 // enviar audio
 await conn.sendMessage(
 m.chat,
 {
-audio: audioBuffer,
+audio: finalAudio,
 mimetype: 'audio/mpeg',
 fileName: `${title}.mp3`,
 ptt: false
 },
 { quoted: m }
 )
+
+// eliminar archivos temporales
+fs.unlinkSync(input)
+fs.unlinkSync(output)
 
 await m.react('✔️')
 
