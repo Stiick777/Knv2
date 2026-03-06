@@ -13,10 +13,6 @@ const handler = async (m, { conn, text }) => {
 
     const v = data.result
 
-    if (v.seconds > 3600) {
-      return m.reply('❗ *El audio supera 1 hora*')
-    }
-
     const caption = `
 ╭─〔 YOUTUBE PLAY 〕
 │
@@ -36,10 +32,15 @@ const handler = async (m, { conn, text }) => {
       { quoted: m }
     )
 
+    // 📥 descargar audio primero
+    const audio = await fetch(v.download)
+    const buffer = await audio.buffer()
+
+    // 🎵 enviar audio
     await conn.sendMessage(
       m.chat,
       {
-        audio: { url: v.download },
+        audio: buffer,
         mimetype: 'audio/mpeg',
         fileName: `${v.title}.mp3`,
         ptt: false
@@ -51,11 +52,7 @@ const handler = async (m, { conn, text }) => {
 
   } catch (e) {
     console.error(e)
-
-    m.reply(`⚠️ Error al descargar el audio
-
-📛 Error exacto:
-${e.stack || e}`)
+    m.reply(`⚠️ Error al descargar el audio\n\n${e.message}`)
   }
 }
 
