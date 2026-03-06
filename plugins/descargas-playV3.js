@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'
+/*import fetch from 'node-fetch'
 
 const handler = async (m, { conn, text }) => {
   if (!text) return m.reply('*Ingresa el nombre de la canción*')
@@ -54,3 +54,4 @@ handler.tags = ['descargas']
 handler.command = ['play']
 
 export default handler
+*/
