@@ -17,50 +17,34 @@ const handler = async (m, { conn, args }) => {
   let result;
 
   // ===================================================
-  // ⭐ API: ANABOT FACEBOOK
+  // ⭐ API: DELIRIUS FACEBOOK
   // ===================================================
   try {
-    const apiUrl = `https://anabot.my.id/api/download/facebook?url=${encodeURIComponent(args[0])}&apikey=freeApikey`;
 
-    const response = await fetch(apiUrl);
+    const api = `https://api.delirius.store/download/facebook?url=${encodeURIComponent(args[0])}`;
+
+    const response = await fetch(api);
     const json = await response.json();
 
-    if (!json.success || !json.data?.result?.api?.mediaItems) {
-      throw new Error("No se encontraron medios");
+    if (!json.urls || !json.urls.length) {
+      throw new Error("No se encontraron enlaces");
     }
 
-    const mediaItems = json.data.result.api.mediaItems;
+    const video = json.urls[0];
 
-    // Filtrar solo videos
-    const videos = mediaItems.filter(item => item.type === "Video");
-
-    if (!videos.length) {
-      throw new Error("No hay videos disponibles");
-    }
-
-    // Prioridad de calidad
-    const qualityOrder = ["1080p", "720p", "540p", "360p"];
-
-    let selectedVideo;
-    for (let quality of qualityOrder) {
-      selectedVideo = videos.find(v => v.mediaRes === quality);
-      if (selectedVideo) break;
-    }
-
-    // Si no encuentra por resolución, toma el primero
-    if (!selectedVideo) selectedVideo = videos[0];
+    const videoUrl = video.hd || video.sd;
 
     result = {
-      title: json.data.result.api.title || "Facebook Video",
-      videoUrl: selectedVideo.mediaUrl
+      title: json.title || "Facebook Video",
+      videoUrl
     };
 
   } catch (err) {
-    console.error("❌ Error Anabot:", err.message);
+    console.error("❌ Error API:", err.message);
     await m.react("❌");
     return conn.reply(
       m.chat,
-      "❎ *No se pudo obtener el video desde Facebook.*",
+      "❎ *No se pudo obtener el video de Facebook.*",
       m
     );
   }
@@ -69,7 +53,8 @@ const handler = async (m, { conn, args }) => {
   // 📥 DESCARGA Y ENVÍO
   // ===================================================
   try {
-    await m.react("📤");
+
+    await m.react("📥");
 
     const { data } = await axios.get(result.videoUrl, {
       responseType: "arraybuffer",
@@ -86,7 +71,7 @@ const handler = async (m, { conn, args }) => {
       {
         video: buffer,
         mimetype: type?.mime || "video/mp4",
-        fileName: "facebook_video.mp4",
+        fileName: "facebook.mp4",
         caption: `🎥 *Facebook Video*
 📌 *Título:* ${result.title}
 ✨ *_By KanBot_*`
