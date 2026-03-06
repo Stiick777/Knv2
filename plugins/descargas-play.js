@@ -11,7 +11,7 @@ const LimitVid = 425 * 1024 * 1024; //425MB
 const handler = async (m, {conn, command, args, text, usedPrefix}) => {
 
 
-/*if (command === 'play') {
+if (command === 'play') {
     if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
 
     await m.react('🕓');
@@ -55,17 +55,17 @@ try {
     const fileExt = 'mp3';
 
     // ─────────────────────────────
-    // 🎵 API FAA (ÚNICA)
+    // 🥇 API ANABOT
     // ─────────────────────────────
-    const apiFaa = `https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(url)}`;
-    const resFaa = await fetch(apiFaa);
-    const jsonFaa = await resFaa.json();
+    const apiAnabot = `https://anabot.my.id/api/download/ytmp3?url=${encodeURIComponent(url)}&apikey=freeApikey`;
+    const res = await fetch(apiAnabot);
+    const json = await res.json();
 
-    if (jsonFaa.status && jsonFaa.result?.mp3) {
-        title = jsonFaa.result.title || title;
-        downloadUrl = jsonFaa.result.mp3;
+    if (json.success && json.data?.result?.urls) {
+        title = json.data.result.metadata?.title || title;
+        downloadUrl = json.data.result.urls;
     } else {
-        throw new Error('API Faa sin datos válidos');
+        throw new Error('API Anabot sin datos válidos');
     }
 
     // ─────────────────────────────
@@ -92,10 +92,10 @@ try {
         { text: '❌ Error al descargar el audio' },
         { quoted: m }
     );
-}
+        }
 //
     }
-*/
+
 if (command == 'play2') {
     if (!text) return conn.reply(m.chat, `*𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎 𝚕𝚘 𝚚𝚞𝚎 𝚚𝚞𝚒𝚎𝚛𝚎𝚜 𝚋𝚞𝚜𝚌𝚊𝚛*`, m, rcanal);
     
