@@ -30,14 +30,17 @@ const handler = async (m, { conn, text }) => {
       cap,
       m
     )
-
-    await conn.sendFile(
-      m.chat,
-      data.result.download,
-      data.result.filename,
-      '',
-      m
-    )
+await conn.sendMessage(
+  m.chat,
+  {
+    audio: { url: data.result.download },
+    mimetype: 'audio/mpeg',
+    fileName: data.result.filename,
+    ptt: false
+  },
+  { quoted: m }
+)
+    
 
     await m.react('✔️')
 
