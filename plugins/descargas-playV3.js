@@ -9,11 +9,10 @@ const handler = async (m, { conn, text }) => {
     const res = await fetch(`https://api.ootaizumi.web.id/downloader/youtube/play?query=${encodeURIComponent(text)}`)
     const data = await res.json()
 
-    if (!data.status) return m.reply('❌ No se encontró el resultado')
+    if (!data.status) throw new Error('La API no devolvió resultados')
 
     const v = data.result
 
-    // 🚨 Limitar duración
     if (v.seconds > 3600) {
       return m.reply('❗ *El audio supera 1 hora*')
     }
@@ -28,7 +27,6 @@ const handler = async (m, { conn, text }) => {
 ╰ Enviando audio...
 `.trim()
 
-    // 📷 Enviar info primero
     await conn.sendMessage(
       m.chat,
       {
@@ -38,7 +36,6 @@ const handler = async (m, { conn, text }) => {
       { quoted: m }
     )
 
-    // 🎵 Enviar audio compatible
     await conn.sendMessage(
       m.chat,
       {
@@ -54,7 +51,11 @@ const handler = async (m, { conn, text }) => {
 
   } catch (e) {
     console.error(e)
-    m.reply('⚠️ Error al descargar el audio')
+
+    m.reply(`⚠️ Error al descargar el audio
+
+📛 Error exacto:
+${e.stack || e}`)
   }
 }
 
