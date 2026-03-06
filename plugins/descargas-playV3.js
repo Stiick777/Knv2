@@ -2,72 +2,71 @@ import fetch from 'node-fetch'
 import fs from 'fs'
 import { exec } from 'child_process'
 
-const handler = async (m, { conn, text }) => {
+const handler = async (m,{conn,text}) => {
 
-if (!text) return m.reply('*Ingresa el nombre de la canción*')
+if(!text) return m.reply('Ingresa el nombre de la canción')
+
 await m.react('🕓')
 
 try {
 
 const api = `https://api-faa.my.id/faa/ytplay?query=${encodeURIComponent(text)}`
+const res = await fetch(api)
+const json = await res.json()
 
-const res = await fetch(api, {
-headers: { 'User-Agent': 'Mozilla/5.0' }
-})
+if(!json.status) return m.reply('No se encontró resultado')
 
-const data = await res.json()
-
-if (!data.status) return m.reply('❌ No se encontraron resultados')
-
-const { title, mp3, thumbnail, duration, views, author } = data.result
-
-const cap = `
-🎵 *YouTube Play*
-━━━━━━━━━━━━━━━
-📀 *Título:* ${title}
-👤 *Autor:* ${author}
-⏱ *Duración:* ${Math.floor(duration/60)}:${(duration%60).toString().padStart(2,'0')}
-👁 *Vistas:* ${views.toLocaleString()}
-
-🚀 Procesando audio...
-`.trim()
+const {title,mp3,thumbnail,author,duration,views} = json.result
 
 await conn.sendMessage(m.chat,{
-image:{ url: thumbnail },
-caption: cap
-},{ quoted:m })
+image:{url:thumbnail},
+caption:`🎵 *YouTube Play*
 
-// descargar audio
-const buffer = await (await fetch(mp3,{
-headers:{ 'User-Agent':'Mozilla/5.0'}
-})).buffer()
+📀 ${title}
+👤 ${author}
+⏱ ${Math.floor(duration/60)}:${(duration%60).toString().padStart(2,'0')}
+👁 ${views}
 
-const input = `./audio_${Date.now()}.tmp`
-const output = `./audio_${Date.now()}.mp3`
+🚀 Procesando audio...`
+},{quoted:m})
 
-fs.writeFileSync(input, buffer)
+/* descargar audio correctamente */
+const audioRes = await fetch(mp3,{
+headers:{
+'User-Agent':'Mozilla/5.0',
+'Accept':'*/*',
+'Connection':'keep-alive'
+}
+})
 
-// convertir correctamente
+if(!audioRes.ok) throw 'Error descargando audio'
+
+const buffer = await audioRes.buffer()
+
+/* verificar tamaño */
+if(buffer.length < 10000) throw 'Archivo inválido'
+
+const input=`./${Date.now()}.m4a`
+const output=`./${Date.now()}.mp3`
+
+fs.writeFileSync(input,buffer)
+
+/* convertir con ffmpeg */
 await new Promise((resolve,reject)=>{
-exec(`ffmpeg -y -loglevel error -i "${input}" -vn -acodec libmp3lame -ab 128k "${output}"`,
+exec(`ffmpeg -y -i "${input}" -vn -ar 44100 -ac 2 -b:a 128k "${output}"`,
 (err)=>{
 if(err) reject(err)
 else resolve()
 })
 })
 
-const finalAudio = fs.readFileSync(output)
+const audio = fs.readFileSync(output)
 
-await conn.sendMessage(
-m.chat,
-{
-audio: finalAudio,
+await conn.sendMessage(m.chat,{
+audio:audio,
 mimetype:'audio/mpeg',
-fileName:`${title}.mp3`,
-ptt:false
-},
-{ quoted:m }
-)
+fileName:`${title}.mp3`
+},{quoted:m})
 
 fs.unlinkSync(input)
 fs.unlinkSync(output)
@@ -76,15 +75,15 @@ await m.react('✔️')
 
 }catch(e){
 
-console.error(e)
-m.reply('⚠️ Error procesando el audio')
+console.log(e)
+m.reply('❌ Error descargando audio')
 
 }
 
 }
 
-handler.help = ['play <texto>']
-handler.tags = ['descargas']
-handler.command = ['play']
+handler.help=['play']
+handler.tags=['descargas']
+handler.command=['play']
 
 export default handler
