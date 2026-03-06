@@ -1,89 +1,65 @@
 import fetch from 'node-fetch'
-import fs from 'fs'
-import { exec } from 'child_process'
 
-const handler = async (m,{conn,text}) => {
+const handler = async (m, { conn, text }) => {
+  if (!text) return m.reply('*Ingresa el nombre de la canción*')
+  await m.react('🕓')
 
-if(!text) return m.reply('Ingresa el nombre de la canción')
+  try {
 
-await m.react('🕓')
+    const res = await fetch(`https://api.ootaizumi.web.id/downloader/youtube/play?query=${encodeURIComponent(text)}`)
+    const data = await res.json()
 
-try {
+    if (!data.status) return m.reply('❌ No se encontró el resultado')
 
-const api = `https://api-faa.my.id/faa/ytplay?query=${encodeURIComponent(text)}`
-const res = await fetch(api)
-const json = await res.json()
+    const v = data.result
 
-if(!json.status) return m.reply('No se encontró resultado')
+    // 🚨 Limitar duración
+    if (v.seconds > 3600) {
+      return m.reply('❗ *El audio supera 1 hora*')
+    }
 
-const {title,mp3,thumbnail,author,duration,views} = json.result
+    const caption = `
+╭─〔 YOUTUBE PLAY 〕
+│
+├ Título: ${v.title}
+├ Autor: ${v.author.name}
+├ Duración: ${v.timestamp}
+│
+╰ Enviando audio...
+`.trim()
 
-await conn.sendMessage(m.chat,{
-image:{url:thumbnail},
-caption:`🎵 *YouTube Play*
+    // 📷 Enviar info primero
+    await conn.sendMessage(
+      m.chat,
+      {
+        image: { url: v.thumbnail },
+        caption
+      },
+      { quoted: m }
+    )
 
-📀 ${title}
-👤 ${author}
-⏱ ${Math.floor(duration/60)}:${(duration%60).toString().padStart(2,'0')}
-👁 ${views}
+    // 🎵 Enviar audio compatible
+    await conn.sendMessage(
+      m.chat,
+      {
+        audio: { url: v.download },
+        mimetype: 'audio/mpeg',
+        fileName: `${v.title}.mp3`,
+        ptt: false
+      },
+      { quoted: m }
+    )
 
-🚀 Procesando audio...`
-},{quoted:m})
+    await m.react('✔️')
 
-/* descargar audio correctamente */
-const audioRes = await fetch(mp3,{
-headers:{
-'User-Agent':'Mozilla/5.0',
-'Accept':'*/*',
-'Connection':'keep-alive'
-}
-})
-
-if(!audioRes.ok) throw 'Error descargando audio'
-
-const buffer = await audioRes.buffer()
-
-/* verificar tamaño */
-if(buffer.length < 10000) throw 'Archivo inválido'
-
-const input=`./${Date.now()}.m4a`
-const output=`./${Date.now()}.mp3`
-
-fs.writeFileSync(input,buffer)
-
-/* convertir con ffmpeg */
-await new Promise((resolve,reject)=>{
-exec(`ffmpeg -y -i "${input}" -vn -ar 44100 -ac 2 -b:a 128k "${output}"`,
-(err)=>{
-if(err) reject(err)
-else resolve()
-})
-})
-
-const audio = fs.readFileSync(output)
-
-await conn.sendMessage(m.chat,{
-audio:audio,
-mimetype:'audio/mpeg',
-fileName:`${title}.mp3`
-},{quoted:m})
-
-fs.unlinkSync(input)
-fs.unlinkSync(output)
-
-await m.react('✔️')
-
-}catch(e){
-
-console.log(e)
-m.reply('❌ Error descargando audio')
-
+  } catch (e) {
+    console.error(e)
+    m.reply('⚠️ Error al descargar el audio')
+  }
 }
 
-}
-
-handler.help=['play']
-handler.tags=['descargas']
-handler.command=['play']
+handler.help = ['play <canción>']
+handler.tags = ['descargas']
+handler.command = ['play']
 
 export default handler
