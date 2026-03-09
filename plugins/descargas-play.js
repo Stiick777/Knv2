@@ -55,17 +55,17 @@ try {
     const fileExt = 'mp3';
 
     // ─────────────────────────────
-    // 🥇 API ANABOT
+    // 🎵 API FAA (ÚNICA)
     // ─────────────────────────────
-    const apiAnabot = `https://anabot.my.id/api/download/ytmp3?url=${encodeURIComponent(url)}&apikey=freeApikey`;
-    const res = await fetch(apiAnabot);
-    const json = await res.json();
+    const apiFaa = `https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(url)}`;
+    const resFaa = await fetch(apiFaa);
+    const jsonFaa = await resFaa.json();
 
-    if (json.success && json.data?.result?.urls) {
-        title = json.data.result.metadata?.title || title;
-        downloadUrl = json.data.result.urls;
+    if (jsonFaa.status && jsonFaa.result?.mp3) {
+        title = jsonFaa.result.title || title;
+        downloadUrl = jsonFaa.result.mp3;
     } else {
-        throw new Error('API Anabot sin datos válidos');
+        throw new Error('API Faa sin datos válidos');
     }
 
     // ─────────────────────────────
@@ -92,7 +92,7 @@ try {
         { text: '❌ Error al descargar el audio' },
         { quoted: m }
     );
-        }
+}
 //
     }
 
@@ -139,7 +139,7 @@ try {
         try {
             const head = await fetch(url, { method: 'HEAD' });
             const size = head.headers.get('content-length');
-            const isLarge = size && Number(size) > 10 * 1024 * 1024; // 10MB
+            const isLarge = size && Number(size) > 10 * 1024 * 1024;
 
             if (isLarge) {
                 return conn.sendMessage(chat, {
@@ -168,8 +168,8 @@ try {
     // ======================================================
     // ⭐ API PRINCIPAL: FAA
     // ======================================================
-
     try {
+
         const apiFaa = `https://api-faa.my.id/faa/ytmp4?url=${encodeURIComponent(url)}`;
         const resF = await fetch(apiFaa);
         const jsonF = await resF.json();
@@ -190,29 +190,29 @@ try {
         return;
 
     } catch (e1) {
-        console.warn('❌ FAA falló, usando respaldo Nexevo...');
+        console.warn('❌ FAA falló, usando respaldo Izumi...');
     }
 
     // ======================================================
-    // 🔁 RESPALDO: NEXEVO
+    // 🔁 RESPALDO: IZUMI
     // ======================================================
 
-    const apiNexevo = `https://nexevo-api.vercel.app/download/y2?url=${encodeURIComponent(url)}`;
-    const resN = await fetch(apiNexevo);
-    const jsonN = await resN.json();
+    const apiIzumi = `https://api.ootaizumi.web.id/downloader/youtube?url=${encodeURIComponent(url)}&format=720`;
+    const resI = await fetch(apiIzumi);
+    const jsonI = await resI.json();
 
-    if (!jsonN.status || !jsonN.result?.url) {
-        throw new Error('NEXEVO inválida');
+    if (!jsonI.status || !jsonI.result?.download) {
+        throw new Error('Izumi inválida');
     }
 
-    const thumb = jsonN.result.info?.thumbnail
-        ? await (await fetch(jsonN.result.info.thumbnail)).buffer()
+    const thumb = jsonI.result.thumbnail
+        ? await (await fetch(jsonI.result.thumbnail)).buffer()
         : null;
 
     await enviarVideo(
         m.chat,
-        jsonN.result.url,
-        `🎬 *Video descargado correctamente*\nCalidad: ${jsonN.result.quality}p\nServidor: Nexevo`,
+        jsonI.result.download,
+        `🎬 *Video descargado correctamente*\nCalidad: 720p\nServidor: Izumi`,
         thumb,
         m
     );
@@ -222,13 +222,14 @@ try {
 } catch (e) {
     console.error(e);
     await m.react('❌');
-    await m.reply('⚠️ No se pudo descargar el video desde ningún servidor intente playv2.');
+    await m.reply('⚠️ No se pudo descargar el video desde ningún servidor.');
 }
+//
 
 }
 
 }
-handler.help = [ 'play2', 'play'];
+handler.help = ['play', 'play2'];
 handler.tags = ['descargas'];
 handler.command = ['play2', 'play']
 handler.group = true;
@@ -326,3 +327,43 @@ if (data.status === 'ok') {
   }
 }
 
+/*
+import yts from 'yt-search';
+import fetch from 'node-fetch';
+let limit = 320;
+let confirmation = {};
+
+let handler = async (m, { conn, command, text, args, usedPrefix }) => {
+    if (!text) throw `✳️ Ejemplo: *${usedPrefix + command}* Lil Peep hate my life`;
+
+    let res = await yts(text);
+    let vid = res.videos[0];
+    if (!vid) throw `✳️ Vídeo/Audio no encontrado`;
+
+    let { title, thumbnail, videoId, timestamp, views, ago, url } = vid;
+
+    m.react('🎧');
+
+    let playMessage = `
+≡ *YOUTUBE MUSIC*
+┌──────────────
+▢ 📌 *Título:* ${title}
+▢ 📆 *Subido hace:* ${ago}
+▢ ⌚ *Duración:* ${timestamp}
+▢ 👀 *Vistas:* ${views.toLocaleString()}
+└──────────────`;
+
+    conn.sendButton(m.chat, playMessage, null, thumbnail, [
+        ['🎶 MP3', `${usedPrefix}yta ${url}`],
+        ['🎥 MP4', `${usedPrefix}ytv ${url}`]
+    ], m);
+};
+
+handler.help = ['play'];
+handler.tags = ['descargas'];
+handler.command = ['play', 'play2'];
+handler.disabled = false;
+handler.group = true;
+
+export default handler;
+*/
