@@ -1,6 +1,21 @@
 let handler = async (m, { conn, usedPrefix, isOwner }) => {
-    let vcard = `BEGIN:VCARD\nVERSION:3.0\nN:;Stiiven⁩;;\nFN:Stiiven⁩\nTITLE:\nitem1.TEL;waid=5216645011701:5216645011701\nitem1.X-ABLabel:Stiiven\nitem2.URL:https://wa.me/5216645011701\nitem2.X-ABLabel:Enviar Mensaje\nEND:VCARD`;
-    await conn.sendMessage(m.chat, { contacts: { displayName: 'KanBot⁩', contacts: [{ vcard }] }}, { quoted: m });
+    let vcard = `BEGIN:VCARD
+VERSION:3.0
+N:;Stiiven;;
+FN:Stiiven
+TITLE:
+item1.TEL;waid=5493705452891:5493705452891
+item1.X-ABLabel:Stiiven
+item2.URL:https://wa.me/5493705452891
+item2.X-ABLabel:Enviar Mensaje
+END:VCARD`;
+
+    await conn.sendMessage(m.chat, { 
+        contacts: { 
+            displayName: 'KanBot', 
+            contacts: [{ vcard }] 
+        } 
+    }, { quoted: m });
 }
 
 handler.help = ['owner'];
