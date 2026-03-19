@@ -23,19 +23,19 @@ let handler = async (m, { conn: star, args }) => {
     const url = args[0];
 
     // ===================================================
-    // ⭐ ÚNICA API: STARLIGHT
+    // ⭐ API DELIRIUS
     // ===================================================
-    const apiUrl = `https://apis-starlights-team.koyeb.app/starlight/youtube-mp4?url=${encodeURIComponent(url)}&format=360p`;
+    const apiUrl = `https://api.delirius.store/download/ytmp4?url=${encodeURIComponent(url)}&format=360`;
 
     const res = await fetch(apiUrl);
     const json = await res.json();
 
-    if (!json?.dl_url)
-      throw new Error('Respuesta inválida de Starlight');
+    if (!json?.status || !json?.data?.download)
+      throw new Error('Respuesta inválida de Delirius');
 
-    const title = json.title || "video";
-    const quality = json.quality || "360p";
-    const download_url = json.dl_url;
+    const title = json.data.title || "video";
+    const quality = json.data.format || "360p";
+    const download_url = json.data.download;
 
     // ===================================================
     // ⏳ Mensaje de espera
@@ -48,7 +48,7 @@ let handler = async (m, { conn: star, args }) => {
     await star.reply(m.chat, txt, m);
 
     // ===================================================
-    // 📦 Enviar video como documento
+    // 📦 Enviar como documento (SIN descargar buffer)
     // ===================================================
     await star.sendMessage(
       m.chat,
@@ -68,7 +68,7 @@ let handler = async (m, { conn: star, args }) => {
     await m.react('✖️');
     return star.reply(
       m.chat,
-      '❌ _*No se pudo descargar el video desde el servidor Starlight.*_',
+      '❌ _*No se pudo descargar el video desde el servidor Delirius.*_',
       m,
       rcanal
     );
