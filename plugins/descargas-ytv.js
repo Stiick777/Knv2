@@ -26,24 +26,24 @@ let handler = async (m, { conn, args }) => {
 
   try {
     // ===================================================
-    // ⭐ ÚNICA API: STARLIGHT
+    // ⭐ API DELIRIUS
     // ===================================================
-    const apiUrl = `https://apis-starlights-team.koyeb.app/starlight/youtube-mp4`;
+    const apiUrl = `https://api.delirius.store/download/ytmp4`;
 
     const { data } = await axios.get(apiUrl, {
       params: {
         url: youtubeLink,
-        format: "360p"
+        format: "360"
       }
     });
 
-    if (!data?.dl_url) {
+    if (!data?.status || !data?.data?.download) {
       throw new Error("Respuesta inválida de la API");
     }
 
-    const title = data.title || "Video";
-    const quality = data.quality || "360p";
-    const downloadUrl = data.dl_url;
+    const title = data.data.title || "Video";
+    const quality = data.data.format || "360p";
+    const downloadUrl = data.data.download;
 
     // ===================================================
     // 🔍 OBTENER TAMAÑO REAL
@@ -90,7 +90,7 @@ ${isHeavy
     );
 
   } catch (err) {
-    console.error("Error Starlight API:", err.message);
+    console.error("Error Delirius API:", err.message);
     await m.react("❌");
     await conn.sendMessage(
       m.chat,
