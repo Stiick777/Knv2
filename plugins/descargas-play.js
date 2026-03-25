@@ -51,21 +51,34 @@ try {
     const url = yt_play[0].url;
     let title = 'audio';
     let downloadUrl = '';
-    const mimetype = 'audio/mpeg';
+    const mimetype = 'audio/mp4'; // la API devuelve mp4 audio
     const fileExt = 'mp3';
 
     // ─────────────────────────────
-    // 🎵 API FAA (ÚNICA)
+    // 🎵 API ANABOT (POST)
     // ─────────────────────────────
-    const apiFaa = `https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(url)}`;
-    const resFaa = await fetch(apiFaa);
-    const jsonFaa = await resFaa.json();
+    const resAna = await fetch('https://anabot.my.id/api/download/ytmp3', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            url: url,
+            apikey: 'freeApikey'
+        })
+    });
 
-    if (jsonFaa.status && jsonFaa.result?.mp3) {
-        title = jsonFaa.result.title || title;
-        downloadUrl = jsonFaa.result.mp3;
+    const jsonAna = await resAna.json();
+
+    if (
+        jsonAna.success &&
+        jsonAna.data?.result?.success &&
+        jsonAna.data?.result?.urls
+    ) {
+        title = jsonAna.data.result.metadata.title || title;
+        downloadUrl = jsonAna.data.result.urls;
     } else {
-        throw new Error('API Faa sin datos válidos');
+        throw new Error('API Anabot sin datos válidos');
     }
 
     // ─────────────────────────────
