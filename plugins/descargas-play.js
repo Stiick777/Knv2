@@ -51,34 +51,66 @@ try {
     const url = yt_play[0].url;
     let title = 'audio';
     let downloadUrl = '';
-    const mimetype = 'audio/mp4'; // la API devuelve mp4 audio
+    const mimetype = 'audio/mpeg';
     const fileExt = 'mp3';
 
     // ─────────────────────────────
-    // 🎵 API ANABOT (POST)
+    // 🥇 DELIRIUS API (PRINCIPAL)
     // ─────────────────────────────
-    const resAna = await fetch('https://anabot.my.id/api/download/ytmp3', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            url: url,
-            apikey: 'freeApikey'
-        })
-    });
+    try {
+        const resDel = await fetch(`https://api.delirius.store/download/ytmp3?url=${encodeURIComponent(url)}`);
+        const jsonDel = await resDel.json();
 
-    const jsonAna = await resAna.json();
+        if (jsonDel.status && jsonDel.data?.download) {
+            title = jsonDel.data.title || title;
+            downloadUrl = jsonDel.data.download;
+        } else {
+            throw new Error('Delirius 1 sin datos');
+        }
+    } catch (e1) {
 
-    if (
-        jsonAna.success &&
-        jsonAna.data?.result?.success &&
-        jsonAna.data?.result?.urls
-    ) {
-        title = jsonAna.data.result.metadata.title || title;
-        downloadUrl = jsonAna.data.result.urls;
-    } else {
-        throw new Error('API Anabot sin datos válidos');
+        // ─────────────────────────────
+        // 🔁 DELIRIUS V2 (RESPALDO)
+        // ─────────────────────────────
+        try {
+            const resDel2 = await fetch(`https://api.delirius.store/download/ytmp3v2?url=${encodeURIComponent(url)}`);
+            const jsonDel2 = await resDel2.json();
+
+            if (jsonDel2.success && jsonDel2.data?.download) {
+                title = jsonDel2.data.title || title;
+                downloadUrl = jsonDel2.data.download;
+            } else {
+                throw new Error('Delirius 2 sin datos');
+            }
+        } catch (e2) {
+
+            // ─────────────────────────────
+            // 🧯 ANABOT (ÚLTIMO RECURSO)
+            // ─────────────────────────────
+            const resAna = await fetch('https://anabot.my.id/api/download/ytmp3', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    url: url,
+                    apikey: 'freeApikey'
+                })
+            });
+
+            const jsonAna = await resAna.json();
+
+            if (
+                jsonAna.success &&
+                jsonAna.data?.result?.success &&
+                jsonAna.data?.result?.urls
+            ) {
+                title = jsonAna.data.result.metadata.title || title;
+                downloadUrl = jsonAna.data.result.urls;
+            } else {
+                throw new Error('Todas las APIs fallaron');
+            }
+        }
     }
 
     // ─────────────────────────────
@@ -102,7 +134,7 @@ try {
     console.error(err);
     await conn.sendMessage(
         m.chat,
-        { text: '❌ Error al descargar el audio' },
+        { text: '❌ Error al descargar el audio (todas las APIs fallaron)' },
         { quoted: m }
     );
 }
