@@ -14,7 +14,6 @@ let handler = async (message, { conn, text }) => {
     );
   }
 
-  // 🎥 Crear mensaje de video
   async function createVideoMessage(url) {
     const { data } = await axios.get(url, { responseType: "arraybuffer" });
     const buffer = Buffer.from(data);
@@ -30,7 +29,6 @@ let handler = async (message, { conn, text }) => {
     return videoMessage;
   }
 
-  // 🔀 Mezclar resultados
   function shuffleArray(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -43,15 +41,16 @@ let handler = async (message, { conn, text }) => {
       react: { text: "⌛", key: message.key }
     });
 
+    // 🔥 NUEVA API (NEJI)
     const { data } = await axios.get(
-      `https://apis-starlights-team.koyeb.app/starlight/tiktoksearch?text=${encodeURIComponent(text)}`
+      `https://neji-api.vercel.app/api/search/tiktok?q=${encodeURIComponent(text)}`
     );
 
-    if (!data.data || !data.data.length) {
+    if (!data.results || !data.results.length) {
       throw new Error("No se encontraron resultados");
     }
 
-    let results = data.data;
+    let results = data.results;
     shuffleArray(results);
 
     let cards = [];
@@ -60,9 +59,9 @@ let handler = async (message, { conn, text }) => {
       cards.push({
         body: proto.Message.InteractiveMessage.Body.fromObject({
           text:
-            `👤 ${result.author}\n` +
-            `👁 ${result.views.toLocaleString()} | ❤️ ${result.likes.toLocaleString()}\n` +
-            `💬 ${result.comments.toLocaleString()} | 🔁 ${result.share.toLocaleString()}`
+            `👤 ${result.author.nickname}\n` +
+            `👁 ${result.stats.play_count.toLocaleString()} | ❤️ ${result.stats.digg_count.toLocaleString()}\n` +
+            `💬 ${result.stats.comment_count.toLocaleString()} | 🔁 ${result.stats.share_count.toLocaleString()}`
         }),
         footer: proto.Message.InteractiveMessage.Footer.fromObject({
           text: "TikTok Search"
@@ -70,7 +69,7 @@ let handler = async (message, { conn, text }) => {
         header: proto.Message.InteractiveMessage.Header.fromObject({
           title: result.title?.slice(0, 80) || "TikTok Video",
           hasMediaAttachment: true,
-          videoMessage: await createVideoMessage(result.nowm)
+          videoMessage: await createVideoMessage(result.play) // 🔥 sin marca
         }),
         nativeFlowMessage:
           proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
