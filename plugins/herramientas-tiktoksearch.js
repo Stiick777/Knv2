@@ -1,9 +1,11 @@
 import axios from "axios";
+const baileys = await import("@whiskeysockets/baileys");
+
 const {
   proto,
   generateWAMessageFromContent,
   generateWAMessageContent
-} = (await import("@whiskeysockets/baileys")).default;
+} = baileys;
 
 let handler = async (message, { conn, text }) => {
   if (!text) {
