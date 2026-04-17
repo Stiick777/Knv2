@@ -1,4 +1,3 @@
-// Detectar links de grupos y canales
 let linkRegex = /https?:\/\/(?:chat\.whatsapp\.com\/[A-Za-z0-9]+(?:\?[^\s]*)?|whatsapp\.com\/channel\/[A-Za-z0-9]+(?:\?[^\s]*)?)/i;
 
 let allowedLinks = [
@@ -6,51 +5,73 @@ let allowedLinks = [
   "https://whatsapp.com/channel/0029VakhAHc5fM5hgaQ8ed2N"
 ];
 
-export async function before(m, { conn, isAdmin, isBotAdmin }) {
-  if (m.isBaileys && m.fromMe) return !0;
-  if (!m.isGroup) return !1;
+export async function before(m, { conn }) {
+
+  if (m.isBaileys && m.fromMe) return true;
+  if (!m.isGroup) return false;
 
   let chat = global.db.data.chats[m.chat];
-  let delet = m.key.participant;
-  let bang = m.key.id;
+  if (!chat?.antiLink) return true;
 
-  const isGroupLink = linkRegex.test(m.text);
+  const text = m.text || "";
+  if (!linkRegex.test(text)) return true;
 
-  // No hay anti-link o no hay link → salir
-  if (!chat.antiLink || !isGroupLink) return !0;
+  // 🔹 Normalizar sender
+  const sender = conn.decodeJid(m.sender)
 
-  // Enlaces permitidos → ignorar
-  if (allowedLinks.some(link => m.text.includes(link))) return !0;
+  // 🔹 Owners
+  const ownerNumbers = global.owner.map(v => v.replace(/[^0-9]/g, ""))
+  const ownerIds = ownerNumbers.map(num => num + "@s.whatsapp.net")
+  const isOwner = ownerIds.includes(sender) || m.fromMe
 
-  // SI ES ADMIN → NO HACER NADA
-  if (isAdmin) return !0;
+  // 🔹 Metadata
+  const groupMetadata = await conn.groupMetadata(m.chat)
+  const participants = groupMetadata.participants
 
-  // Verificar si el bot es admin
+  const userData = participants.find(u => conn.decodeJid(u.id) === sender)
+  const botData = participants.find(u => conn.decodeJid(u.id) === conn.decodeJid(conn.user.id))
+
+  const isAdmin = userData?.admin === "admin" || userData?.admin === "superadmin"
+  const isBotAdmin = botData?.admin
+
+  // 🔥 Ignorar
+  if (allowedLinks.some(link => text.includes(link))) return true
+  if (isAdmin || isOwner) return true
+
+  // 🔥 Verificar bot admin
   if (!isBotAdmin) {
-    return conn.reply(m.chat, `⚡ *No soy admin, no puedo eliminar intrusos*`, m);
+    return conn.reply(m.chat, `⚡ *No soy admin, no puedo eliminar enlaces*`, m)
   }
 
-  // Verificar si es el enlace del propio grupo
-  const linkThisGroup = `https://chat.whatsapp.com/${await conn.groupInviteCode(m.chat)}`;
-  if (m.text.includes(linkThisGroup)) return !0;
+  // 🔹 Evitar link del propio grupo
+  const thisGroupLink = `https://chat.whatsapp.com/${await conn.groupInviteCode(m.chat)}`
+  if (text.includes(thisGroupLink)) return true
 
-  // Eliminar mensaje
-  await conn.sendMessage(m.chat, {
-    delete: { 
-      remoteJid: m.chat, 
-      fromMe: false, 
-      id: bang, 
-      participant: delet 
-    }
-  });
+  try {
+    // 🔹 Eliminar mensaje
+    await conn.sendMessage(m.chat, {
+      delete: {
+        remoteJid: m.chat,
+        fromMe: false,
+        id: m.key.id,
+        participant: m.key.participant
+      }
+    })
 
-  // Expulsar al usuario
-  await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove');
+    // 🔴 Protección extra (no expulsar owner)
+    if (ownerIds.includes(sender)) return true
 
-  await conn.sendMessage(m.chat, {
-    text: `🚫 Se eliminó a @${m.sender.split('@')[0]} por enviar un enlace prohibido.`,
-    mentions: [m.sender]
-  });
+    // 🔹 Expulsar usuario
+    await conn.groupParticipantsUpdate(m.chat, [sender], 'remove')
 
-  return !0;
+    await conn.sendMessage(m.chat, {
+      text: `🚫 Se eliminó a @${sender.split('@')[0]} por enviar un enlace prohibido.`,
+      mentions: [sender]
+    })
+
+  } catch (e) {
+    console.log(e)
+  }
+
+  return true
 }
