@@ -1,65 +1,39 @@
-/*import {generateWAMessageFromContent} from '@whiskeysockets/baileys';
-import * as fs from 'fs';
-const handler = async (m, {conn, text, participants, isOwner, isAdmin}) => {
-  try {
-    const users = participants.map((u) => conn.decodeJid(u.id));
-    const q = m.quoted ? m.quoted : m || m.text || m.sender;
-    const c = m.quoted ? await m.getQuotedObj() : m.msg || m.text || m.sender;
-    const msg = conn.cMod(m.chat, generateWAMessageFromContent(m.chat, {[m.quoted ? q.mtype : 'extendedTextMessage']: m.quoted ? c.message[q.mtype] : {text: '' || c}}, {quoted: m, userJid: conn.user.id}), text || q.text, conn.user.jid, {mentions: users});
-    await conn.relayMessage(m.chat, msg.message, {messageId: msg.key.id});
-  } catch {
-    
-
-
-    const users = participants.map((u) => conn.decodeJid(u.id));
-    const quoted = m.quoted ? m.quoted : m;
-    const mime = (quoted.msg || quoted).mimetype || '';
-    const isMedia = /image|video|sticker|audio/.test(mime);
-    const more = String.fromCharCode(8206);
-    const masss = more.repeat(850);
-    const htextos = `${text ? text : '*Escribe nuevamente el texto:D*'}`;
-    if ((isMedia && quoted.mtype === 'imageMessage') && htextos) {
-      var mediax = await quoted.download?.();
-      conn.sendMessage(m.chat, {image: mediax, mentions: users, caption: htextos, mentions: users}, {quoted: m});
-    } else if ((isMedia && quoted.mtype === 'videoMessage') && htextos) {
-      var mediax = await quoted.download?.();
-      conn.sendMessage(m.chat, {video: mediax, mentions: users, mimetype: 'video/mp4', caption: htextos}, {quoted: m});
-    } else if ((isMedia && quoted.mtype === 'audioMessage') && htextos) {
-      var mediax = await quoted.download?.();
-      conn.sendMessage(m.chat, {audio: mediax, mentions: users, mimetype: 'audio/mpeg', fileName: `Hidetag.mp3`}, {quoted: m});
-    } else if ((isMedia && quoted.mtype === 'stickerMessage') && htextos) {
-      var mediax = await quoted.download?.();
-      conn.sendMessage(m.chat, {sticker: mediax, mentions: users}, {quoted: m});
-    } else {
-      await conn.relayMessage(m.chat, {extendedTextMessage: {text: `${masss}\n${htextos}\n`, ...{contextInfo: {mentionedJid: users, externalAdReply: {thumbnail: imagen3, sourceUrl: md }}}}}, {});
-    }
-  }
-};
-handler.help = ['hidetag'];
-handler.tags = ['grupo'];
-handler.command = ['hidetag','tag'];
-handler.group = true;
-handler.admin = true;
-export default handler;
-*/
 import { generateWAMessageFromContent } from '@whiskeysockets/baileys'
-import * as fs from 'fs'
 
-// 🔄 Función para normalizar JIDs
-function normalizeJid(jid = '') {
-  return jid.replace(/@.+/, '@s.whatsapp.net')
+// 🔄 Normalizar correctamente
+function normalizeJid(conn, jid = '') {
+  return conn.decodeJid(jid)
 }
 
 var handler = async (m, { conn, text, participants }) => {
+
   if (!m.quoted && !text)
     return conn.reply(m.chat, `❀ Debes enviar un texto para hacer un tag.`, m)
 
-  try {
-    // ✅ JIDs normalizados
-    let users = participants.map(u => normalizeJid(u.id))
+  // 🔹 Sender normalizado
+  const sender = conn.decodeJid(m.sender)
 
-    let q = m.quoted ? m.quoted : m || m.text || m.sender
+  // 🔹 Owners
+  const ownerNumbers = global.owner.map(v => v.replace(/[^0-9]/g, ""))
+  const ownerIds = ownerNumbers.map(num => num + "@s.whatsapp.net")
+  const isOwner = ownerIds.includes(sender) || m.fromMe
+
+  // 🔹 Admin
+  const userData = participants.find(u => conn.decodeJid(u.id) === sender)
+  const isAdmin = userData?.admin === "admin" || userData?.admin === "superadmin"
+
+  // 🔥 Permiso combinado
+  if (!isAdmin && !isOwner) {
+    return conn.reply(m.chat, `❌ Solo admins o owner pueden usar este comando.`, m)
+  }
+
+  try {
+    // ✅ JIDs bien normalizados
+    let users = participants.map(u => normalizeJid(conn, u.id))
+
+    let q = m.quoted ? m.quoted : m
     let c = m.quoted ? await m.getQuotedObj() : m.msg || m.text || m.sender
+
     let msg = conn.cMod(
       m.chat,
       generateWAMessageFromContent(
@@ -67,25 +41,29 @@ var handler = async (m, { conn, text, participants }) => {
         {
           [m.quoted ? q.mtype : 'extendedTextMessage']: m.quoted
             ? c.message[q.mtype]
-            : { text: '' || c }
+            : { text: c }
         },
         { quoted: null, userJid: conn.user.id }
       ),
-      text || q.text,
-      conn.user.jid,
+      text || q.text || '',
+      conn.decodeJid(conn.user.id),
       { mentions: users }
     )
+
     await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+
   } catch {
-    let users = participants.map(u => normalizeJid(u.id))
+    let users = participants.map(u => normalizeJid(conn, u.id))
+
     let quoted = m.quoted ? m.quoted : m
     let mime = (quoted.msg || quoted).mimetype || ''
     let isMedia = /image|video|sticker|audio/.test(mime)
+
     let more = String.fromCharCode(8206)
     let masss = more.repeat(850)
     let htextos = `${text ? text : '*¡¡¡Hola!!!*'}`
 
-    if ((isMedia && quoted.mtype === 'imageMessage') && htextos) {
+    if (isMedia && quoted.mtype === 'imageMessage') {
       var mediax = await quoted.download?.()
       conn.sendMessage(m.chat, {
         image: mediax,
@@ -93,7 +71,7 @@ var handler = async (m, { conn, text, participants }) => {
         caption: htextos
       }, { quoted: null })
 
-    } else if ((isMedia && quoted.mtype === 'videoMessage') && htextos) {
+    } else if (isMedia && quoted.mtype === 'videoMessage') {
       var mediax = await quoted.download?.()
       conn.sendMessage(m.chat, {
         video: mediax,
@@ -102,7 +80,7 @@ var handler = async (m, { conn, text, participants }) => {
         caption: htextos
       }, { quoted: null })
 
-    } else if ((isMedia && quoted.mtype === 'audioMessage') && htextos) {
+    } else if (isMedia && quoted.mtype === 'audioMessage') {
       var mediax = await quoted.download?.()
       conn.sendMessage(m.chat, {
         audio: mediax,
@@ -111,7 +89,7 @@ var handler = async (m, { conn, text, participants }) => {
         fileName: `Hidetag.mp3`
       }, { quoted: null })
 
-    } else if ((isMedia && quoted.mtype === 'stickerMessage') && htextos) {
+    } else if (isMedia && quoted.mtype === 'stickerMessage') {
       var mediax = await quoted.download?.()
       conn.sendMessage(m.chat, {
         sticker: mediax,
@@ -135,6 +113,6 @@ handler.help = ['hidetag']
 handler.tags = ['grupo']
 handler.command = ['hidetag', 'notificar', 'notify', 'tag']
 handler.group = true
-handler.admin = true
+handler.admin = false // 🔥 importante
 
 export default handler
