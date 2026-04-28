@@ -17,7 +17,7 @@ let handler = async (m, { conn, args }) => {
   if (!youtubeRegex.test(youtubeLink)) {
     return conn.reply(
       m.chat,
-      `⚠️ Asegúrate de ingresar un enlace *válido* de YouTube.`,
+      `⚠️ Asegúrate de ingresar un enlace válido de YouTube.`,
       m
     );
   }
@@ -25,39 +25,54 @@ let handler = async (m, { conn, args }) => {
   await m.react("🕓");
 
   try {
-    // ===================================================
-    // ⭐ API DELIRIUS
-    // ===================================================
-    const apiUrl = `https://api.delirius.store/download/ytmp4`;
+
+    // ==============================
+    // API ALYACORE
+    // ==============================
+    const apiUrl = "https://api.alyacore.xyz/dl/ytmp4";
 
     const { data } = await axios.get(apiUrl, {
       params: {
         url: youtubeLink,
-        format: "360"
+        quality: "360",
+        key: "Alya-7IlWb4gp"
       }
     });
 
-    if (!data?.status || !data?.data?.download) {
-      throw new Error("Respuesta inválida de la API");
+    if (!data?.status || !data?.data?.dl) {
+      throw new Error("Respuesta inválida de Alya API");
     }
 
     const title = data.data.title || "Video";
-    const quality = data.data.format || "360p";
-    const downloadUrl = data.data.download;
+    const quality = data.data.quality || "360p";
+    const size = data.data.size || "Desconocido";
+    const downloadUrl = data.data.dl;
 
-    // ===================================================
-    // 🔍 OBTENER TAMAÑO REAL
-    // ===================================================
+    // ==============================
+    // Obtener tamaño real (opcional)
+    // ==============================
     let sizeMB = 0;
-    try {
-      const head = await fetch(downloadUrl, { method: "HEAD" });
-      const length = head.headers.get("content-length");
-      if (length) sizeMB = Number(length) / (1024 * 1024);
-    } catch {}
 
-    // ===================================================
-    // 📥 DESCARGAR VIDEO
-    // ===================================================
+    try {
+      const head = await fetch(downloadUrl, {
+        method: "HEAD"
+      });
+
+      const length = head.headers.get("content-length");
+
+      if (length) {
+        sizeMB = Number(length) / (1024 * 1024);
+      } else {
+        sizeMB = parseFloat(size) || 0;
+      }
+
+    } catch {
+      sizeMB = parseFloat(size) || 0;
+    }
+
+    // ==============================
+    // Descargar video
+    // ==============================
     const videoRes = await axios.get(downloadUrl, {
       responseType: "arraybuffer"
     });
@@ -71,12 +86,12 @@ let handler = async (m, { conn, args }) => {
 
     const caption = `🎬 *${title}*
 🎞️ *Calidad:* ${quality}
-📏 *Tamaño:* ${sizeMB.toFixed(2)} MB
+📏 *Tamaño:* ${sizeMB ? sizeMB.toFixed(2)+" MB" : size}
 
 ${isHeavy
-        ? "📁 Enviado como *documento* (más de 30 MB)."
-        : "😎 Video descargado por *KanBot*."
-      }`;
+? "📁 Enviado como documento (más de 30 MB)"
+: "😎 Video descargado por KanBot"
+}`;
 
     await conn.sendMessage(
       m.chat,
@@ -90,19 +105,22 @@ ${isHeavy
     );
 
   } catch (err) {
-    console.error("Error Delirius API:", err.message);
+    console.error("Error Alya API:", err.message);
     await m.react("❌");
+
     await conn.sendMessage(
       m.chat,
-      { text: "❌ No se pudo descargar el video. Intenta nuevamente." },
+      {
+        text: "❌ No se pudo descargar el video."
+      },
       { quoted: m }
     );
   }
 };
 
 handler.tags = ["descargas"];
-handler.help = ["ytmp4", "ytvideo", "ytv"];
-handler.command = ["ytmp4", "ytvideo", "ytv"];
+handler.help = ["ytmp4","ytvideo","ytv"];
+handler.command = ["ytmp4","ytvideo","ytv"];
 handler.group = true;
 
 export default handler;
