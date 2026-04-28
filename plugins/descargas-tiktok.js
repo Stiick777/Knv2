@@ -12,13 +12,17 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
   if (!/(?:https?:\/\/)?(?:www|vm|vt|tiktok)\.com\/[^\s]+/gi.test(args[0])) {
     m.react('❌');
-    return conn.reply(m.chat, '*☁️ Enlace de TikTok inválido.*', m);
+    return conn.reply(
+      m.chat,
+      '*☁️ Enlace de TikTok inválido.*',
+      m
+    );
   }
 
   try {
     m.react('🕒');
 
-    const api = `https://api.vreden.my.id/api/v1/download/tiktok?url=${encodeURIComponent(args[0])}`;
+    const api = `https://api.ootaizumi.web.id/downloader/tiktok/v1?url=${encodeURIComponent(args[0])}`;
     const res = await fetch(api);
 
     if (!res.ok) throw new Error('API no respondió');
@@ -32,56 +36,81 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     const r = json.result;
 
     const caption = `
-*👤 Autor:* ${r.author?.nickname || 'Desconocido'}
+*👤 Autor:* ${r.author?.name || r.author?.username || 'Desconocido'}
 *📝 Título:* ${r.title || 'Sin título'}
-*⏱ Duración:* ${r.duration || 'Desconocida'}
+*❤️ Likes:* ${r.stats?.digg_count || 0}
+*▶️ Views:* ${r.stats?.play_count || 0}
 
 📥 *Descargado por KanBot*
 `.trim();
 
-    const data = r.data || [];
-
-    // ==============================
-    // 🎥 VIDEO (prioridad HD)
-    // ==============================
-    const video =
-      data.find(v => v.type === 'nowatermark_hd') ||
-      data.find(v => v.type === 'nowatermark');
-
-    // ==============================
-    // 🖼 FOTOS (slides)
-    // ==============================
-    const photos = data.filter(v => v.type === 'photo');
-
     await m.react('📤');
 
-    // ───────── FOTOS ─────────
-    if (photos.length > 0) {
-      for (let i = 0; i < photos.length; i++) {
+    //=========================
+    // 🎥 VIDEO
+    //=========================
+    if (r.type === 'video' && r.nowm) {
+
+      await conn.sendMessage(
+        m.chat,
+        {
+          video: { url: r.nowm },
+          caption
+        },
+        { quoted: m }
+      );
+
+      // audio opcional
+      if (r.music?.url) {
+        try {
+          await conn.sendMessage(
+            m.chat,
+            {
+              audio: { url: r.music.url },
+              mimetype: 'audio/mpeg',
+              ptt: false
+            },
+            { quoted: m }
+          );
+        } catch (e) {
+          console.log('Audio no enviado:', e.message);
+        }
+      }
+
+      m.react('✅');
+      return;
+    }
+
+    //=========================
+    // 🖼 FOTO/SLIDES
+    //=========================
+    if (r.type === 'image' && Array.isArray(r.image)) {
+
+      for (let i = 0; i < r.image.length; i++) {
         await conn.sendMessage(
           m.chat,
           {
-            image: { url: photos[i].url },
-            caption: i === 0 ? caption : undefined,
+            image: { url: r.image[i] },
+            caption: i === 0 ? caption : undefined
           },
           { quoted: m }
         );
       }
 
-      // 🎵 Audio
-      if (r.music_info?.url) {
+      // audio del slideshow
+      if (r.music?.url) {
         try {
           await conn.sendMessage(
             m.chat,
             {
-              audio: { url: r.music_info.url },
+              audio: { url: r.music.url },
               mimetype: 'audio/mpeg',
-              ptt: false,
+              ptt: false
             },
             { quoted: m }
           );
         } catch (e) {
-          console.log('⚠️ Audio no enviado:', e.message);
+          console.log('Audio no enviado:', e.message);
         }
       }
 
@@ -89,43 +118,12 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
       return;
     }
 
-    // ───────── VIDEO ─────────
-    if (video) {
-      await conn.sendMessage(
-        m.chat,
-        {
-          video: { url: video.url },
-          caption,
-        },
-        { quoted: m }
-      );
-
-      // 🎵 Audio opcional
-      if (r.music_info?.url) {
-        try {
-          await conn.sendMessage(
-            m.chat,
-            {
-              audio: { url: r.music_info.url },
-              mimetype: 'audio/mpeg',
-              ptt: false,
-            },
-            { quoted: m }
-          );
-        } catch (e) {
-          console.log('⚠️ Audio no enviado:', e.message);
-        }
-      }
-
-      m.react('✅');
-      return;
-    }
-
-    throw new Error('No se encontró video ni fotos');
+    throw new Error('No se encontró contenido');
 
   } catch (err) {
     console.error('❌ TikTok Error:', err);
     m.react('❌');
+
     return conn.reply(
       m.chat,
       '*🌟 Error al procesar el TikTok, intenta más tarde.*',
@@ -136,7 +134,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
 handler.tags = ['descargas'];
 handler.help = ['tiktok <url>'];
-handler.command = ['tiktok', 'tt', 'ttdl', 'tiktokdl'];
+handler.command = ['tiktok','tt','ttdl','tiktokdl'];
 handler.group = true;
 
 export default handler;
