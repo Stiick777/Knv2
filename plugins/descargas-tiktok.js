@@ -22,24 +22,26 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   try {
     m.react('🕒');
 
-    const api = `https://api.ootaizumi.web.id/downloader/tiktok/v1?url=${encodeURIComponent(args[0])}`;
+    const api = `https://api.yupra.my.id/api/downloader/tiktok?url=${encodeURIComponent(args[0])}`;
     const res = await fetch(api);
 
     if (!res.ok) throw new Error('API no respondió');
 
     const json = await res.json();
 
-    if (!json.status || !json.result) {
+    if (json.status !== 200 || !json.result) {
       throw new Error('Respuesta inválida');
     }
 
     const r = json.result;
 
     const caption = `
-*👤 Autor:* ${r.author?.name || r.author?.username || 'Desconocido'}
+*👤 Autor:* ${r.author?.nickname || r.author?.username || 'Desconocido'}
 *📝 Título:* ${r.title || 'Sin título'}
-*❤️ Likes:* ${r.stats?.digg_count || 0}
-*▶️ Views:* ${r.stats?.play_count || 0}
+*❤️ Likes:* ${r.like || 0}
+*👁 Views:* ${r.views || 0}
+*🔁 Shares:* ${r.share || 0}
+*💬 Comentarios:* ${r.comment || 0}
 
 📥 *Descargado por KanBot*
 `.trim();
@@ -49,18 +51,18 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     //=========================
     // 🎥 VIDEO
     //=========================
-    if (r.type === 'video' && r.nowm) {
+    if (r.isVideo && r.download) {
 
       await conn.sendMessage(
         m.chat,
         {
-          video: { url: r.nowm },
+          video: { url: r.download },
           caption
         },
         { quoted: m }
       );
 
-      // audio opcional
+      // 🎵 Audio
       if (r.music?.url) {
         try {
           await conn.sendMessage(
@@ -82,22 +84,22 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     }
 
     //=========================
-    // 🖼 FOTO/SLIDES
+    // 🖼 IMÁGENES / SLIDES
     //=========================
-    if (r.type === 'image' && Array.isArray(r.image)) {
+    if (!r.isVideo && Array.isArray(r.download)) {
 
-      for (let i = 0; i < r.image.length; i++) {
+      for (let i = 0; i < r.download.length; i++) {
         await conn.sendMessage(
           m.chat,
           {
-            image: { url: r.image[i] },
+            image: { url: r.download[i] },
             caption: i === 0 ? caption : undefined
           },
           { quoted: m }
         );
       }
 
-      // audio del slideshow
+      // 🎵 Audio del slideshow
       if (r.music?.url) {
         try {
           await conn.sendMessage(
