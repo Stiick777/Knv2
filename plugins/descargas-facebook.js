@@ -27,42 +27,38 @@ await m.react("⏳")
 let result
 
 // =====================================
-// ⭐ API ALYACORE FACEBOOK
+// ⭐ API DELIRIUS FACEBOOK
 // =====================================
 try {
 
-const api = `https://api.alyacore.xyz/dl/facebook?url=${encodeURIComponent(args[0])}&key=Alya-7IlWb4gp`
+const api = `https://api.delirius.store/download/facebook?url=${encodeURIComponent(args[0])}`
 
 const response = await fetch(api)
 const json = await response.json()
 
-if (!json.status || !json.resultados?.length) {
+if (!json.status || !json.list?.length) {
 throw new Error("No se encontraron enlaces")
 }
 
-// Prioridad calidad
+// Prioridad de calidad
 let video =
-json.resultados.find(v =>
+json.list.find(v =>
 v.quality?.includes("720p") &&
-v.url &&
-v.url !== "/"
+v.url
 ) ||
 
-json.resultados.find(v =>
-v.quality?.includes("840p") &&
-v.url &&
-v.url !== "/"
+json.list.find(v =>
+v.quality?.includes("HD") &&
+v.url
 ) ||
 
-json.resultados.find(v =>
+json.list.find(v =>
 v.quality?.includes("360p") &&
-v.url &&
-v.url !== "/"
+v.url
 ) ||
 
-json.resultados.find(v =>
-v.url &&
-v.url !== "/"
+json.list.find(v =>
+v.url
 )
 
 if (!video?.url) {
@@ -72,17 +68,22 @@ throw new Error("Sin URL válida")
 result = {
 title: "Facebook Video",
 videoUrl: video.url,
-quality: video.quality
+quality: video.quality || "Desconocida",
+thumb: json.thumb || null
 }
 
 } catch (err) {
+
 console.error("❌ Error API:", err.message)
+
 await m.react("❌")
+
 return conn.reply(
 m.chat,
 "❎ *No se pudo obtener el video de Facebook.*",
 m
 )
+
 }
 
 // =====================================
