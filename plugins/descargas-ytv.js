@@ -25,31 +25,50 @@ let handler = async (m, { conn, args }) => {
   await m.react("🕓");
 
   try {
+    let title;
+    let quality;
+    let downloadUrl;
+    let servidor;
 
     // ==============================
-    // API ALYACORE
+    // API PRINCIPAL: DELIRIUS
     // ==============================
-    const apiUrl = "https://api.alyacore.xyz/dl/ytmp4";
+    try {
+      const { data } = await axios.get(
+        `https://api.delirius.store/download/ytmp4?url=${encodeURIComponent(youtubeLink)}&format=360p`
+      );
 
-    const { data } = await axios.get(apiUrl, {
-      params: {
-        url: youtubeLink,
-        quality: "360",
-        key: "Alya-7IlWb4gp"
+      if (!data?.status || !data?.data?.download) {
+        throw new Error("Respuesta inválida de Delirius");
       }
-    });
 
-    if (!data?.status || !data?.data?.dl) {
-      throw new Error("Respuesta inválida de Alya API");
+      title = data.data.title || "Video";
+      quality = data.data.format || "360p";
+      downloadUrl = data.data.download;
+      servidor = "Delirius";
+
+    } catch (e) {
+      console.log("Delirius falló, usando ZennzXD...");
+
+      // ==============================
+      // API RESPALDO: ZENNZXD
+      // ==============================
+      const { data } = await axios.get(
+        `https://api.zenzxz.my.id/download/youtube?url=${encodeURIComponent(youtubeLink)}&format=360`
+      );
+
+      if (!data?.status || !data?.result?.download) {
+        throw new Error("Respuesta inválida de ZennzXD");
+      }
+
+      title = data.result.title || "Video";
+      quality = `${data.result.format}p`;
+      downloadUrl = data.result.download;
+      servidor = "ZennzXD";
     }
 
-    const title = data.data.title || "Video";
-    const quality = data.data.quality || "360p";
-    const size = data.data.size || "Desconocido";
-    const downloadUrl = data.data.dl;
-
     // ==============================
-    // Obtener tamaño real (opcional)
+    // Obtener tamaño real
     // ==============================
     let sizeMB = 0;
 
@@ -62,12 +81,9 @@ let handler = async (m, { conn, args }) => {
 
       if (length) {
         sizeMB = Number(length) / (1024 * 1024);
-      } else {
-        sizeMB = parseFloat(size) || 0;
       }
-
     } catch {
-      sizeMB = parseFloat(size) || 0;
+      sizeMB = 0;
     }
 
     // ==============================
@@ -86,7 +102,8 @@ let handler = async (m, { conn, args }) => {
 
     const caption = `🎬 *${title}*
 🎞️ *Calidad:* ${quality}
-📏 *Tamaño:* ${sizeMB ? sizeMB.toFixed(2)+" MB" : size}
+📏 *Tamaño:* ${sizeMB ? sizeMB.toFixed(2) + " MB" : "Desconocido"}
+🌐 *Servidor:* ${servidor}
 
 ${isHeavy
 ? "📁 Enviado como documento (más de 30 MB)"
@@ -105,13 +122,14 @@ ${isHeavy
     );
 
   } catch (err) {
-    console.error("Error Alya API:", err.message);
+    console.error("Error descarga:", err);
+
     await m.react("❌");
 
     await conn.sendMessage(
       m.chat,
       {
-        text: "❌ No se pudo descargar el video."
+        text: "❌ No se pudo descargar el video desde ningún servidor."
       },
       { quoted: m }
     );
@@ -119,8 +137,8 @@ ${isHeavy
 };
 
 handler.tags = ["descargas"];
-handler.help = ["ytmp4","ytvideo","ytv"];
-handler.command = ["ytmp4","ytvideo","ytv"];
+handler.help = ["ytmp4", "ytvideo", "ytv"];
+handler.command = ["ytmp4", "ytvideo", "ytv"];
 handler.group = true;
 
 export default handler;
