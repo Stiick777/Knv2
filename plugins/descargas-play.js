@@ -194,13 +194,14 @@ try {
                     caption,
                     jpegThumbnail: thumbnail
                 }, { quoted });
-            } else {
-                return conn.sendMessage(chat, {
-                    video: { url },
-                    caption,
-                    jpegThumbnail: thumbnail
-                }, { quoted });
             }
+
+            return conn.sendMessage(chat, {
+                video: { url },
+                caption,
+                jpegThumbnail: thumbnail
+            }, { quoted });
+
         } catch {
             return conn.sendMessage(chat, {
                 video: { url },
@@ -211,23 +212,34 @@ try {
     }
 
     // ======================================================
-    // ⭐ API PRINCIPAL: FAA
+    // ⭐ API PRINCIPAL: DELIRIUS
     // ======================================================
     try {
 
-        const apiFaa = `https://api-faa.my.id/faa/ytmp4?url=${encodeURIComponent(url)}`;
-        const resF = await fetch(apiFaa);
-        const jsonF = await resF.json();
+        const apiDelirius = `https://api.delirius.store/download/ytmp4?url=${encodeURIComponent(url)}&format=360p`;
 
-        if (!jsonF.status || !jsonF.result?.download_url) {
-            throw new Error('FAA inválida');
+        const resD = await fetch(apiDelirius);
+        const jsonD = await resD.json();
+
+        if (!jsonD.status || !jsonD.data?.download) {
+            throw new Error('Delirius inválida');
         }
+
+        const thumb = jsonD.data.image
+            ? await (await fetch(jsonD.data.image)).buffer()
+            : null;
 
         await enviarVideo(
             m.chat,
-            jsonF.result.download_url,
-            `🎬 *Video descargado correctamente*\nFormato: ${jsonF.result.format}\nServidor: Faa`,
-            null,
+            jsonD.data.download,
+            `🎬 *${jsonD.data.title}*
+
+👤 Autor: ${jsonD.data.author}
+👁️ Vistas: ${jsonD.data.views}
+👍 Likes: ${jsonD.data.likes}
+🎞️ Calidad: ${jsonD.data.format}
+🌐 Servidor: Delirius`,
+            thumb,
             m
         );
 
@@ -235,29 +247,34 @@ try {
         return;
 
     } catch (e1) {
-        console.warn('❌ FAA falló, usando respaldo Izumi...');
+        console.warn('❌ Delirius falló, usando respaldo ZennzXD...');
     }
 
     // ======================================================
-    // 🔁 RESPALDO: IZUMI
+    // 🔁 RESPALDO: ZENNZXD
     // ======================================================
 
-    const apiIzumi = `https://api.ootaizumi.web.id/downloader/youtube?url=${encodeURIComponent(url)}&format=720`;
-    const resI = await fetch(apiIzumi);
-    const jsonI = await resI.json();
+    const apiZen = `https://api.zenzxz.my.id/download/youtube?url=${encodeURIComponent(url)}&format=360`;
 
-    if (!jsonI.status || !jsonI.result?.download) {
-        throw new Error('Izumi inválida');
+    const resZ = await fetch(apiZen);
+    const jsonZ = await resZ.json();
+
+    if (!jsonZ.status || !jsonZ.result?.download) {
+        throw new Error('ZennzXD inválida');
     }
 
-    const thumb = jsonI.result.thumbnail
-        ? await (await fetch(jsonI.result.thumbnail)).buffer()
+    const thumb = jsonZ.result.thumbnail
+        ? await (await fetch(jsonZ.result.thumbnail)).buffer()
         : null;
 
     await enviarVideo(
         m.chat,
-        jsonI.result.download,
-        `🎬 *Video descargado correctamente*\nCalidad: 720p\nServidor: Izumi`,
+        jsonZ.result.download,
+        `🎬 *${jsonZ.result.title}*
+
+⏱️ Duración: ${jsonZ.result.duration}s
+🎞️ Calidad: ${jsonZ.result.format}p
+🌐 Servidor: ZennzXD`,
         thumb,
         m
     );
