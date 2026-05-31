@@ -24,37 +24,63 @@ try {
 
 const url = args[0];
 
+let title;
+let quality;
+let download_url;
+let servidor;
 
 // ==================================
-// API ALYACORE
+// API PRINCIPAL: DELIRIUS
 // ==================================
-const apiUrl =
-`https://api.alyacore.xyz/dl/ytmp4?url=${encodeURIComponent(url)}&quality=360&key=Alya-7IlWb4gp`;
+try {
+
+const apiUrl = `https://api.delirius.store/download/ytmp4?url=${encodeURIComponent(url)}&format=360p`;
 
 const res = await fetch(apiUrl);
 const json = await res.json();
 
-if (!json?.status || !json?.data?.dl){
-throw new Error('Respuesta inválida de AlyaCore');
+if (!json?.status || !json?.data?.download) {
+throw new Error('Delirius inválida');
 }
 
-const title = json.data.title || 'video';
-const quality = json.data.quality || '360p';
-const size = json.data.size || 'Desconocido';
-const download_url = json.data.dl;
+title = json.data.title || 'video';
+quality = json.data.format || '360p';
+download_url = json.data.download;
+servidor = 'Delirius';
 
+} catch (e) {
+
+console.log('Delirius falló, usando ZennzXD...');
 
 // ==================================
-// Mensaje de espera
+// API RESPALDO: ZENNZXD
+// ==================================
+const apiUrl = `https://api.zenzxz.my.id/download/youtube?url=${encodeURIComponent(url)}&format=360`;
+
+const res = await fetch(apiUrl);
+const json = await res.json();
+
+if (!json?.status || !json?.result?.download) {
+throw new Error('ZennzXD inválida');
+}
+
+title = json.result.title || 'video';
+quality = `${json.result.format}p`;
+download_url = json.result.download;
+servidor = 'ZennzXD';
+
+}
+
+// ==================================
+// MENSAJE DE ESPERA
 // ==================================
 let txt = '`🅓🅞🅒🅢 🅥➋ - 🅚🅐🅝🅑🅞🅣`\n\n';
 txt += `🍁 *Título:* ${title}\n`;
 txt += `🎞️ *Calidad:* ${quality}\n`;
-txt += `📦 *Peso:* ${size}\n\n`;
+txt += `🌐 *Servidor:* ${servidor}\n\n`;
 txt += `> *Se está enviando su video, por favor espere*`;
 
 await star.reply(m.chat, txt, m);
-
 
 // ==================================
 // ENVIAR COMO DOCUMENTO
@@ -77,13 +103,14 @@ quoted: m
 await m.react('✅');
 
 } catch (e) {
-console.error('Error descarga:', e.message);
+
+console.error('Error descarga:', e);
 
 await m.react('✖️');
 
 return star.reply(
 m.chat,
-'❌ _*No se pudo descargar el video desde AlyaCore.*_',
+'❌ _*No se pudo descargar el video desde ningún servidor.*_',
 m,
 rcanal
 );
@@ -93,7 +120,7 @@ rcanal
 
 handler.help = ['ytmp4doc <link yt>'];
 handler.tags = ['descargas'];
-handler.command = ['ytmp4doc','yt4doc'];
+handler.command = ['ytmp4doc', 'yt4doc'];
 handler.group = true;
 
 export default handler;
