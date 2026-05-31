@@ -90,11 +90,12 @@ function isUrl(text) {
   )
         }
 */
+
 import fs from 'fs'
 import path from 'path'
 import fetch from 'node-fetch'
 import fluent from 'fluent-ffmpeg'
-import { Sticker } from 'wa-sticker-formatter'
+import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 import { fileTypeFromBuffer as fromBuffer } from 'file-type'
 
 let handler = async (m, { conn, args }) => {
@@ -103,29 +104,43 @@ let handler = async (m, { conn, args }) => {
   let buffer
 
   try {
-    // Si responde a un sticker
+    await m.react('🕓')
+
+    // STICKER
     if (/webp/.test(mime) && q.download) {
       buffer = await q.download()
 
-      await m.react('🕓')
+      const userName = m.pushName || m.sender.split('@')[0]
 
-      return await conn.sendFile(
+      const sticker = new Sticker(buffer, {
+        pack: '✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰',
+        author: `@${userName}`,
+        type: StickerTypes.FULL
+      })
+
+      const finalSticker = await sticker.toBuffer()
+
+      await conn.sendFile(
         m.chat,
-        buffer,
+        finalSticker,
         'sticker.webp',
         '',
         m
       )
+
+      await m.react('✅')
+      return
     }
 
-    // Imagen o video
+    // IMAGEN O VIDEO
     if (/image|video/g.test(mime) && q.download) {
-      if (/video/.test(mime) && (q.msg || q).seconds > 11)
+      if (/video/.test(mime) && (q.msg || q).seconds > 11) {
         return conn.reply(
           m.chat,
           '[ ✰ ] El video no puede durar más de *10 segundos*',
           m
         )
+      }
 
       buffer = await q.download()
     }
@@ -139,12 +154,10 @@ let handler = async (m, { conn, args }) => {
     else {
       return conn.reply(
         m.chat,
-        '[ ✰ ] Responde a una *imagen, video o sticker*.',
+        '[ ✰ ] Responde a una imagen, video o sticker.',
         m
       )
     }
-
-    await m.react('🕓')
 
     const webpBuffer = await toWebp(buffer)
 
@@ -153,7 +166,7 @@ let handler = async (m, { conn, args }) => {
     const sticker = new Sticker(webpBuffer, {
       pack: '✰ 𝙺𝚊𝚗𝙱𝚘𝚝 ✰',
       author: `@${userName}`,
-      type: 'full'
+      type: StickerTypes.FULL
     })
 
     const finalSticker = await sticker.toBuffer()
@@ -167,6 +180,7 @@ let handler = async (m, { conn, args }) => {
     )
 
     await m.react('✅')
+
   } catch (e) {
     console.error(e)
     await m.react('✖️')
@@ -204,7 +218,8 @@ async function toWebp(buffer) {
     '-preset', 'default',
     '-an',
     '-vsync', '0',
-    '-vf', 'scale=512:512:flags=lanczos'
+    '-vf',
+    'scale=512:512:flags=lanczos'
   ]
 
   return new Promise((resolve, reject) => {
@@ -220,12 +235,7 @@ async function toWebp(buffer) {
 
         resolve(result)
       })
-      .on('error', (err) => {
-        if (fs.existsSync(input))
-          fs.unlinkSync(input)
-
-        reject(err)
-      })
+      .on('error', reject)
   })
 }
 
