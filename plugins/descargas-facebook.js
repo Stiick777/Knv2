@@ -4,143 +4,145 @@ import { fileTypeFromBuffer } from "file-type";
 
 const handler = async (m, { conn, args }) => {
 
-if (!args[0]) {
-return conn.reply(
-m.chat,
-"🎈 *Ingresa un link de Facebook*",
-m
-)
-}
+  if (!args[0]) {
+    return conn.reply(
+      m.chat,
+      "🎈 *Ingresa un link de Facebook*",
+      m
+    );
+  }
 
-const facebookRegex = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.watch)\/.+$/i
+  const facebookRegex = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.watch)\/.+$/i;
 
-if (!facebookRegex.test(args[0])) {
-return conn.reply(
-m.chat,
-"❌ *El enlace proporcionado no es válido.*",
-m
-)
-}
+  if (!facebookRegex.test(args[0])) {
+    return conn.reply(
+      m.chat,
+      "❌ *El enlace proporcionado no es válido.*",
+      m
+    );
+  }
 
-await m.react("⏳")
+  await m.react("⏳");
 
-let result
+  let result;
 
-// =====================================
-// ⭐ API DELIRIUS FACEBOOK
-// =====================================
-try {
+  try {
 
-const api = `https://api.delirius.store/download/facebook?url=${encodeURIComponent(args[0])}`
+    const response = await fetch(
+      "https://api.siputzx.my.id/api/d/facebook",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          url: args[0]
+        })
+      }
+    );
 
-const response = await fetch(api)
-const json = await response.json()
+    const json = await response.json();
 
-if (!json.status || !json.list?.length) {
-throw new Error("No se encontraron enlaces")
-}
+    if (!json.status || !json.data?.downloads?.length) {
+      throw new Error("No se encontraron enlaces");
+    }
 
-// Prioridad de calidad
-let video =
-json.list.find(v =>
-v.quality?.includes("720p") &&
-v.url
-) ||
+    let video =
+      json.data.downloads.find(v =>
+        v.quality?.includes("720p") &&
+        v.url
+      ) ||
 
-json.list.find(v =>
-v.quality?.includes("HD") &&
-v.url
-) ||
+      json.data.downloads.find(v =>
+        v.quality?.includes("HD") &&
+        v.url
+      ) ||
 
-json.list.find(v =>
-v.quality?.includes("360p") &&
-v.url
-) ||
+      json.data.downloads.find(v =>
+        v.quality?.includes("360p") &&
+        v.url
+      ) ||
 
-json.list.find(v =>
-v.url
-)
+      json.data.downloads.find(v =>
+        v.url
+      );
 
-if (!video?.url) {
-throw new Error("Sin URL válida")
-}
+    if (!video?.url) {
+      throw new Error("Sin URL válida");
+    }
 
-result = {
-title: "Facebook Video",
-videoUrl: video.url,
-quality: video.quality || "Desconocida",
-thumb: json.thumb || null
-}
+    result = {
+      title: json.data.title || "Facebook Video",
+      videoUrl: video.url,
+      quality: video.quality || "Desconocida",
+      thumb: json.data.thumbnail || null,
+      duration: json.data.duration || "-"
+    };
 
-} catch (err) {
+  } catch (err) {
 
-console.error("❌ Error API:", err.message)
+    console.error("❌ Error API:", err);
 
-await m.react("❌")
+    await m.react("❌");
 
-return conn.reply(
-m.chat,
-"❎ *No se pudo obtener el video de Facebook.*",
-m
-)
+    return conn.reply(
+      m.chat,
+      "❎ *No se pudo obtener el video de Facebook.*",
+      m
+    );
+  }
 
-}
+  try {
 
-// =====================================
-// 📥 DESCARGAR Y ENVIAR
-// =====================================
-try {
+    await m.react("📥");
 
-await m.react("📥")
+    const { data } = await axios.get(
+      result.videoUrl,
+      {
+        responseType: "arraybuffer",
+        headers: {
+          "User-Agent": "Mozilla/5.0"
+        }
+      }
+    );
 
-const { data } = await axios.get(
-result.videoUrl,
-{
-responseType: "arraybuffer",
-headers: {
-"User-Agent": "Mozilla/5.0"
-}
-}
-)
+    const buffer = Buffer.from(data);
+    const type = await fileTypeFromBuffer(buffer);
 
-const buffer = Buffer.from(data)
-const type = await fileTypeFromBuffer(buffer)
-
-await conn.sendMessage(
-m.chat,
-{
-video: buffer,
-mimetype: type?.mime || "video/mp4",
-fileName: "facebook.mp4",
-caption:
-`🎥 *Facebook Video*
+    await conn.sendMessage(
+      m.chat,
+      {
+        video: buffer,
+        mimetype: type?.mime || "video/mp4",
+        fileName: "facebook.mp4",
+        caption: `🎥 *${result.title}*
+⏱️ Duración: ${result.duration}
 📺 Calidad: ${result.quality}
+
 ✨ *_By KanBot_*`
-},
-{ quoted: m }
-)
+      },
+      { quoted: m }
+    );
 
-await m.react("✅")
+    await m.react("✅");
 
-} catch (err) {
+  } catch (err) {
 
-console.error("❌ Error al enviar:", err.message)
+    console.error("❌ Error al enviar:", err);
 
-await m.react("❌")
+    await m.react("❌");
 
-return conn.reply(
-m.chat,
-"❌ *Error al enviar el video. Intenta nuevamente.*",
-m
-)
+    return conn.reply(
+      m.chat,
+      "❌ *Error al enviar el video. Intenta nuevamente.*",
+      m
+    );
+  }
+};
 
-}
+handler.help = ["facebook <url>", "fb <url>"];
+handler.tags = ["descargas"];
+handler.command = ["facebook", "fb"];
+handler.group = true;
 
-}
-
-handler.help = ["facebook <url>", "fb <url>"]
-handler.tags = ["descargas"]
-handler.command = ["facebook", "fb"]
-handler.group = true
-
-export default handler
+export default handler;
