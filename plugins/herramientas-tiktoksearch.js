@@ -143,7 +143,7 @@ let handler = async (message, { conn, text }) => {
                 },
 
                 footer: {
-                  text: `🔎 Se encontraron ${results.length} resultados`
+                  text: `🔎 Se encontraron ${results.length} resultados\nby ☆KanBot☆`
                 },
 
                 header: {
