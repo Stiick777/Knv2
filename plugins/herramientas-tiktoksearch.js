@@ -1,4 +1,5 @@
 import axios from "axios";
+
 const baileys = await import("@whiskeysockets/baileys");
 
 const {
@@ -17,7 +18,15 @@ let handler = async (message, { conn, text }) => {
   }
 
   async function createVideoMessage(url) {
-    const { data } = await axios.get(url, { responseType: "arraybuffer" });
+    const { data } = await axios.get(url, {
+      responseType: "arraybuffer",
+      headers: {
+        Referer: "https://www.tiktok.com/",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    });
+
     const buffer = Buffer.from(data);
 
     const { videoMessage } = await generateWAMessageContent(
@@ -25,7 +34,9 @@ let handler = async (message, { conn, text }) => {
         video: buffer,
         mimetype: "video/mp4"
       },
-      { upload: conn.waUploadToServer }
+      {
+        upload: conn.waUploadToServer
+      }
     );
 
     return videoMessage;
@@ -40,44 +51,80 @@ let handler = async (message, { conn, text }) => {
 
   try {
     await conn.sendMessage(message.chat, {
-      react: { text: "⌛", key: message.key }
+      react: {
+        text: "⌛",
+        key: message.key
+      }
     });
 
-    // 🔥 NUEVA API (NEJI)
     const { data } = await axios.get(
-      `https://neji-api.vercel.app/api/search/tiktok?q=${encodeURIComponent(text)}`
+      `https://api.delirius.store/search/tiktoksearch?query=${encodeURIComponent(
+        text
+      )}`
     );
 
-    if (!data.results || !data.results.length) {
+    if (!data?.meta?.length) {
       throw new Error("No se encontraron resultados");
     }
 
-    let results = data.results;
+    let results = data.meta;
     shuffleArray(results);
 
     let cards = [];
 
-    for (let result of results.slice(0, 7)) {
-      cards.push({
-        body: proto.Message.InteractiveMessage.Body.fromObject({
-          text:
-            `👤 ${result.author.nickname}\n` +
-            `👁 ${result.stats.play_count.toLocaleString()} | ❤️ ${result.stats.digg_count.toLocaleString()}\n` +
-            `💬 ${result.stats.comment_count.toLocaleString()} | 🔁 ${result.stats.share_count.toLocaleString()}`
-        }),
-        footer: proto.Message.InteractiveMessage.Footer.fromObject({
-          text: "TikTok Search"
-        }),
-        header: proto.Message.InteractiveMessage.Header.fromObject({
-          title: result.title?.slice(0, 80) || "TikTok Video",
-          hasMediaAttachment: true,
-          videoMessage: await createVideoMessage(result.play) // 🔥 sin marca
-        }),
-        nativeFlowMessage:
-          proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-            buttons: []
-          })
-      });
+    for (const result of results.slice(0, 7)) {
+      try {
+        cards.push({
+          body: proto.Message.InteractiveMessage.Body.fromObject({
+            text:
+              `👤 ${result.author?.nickname || "Desconocido"}\n` +
+              `👁 ${Number(result.play || 0).toLocaleString()}\n` +
+              `❤️ ${Number(result.like || 0).toLocaleString()} | 💬 ${Number(
+                result.coment || 0
+              ).toLocaleString()}\n` +
+              `🔁 ${Number(result.share || 0).toLocaleString()}`
+          }),
+
+          footer: proto.Message.InteractiveMessage.Footer.fromObject({
+            text: `🎵 ${
+              result.music?.title || "Audio no disponible"
+            }`
+          }),
+
+          header: proto.Message.InteractiveMessage.Header.fromObject({
+            title:
+              result.title?.slice(0, 80) ||
+              "TikTok Video",
+            hasMediaAttachment: true,
+            videoMessage: await createVideoMessage(result.hd)
+          }),
+
+          nativeFlowMessage:
+            proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+              buttons: [
+                {
+                  name: "cta_url",
+                  buttonParamsJson: JSON.stringify({
+                    display_text: "Ver en TikTok",
+                    url: result.url
+                  })
+                }
+              ]
+            })
+        });
+      } catch (e) {
+        console.error(
+          "Error cargando video:",
+          result.id,
+          e.message
+        );
+      }
+    }
+
+    if (!cards.length) {
+      throw new Error(
+        "No fue posible generar las tarjetas."
+      );
     }
 
     const msg = generateWAMessageFromContent(
@@ -92,32 +139,53 @@ let handler = async (message, { conn, text }) => {
             interactiveMessage:
               proto.Message.InteractiveMessage.fromObject({
                 body: {
-                  text: `✨ RESULTADOS DE: *${text}*`
+                  text: `✨ *RESULTADOS DE:* ${text}`
                 },
+
                 footer: {
-                  text: "By ✰ KanBot ✰"
+                  text: `🔎 Se encontraron ${results.length} resultados`
                 },
-                carouselMessage: { cards }
+
+                header: {
+                  hasMediaAttachment: false
+                },
+
+                carouselMessage: {
+                  cards
+                }
               })
           }
         }
       },
-      { quoted: message }
+      {
+        quoted: message
+      }
     );
 
-    await conn.relayMessage(message.chat, msg.message, {
-      messageId: msg.key.id
-    });
+    await conn.relayMessage(
+      message.chat,
+      msg.message,
+      {
+        messageId: msg.key.id
+      }
+    );
 
     await conn.sendMessage(message.chat, {
-      react: { text: "✅", key: message.key }
+      react: {
+        text: "✅",
+        key: message.key
+      }
     });
-
   } catch (err) {
-    console.error(err.response?.data || err);
+    console.error(err);
+
     await conn.sendMessage(message.chat, {
-      react: { text: "❌", key: message.key }
+      react: {
+        text: "❌",
+        key: message.key
+      }
     });
+
     conn.reply(
       message.chat,
       `❌ *ERROR:* ${err.message}`,
