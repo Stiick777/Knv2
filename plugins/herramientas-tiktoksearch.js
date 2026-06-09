@@ -114,7 +114,7 @@ let handler = async (message, { conn, text }) => {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error(err.response?.data || err);
     await conn.sendMessage(message.chat, {
       react: { text: "❌", key: message.key }
     });
