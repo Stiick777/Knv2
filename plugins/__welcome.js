@@ -56,7 +56,7 @@ conn.ev.on('group-participants.update', async (update) => {
       if (action === 'add') {
         const texto = `
 ╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
-¡Bienvenido, ✰ ${username}!
+¡Bienvenido, ✰ @${jid.split('@')[0]}!
 A ${groupMetadata.subject}
 ● ${fecha}
 ╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
@@ -75,7 +75,7 @@ Nos alegra tenerte aquí.
       if (action === 'remove') {
         const texto = `
 ╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
-¡Adiós, ✰ ${username}!
+¡Adiós, ✰ @${jid.split('@')[0]}!
 DE ${groupMetadata.subject}
 ● ${fecha}
 ╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
