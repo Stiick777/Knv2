@@ -13,11 +13,16 @@ conn.ev.on('group-participants.update', async (update) => {
     for (const user of participants) {
       const jid = user.phoneNumber || user.id
 
-      let username = jid.split('@')[0]
+      const mentionJid = user.phoneNumber || user.id
+const userJid = user.id || mentionJid
 
-      try {
-        username = await conn.getName(jid)
-      } catch {}
+let username
+
+try {
+  username = await conn.getName(userJid)
+} catch {
+  username = mentionJid.split('@')[0]
+}
 
       let pp = 'https://i.imgur.com/JP4hV4D.jpeg'
 
