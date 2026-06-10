@@ -1,167 +1,167 @@
-/*import fs from 'fs'
-import { WAMessageStubType } from '@whiskeysockets/baileys'
+import chalk from 'chalk'
+import moment from 'moment-timezone'
 
-async function generarBienvenida({ conn, userId, groupMetadata, chat }) {
-const username = `@${userId.split('@')[0]}`
-const pp = await conn.profilePictureUrl(userId, 'image').catch(() => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg')
-const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Mexico_City", day: 'numeric', month: 'long', year: 'numeric' })
-const groupSize = groupMetadata.participants.length + 1
-const desc = groupMetadata.desc?.toString() || 'Sin descripción'
-const mensaje = (chat.sWelcome || 'Edita con el comando "setwelcome"').replace(/{usuario}/g, `${username}`).replace(/{grupo}/g, `*${groupMetadata.subject}*`).replace(/{desc}/g, `${desc}`)
-const caption = 
-`╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
-¡Bienvenido/a, ✰ ${username}
-A ${groupMetadata.subject}
+export const participantsUpdate = async (client, anu) => {
+    try {
+        const metadata = await client.groupMetadata(anu.id)
+        const chat = global.db.data.chats[anu.id]
+        const botId = client.user.id.split(':')[0] + '@s.whatsapp.net'
+        const primaryBotId = chat?.primaryBot
+
+        const now = new Date()
+        const colombianTime = new Date(
+            now.toLocaleString('en-US', {
+                timeZone: 'America/Bogota'
+            })
+        )
+
+        const tiempo = colombianTime
+            .toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            })
+            .replace(/,/g, '')
+
+        const tiempo2 = moment
+            .tz('America/Bogota')
+            .format('hh:mm A')
+
+        let memberCount = metadata.participants.length
+
+        if (anu.action === 'add') memberCount += 1
+        if (anu.action === 'remove' || anu.action === 'leave') memberCount -= 1
+
+        for (const p of anu.participants) {
+            const jid = p.phoneNumber || p
+            const phone = jid.split('@')[0]
+
+            const pp = await client
+                .profilePictureUrl(jid, 'image')
+                .catch(
+                    () =>
+                        'https://cdn.sockywa.xyz/files/1755559736781.jpeg'
+                )
+
+            
+            const fakeContext = {
+    contextInfo: {
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363000000000000@newsletter',
+            serverMessageId: '0',
+            newsletterName: '☆KanBot☆'
+        },
+        externalAdReply: {
+    title: '☆KanBot☆',
+    body: 'by Stiiven',
+    mediaUrl: null,
+    description: null,
+    previewType: 'PHOTO',
+    thumbnailUrl: 'https://i.ibb.co/p6nb9fyN/IMG-20210703-WA0333.jpg',
+    sourceUrl: 'https://chat.whatsapp.com/FhJrUdTpY8AL9jXcmb4ohT',
+    mediaType: 1,
+    renderLargerThumbnail: false
+        }
+        mentionedJid: [jid, anu.author].filter(Boolean)
+    }
+            }
+
+            // BIENVENIDA
+            if (
+                anu.action === 'add' &&
+                chat?.welcome &&
+                (!primaryBotId || primaryBotId === botId)
+            ) {
+                const fecha = `${tiempo} • ${tiempo2}`
+
+                const caption = `
+╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
+¡Bienvenido/a, ✰ @${phone}
+A ${metadata.subject}
 ● ${fecha}
 ╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
 
 Esperamos que disfrutes tu estancia en el grupo.
 *_Recuerda leer la descripción_*
 🥀*ੈ✩‧₊˚༺☆༻*ੈ✩˚🍁`
-return { pp, caption, mentions: [userId] }
-}
-async function generarDespedida({ conn, userId, groupMetadata, chat }) {
-const username = `@${userId.split('@')[0]}`
-const pp = await conn.profilePictureUrl(userId, 'image').catch(() => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg')
-const fecha = new Date().toLocaleDateString("es-ES", { timeZone: "America/Mexico_City", day: 'numeric', month: 'long', year: 'numeric' })
-const groupSize = groupMetadata.participants.length - 1
-const desc = groupMetadata.desc?.toString() || 'Sin descripción'
-const mensaje = (chat.sBye || 'Edita con el comando "setbye"').replace(/{usuario}/g, `${username}`).replace(/{grupo}/g, `${groupMetadata.subject}`).replace(/{desc}/g, `*${desc}*`)
-const caption = 
-`╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
-¡Adiós, ✰ ${username}
-DE ${groupMetadata.subject}
-● ${fecha}
-╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
 
-Gracias por haber estado con nosotros.
-🥀*ੈ✩‧₊˚༺☆༻*ੈ✩˚🍁`
-return { pp, caption, mentions: [userId] }
-}
-let handler = m => m
-handler.before = async function (m, { conn, participants, groupMetadata }) {
-if (!m.messageStubType || !m.isGroup) return !0
-const primaryBot = global.db.data.chats[m.chat].primaryBot
-if (primaryBot && conn.user.jid !== primaryBot) throw !1
-const chat = global.db.data.chats[m.chat]
-const userId = m.messageStubParameters[0]
-if (chat.welcome && m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_ADD) {
-const { pp, caption, mentions } = await generarBienvenida({ conn, userId, groupMetadata, chat })
-rcanal.contextInfo.mentionedJid = mentions
-await conn.sendMessage(m.chat, { image: { url: pp }, caption, ...rcanal }, { quoted: null })
-try { fs.unlinkSync(img) } catch {}
-}
-if (chat.welcome && (m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_REMOVE || m.messageStubType == WAMessageStubType.GROUP_PARTICIPANT_LEAVE)) {
-const { pp, caption, mentions } = await generarDespedida({ conn, userId, groupMetadata, chat })
-rcanal.contextInfo.mentionedJid = mentions
-await conn.sendMessage(m.chat, { image: { url: pp }, caption, ...rcanal }, { quoted: null })
-try { fs.unlinkSync(img) } catch {}
-}}
+                await client.sendMessage(
+                    anu.id,
+                    {
+                        image: { url: pp },
+                        caption,
+                        mentions: [jid],
+                        ...fakeContext
+                    }
+                )
+            }
 
-export { generarBienvenida, generarDespedida }
-export default handler
-*/
-import fs from 'fs'
+            // DESPEDIDA
+            if (
+                (anu.action === 'remove' ||
+                    anu.action === 'leave') &&
+                chat?.welcome &&
+                (!primaryBotId || primaryBotId === botId)
+            ) {
+                const fecha = `${tiempo} • ${tiempo2}`
 
-async function generarBienvenida({ conn, userId, groupMetadata, chat }) {
-  const username = `@${userId.split('@')[0]}`
-  const pp = await conn.profilePictureUrl(userId, 'image')
-    .catch(() => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg')
-
-  const fecha = new Date().toLocaleDateString('es-ES', {
-    timeZone: 'America/Mexico_City',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  })
-
-  const desc = groupMetadata.desc?.toString() || 'Sin descripción'
-
-  const caption = `╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
-¡Bienvenido/a, ✰ ${username}
-A ${groupMetadata.subject}
-● ${fecha}
-╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
-
-Esperamos que disfrutes tu estancia en el grupo.
-*_Recuerda leer la descripción_*
-🥀*ੈ✩‧₊˚༺☆༻*ੈ✩˚🍁`
-
-  return { pp, caption, mentions: [userId] }
-}
-
-async function generarDespedida({ conn, userId, groupMetadata }) {
-  const username = `@${userId.split('@')[0]}`
-  const pp = await conn.profilePictureUrl(userId, 'image')
-    .catch(() => 'https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1745522645448.jpeg')
-
-  const fecha = new Date().toLocaleDateString('es-ES', {
-    timeZone: 'America/Mexico_City',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  })
-
-  const caption = `╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
-¡Adiós, ✰ ${username}
-DE ${groupMetadata.subject}
+                const caption = `
+╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
+¡Adiós, ✰ @${phone}
+DE ${metadata.subject}
 ● ${fecha}
 ╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
 
 Gracias por haber estado con nosotros.
 🥀*ੈ✩‧₊˚༺☆༻*ੈ✩˚🍁`
 
-  return { pp, caption, mentions: [userId] }
-}
+                await client.sendMessage(
+                    anu.id,
+                    {
+                        image: { url: pp },
+                        caption,
+                        mentions: [jid],
+                        ...fakeContext
+                    }
+                )
+            }
 
-let handler = m => m
+            // PROMOVER
+            if (
+                anu.action === 'promote' &&
+                chat?.alerts &&
+                (!primaryBotId || primaryBotId === botId)
+            ) {
+                const usuario = anu.author
 
-handler.before = async function (m, { conn, groupMetadata }) {
-  if (!m.isGroup || !m.messageStubType) return true
+                await client.sendMessage(anu.id, {
+                    text: `「✎」 *@${phone}* ha sido promovido a Administrador por *@${
+                        usuario?.split('@')[0] || 'Sistema'
+                    }.*`,
+                    mentions: [jid, usuario].filter(Boolean)
+                })
+            }
 
-  const chat = global.db.data.chats[m.chat]
-  if (!chat?.welcome) return true
+            // DEGRADAR
+            if (
+                anu.action === 'demote' &&
+                chat?.alerts &&
+                (!primaryBotId || primaryBotId === botId)
+            ) {
+                const usuario = anu.author
 
-  const userId = m.messageStubParameters?.[0]
-  if (!userId) return true
-
-  // 🔎 DEBUG (déjalo si quieres)
-  // console.log('STUB:', m.messageStubType, m.messageStubParameters)
-
-  // ➕ BIENVENIDA
-  if ([27, 32].includes(m.messageStubType)) {
-    const { pp, caption, mentions } = await generarBienvenida({
-      conn,
-      userId,
-      groupMetadata,
-      chat
-    })
-
-    await conn.sendMessage(m.chat, {
-      image: { url: pp },
-      caption,
-      mentions
-    })
-  }
-
-  // ➖ DESPEDIDA
-  if ([28, 29].includes(m.messageStubType)) {
-    const { pp, caption, mentions } = await generarDespedida({
-      conn,
-      userId,
-      groupMetadata,
-      chat
-    })
-
-    await conn.sendMessage(m.chat, {
-      image: { url: pp },
-      caption,
-      mentions
-    })
-  }
-
-  return true
-}
-
-export { generarBienvenida, generarDespedida }
-export default handler
+                await client.sendMessage(anu.id, {
+                    text: `「✎」 *@${phone}* ha sido degradado de Administrador por *@${
+                        usuario?.split('@')[0] || 'Sistema'
+                    }.*`,
+                    mentions: [jid, usuario].filter(Boolean)
+                })
+            }
+        }
+    } catch (err) {
+        console.log(
+            chalk.gray(`[ EVENT ERROR ] → ${err}`)
+        )
+    }
+        }
