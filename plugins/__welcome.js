@@ -1,27 +1,69 @@
-export async function before(m, { conn }) {
-  conn.ev.on('group-participants.update', async (update) => {
-    try {
-      const { id, participants, action } = update
+conn.ev.on('group-participants.update', async (update) => {
+  try {
+    const { id, participants, action } = update
 
-      for (const user of participants) {
-        const jid = user.phoneNumber || user.id
+    const groupMetadata = await conn.groupMetadata(id)
 
-        if (action === 'add') {
-          await conn.sendMessage(id, {
-            text: `👋 Bienvenido @${jid.split('@')[0]}`,
-            mentions: [jid]
-          })
-        }
+    const fecha = new Date().toLocaleDateString('es-CO', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
 
-        if (action === 'remove') {
-          await conn.sendMessage(id, {
-            text: `👋 Hasta luego @${jid.split('@')[0]}`,
-            mentions: [jid]
-          })
-        }
+    for (const user of participants) {
+      const jid = user.phoneNumber || user.id
+
+      let username = jid.split('@')[0]
+
+      try {
+        username = await conn.getName(jid)
+      } catch {}
+
+      let pp = 'https://i.imgur.com/JP4hV4D.jpeg'
+
+      try {
+        pp = await conn.profilePictureUrl(jid, 'image')
+      } catch {}
+
+      if (action === 'add') {
+        const texto = `
+╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
+¡Bienvenido, ✰ ${username}!
+A ${groupMetadata.subject}
+● ${fecha}
+╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
+
+Nos alegra tenerte aquí.
+🌸*ੈ✩‧₊˚༺☆༻*ੈ✩˚🌸
+`
+
+        await conn.sendMessage(id, {
+          image: { url: pp },
+          caption: texto,
+          mentions: [jid]
+        })
       }
-    } catch (e) {
-      console.error(e)
+
+      if (action === 'remove') {
+        const texto = `
+╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
+¡Adiós, ✰ ${username}!
+DE ${groupMetadata.subject}
+● ${fecha}
+╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
+
+Gracias por haber estado con nosotros.
+🥀*ੈ✩‧₊˚༺☆༻*ੈ✩˚🍁
+`
+
+        await conn.sendMessage(id, {
+          image: { url: pp },
+          caption: texto,
+          mentions: [jid]
+        })
+      }
     }
-  })
-}
+  } catch (e) {
+    console.error('Error en bienvenida:', e)
+  }
+})
