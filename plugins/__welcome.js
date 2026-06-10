@@ -1,4 +1,7 @@
+conn.ev.removeAllListeners('group-participants.update')
+
 conn.ev.on('group-participants.update', async (update) => {
+  
   try {
     const { id, participants, action } = update
 
