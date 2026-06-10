@@ -1,11 +1,15 @@
-let handler = async (m, { conn }) => {
-  let version = 'Desconocida'
+import fs from 'fs'
 
-  if (conn?.ws?.version) {
-    version = conn.ws.version.join('.')
+let handler = async (m) => {
+  try {
+    const path = './node_modules/@whiskeysockets/baileys/package.json'
+
+    const pkg = JSON.parse(fs.readFileSync(path, 'utf8'))
+
+    m.reply(`Versión instalada: ${pkg.version}`)
+  } catch (e) {
+    m.reply(`Error:\n${e.message}`)
   }
-
-  await m.reply(`Versión de Baileys: ${version}`)
 }
 
 handler.command = ['baileys']
