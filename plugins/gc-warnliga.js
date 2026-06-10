@@ -1,22 +1,14 @@
-import { version as baileysVersion } from '@whiskeysockets/baileys/package.json'
-
 let handler = async (m, { conn }) => {
-  const version = Array.isArray(conn?.ws?.version)
-    ? conn.ws.version.join('.')
-    : baileysVersion
+  let version = 'Desconocida'
 
-  let mensaje = `
-╭━━━〔 BAILEYS INFO 〕━━━⬣
-┃ 📦 Versión: ${version}
-┃ 🤖 Bot: ${conn.user?.name || 'Desconocido'}
-┃ 🆔 JID: ${conn.user?.jid || conn.user?.id}
-╰━━━━━━━━━━━━━━━━⬣
-`
+  if (conn?.ws?.version) {
+    version = conn.ws.version.join('.')
+  }
 
-  await conn.reply(m.chat, mensaje, m)
+  await m.reply(`Versión de Baileys: ${version}`)
 }
 
-handler.command = ['baileys', 'version']
+handler.command = ['baileys']
 handler.owner = true
 
 export default handler
