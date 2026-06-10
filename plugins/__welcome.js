@@ -2,6 +2,7 @@ import chalk from 'chalk'
 import moment from 'moment-timezone'
 
 export const participantsUpdate = async (client, anu) => {
+    console.log(JSON.stringify(anu, null, 2))
     try {
         const metadata = await client.groupMetadata(anu.id)
         const chat = global.db.data.chats[anu.id]
