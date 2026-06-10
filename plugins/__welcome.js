@@ -13,16 +13,36 @@ conn.ev.on('group-participants.update', async (update) => {
     for (const user of participants) {
       const jid = user.phoneNumber || user.id
 
-      const mentionJid = user.phoneNumber || user.id
-const userJid = user.id || mentionJid
+      console.log('========================')
+      console.log('USER:', JSON.stringify(user, null, 2))
 
-let username
+      try {
+        console.log('GETNAME:', await conn.getName(jid))
+      } catch (e) {
+        console.log('GETNAME ERROR:', e.message)
+      }
 
-try {
-  username = await conn.getName(userJid)
-} catch {
-  username = mentionJid.split('@')[0]
-}
+      const participantData = groupMetadata.participants.find(
+        p => p.id === jid || p.id === user.id
+      )
+
+      console.log(
+        'PARTICIPANT:',
+        JSON.stringify(participantData, null, 2)
+      )
+
+      let username = 'Usuario'
+
+      try {
+        username =
+          participantData?.notify ||
+          participantData?.name ||
+          participantData?.verifiedName ||
+          await conn.getName(jid) ||
+          jid.split('@')[0]
+      } catch {
+        username = jid.split('@')[0]
+      }
 
       let pp = 'https://i.imgur.com/JP4hV4D.jpeg'
 
