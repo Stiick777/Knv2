@@ -63,7 +63,7 @@ export const participantsUpdate = async (client, anu) => {
     sourceUrl: 'https://chat.whatsapp.com/FhJrUdTpY8AL9jXcmb4ohT',
     mediaType: 1,
     renderLargerThumbnail: false
-        }
+        },
         mentionedJid: [jid, anu.author].filter(Boolean)
     }
             }
