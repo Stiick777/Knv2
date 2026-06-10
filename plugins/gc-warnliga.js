@@ -1,13 +1,13 @@
 let handler = async (m, { conn }) => {
-  m.reply(
-    'Propiedades:\n\n' +
-    Object.keys(conn)
-      .sort()
-      .join('\n')
-  )
+  conn.ev.on('group-participants.update', async (json) => {
+    console.log('EVENTO DETECTADO:')
+    console.log(JSON.stringify(json, null, 2))
+  })
+
+  m.reply('Listener activado')
 }
 
-handler.command = ['conninfo']
+handler.command = ['testwelcome']
 handler.owner = true
 
 export default handler
