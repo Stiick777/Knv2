@@ -1,11 +1,20 @@
 conn.ev.removeAllListeners('group-participants.update')
 
 conn.ev.on('group-participants.update', async (update) => {
-  
   try {
-    const { id, participants, action } = update
+    console.log('GROUP UPDATE:')
+    console.log(JSON.stringify(update, null, 2))
 
-    const groupMetadata = await conn.groupMetadata(id)
+    const groupId = update.id
+    const participants = update.participants || []
+
+    const action =
+      update.action ||
+      update.type ||
+      update.event ||
+      ''
+
+    const groupMetadata = await conn.groupMetadata(groupId)
 
     const fecha = new Date().toLocaleDateString('es-CO', {
       day: '2-digit',
@@ -13,48 +22,37 @@ conn.ev.on('group-participants.update', async (update) => {
       year: 'numeric'
     })
 
-    for (const user of participants) {
-      const jid = user.phoneNumber || user.id
-
-      console.log('========================')
-      console.log('USER:', JSON.stringify(user, null, 2))
-
+    for (const participant of participants) {
       try {
-        console.log('GETNAME:', await conn.getName(jid))
-      } catch (e) {
-        console.log('GETNAME ERROR:', e.message)
-      }
+        const jid =
+          typeof participant === 'string'
+            ? participant
+            : participant.phoneNumber || participant.id
 
-      const participantData = groupMetadata.participants.find(
-        p => p.id === jid || p.id === user.id
-      )
+        console.log('JID:', jid)
+        console.log('ACTION:', action)
 
-      console.log(
-        'PARTICIPANT:',
-        JSON.stringify(participantData, null, 2)
-      )
+        let pp = 'https://i.imgur.com/JP4hV4D.jpeg'
 
-      let username = 'Usuario'
+        try {
+          pp = await conn.profilePictureUrl(jid, 'image')
+        } catch {}
 
-      try {
-        username =
-          participantData?.notify ||
-          participantData?.name ||
-          participantData?.verifiedName ||
-          await conn.getName(jid) ||
-          jid.split('@')[0]
-      } catch {
-        username = jid.split('@')[0]
-      }
+        let nombre = 'Usuario'
 
-      let pp = 'https://i.imgur.com/JP4hV4D.jpeg'
+        try {
+          nombre =
+            await conn.getName(jid) ||
+            jid.split('@')[0]
+        } catch {
+          nombre = jid.split('@')[0]
+        }
 
-      try {
-        pp = await conn.profilePictureUrl(jid, 'image')
-      } catch {}
-
-      if (action === 'add') {
-        const texto = `
+        // BIENVENIDA
+        if (
+          ['add', 'invite', 'join'].includes(action)
+        ) {
+          const texto = `
 ╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
 ¡Bienvenido, ✰ @${jid.split('@')[0]}!
 A ${groupMetadata.subject}
@@ -65,15 +63,20 @@ Nos alegra tenerte aquí.
 🌸*ੈ✩‧₊˚༺☆༻*ੈ✩˚🌸
 `
 
-        await conn.sendMessage(id, {
-          image: { url: pp },
-          caption: texto,
-          mentions: [jid]
-        })
-      }
+          await conn.sendMessage(groupId, {
+            image: { url: pp },
+            caption: texto,
+            mentions: [jid]
+          })
 
-      if (action === 'remove') {
-        const texto = `
+          console.log('✅ Bienvenida enviada')
+        }
+
+        // DESPEDIDA
+        if (
+          ['remove', 'leave'].includes(action)
+        ) {
+          const texto = `
 ╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
 ¡Adiós, ✰ @${jid.split('@')[0]}!
 DE ${groupMetadata.subject}
@@ -84,11 +87,16 @@ Gracias por haber estado con nosotros.
 🥀*ੈ✩‧₊˚༺☆༻*ੈ✩˚🍁
 `
 
-        await conn.sendMessage(id, {
-          image: { url: pp },
-          caption: texto,
-          mentions: [jid]
-        })
+          await conn.sendMessage(groupId, {
+            image: { url: pp },
+            caption: texto,
+            mentions: [jid]
+          })
+
+          console.log('✅ Despedida enviada')
+        }
+      } catch (err) {
+        console.error('Error participante:', err)
       }
     }
   } catch (e) {
