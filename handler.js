@@ -186,7 +186,11 @@ const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(p
 //console.log('userGroup:', userGroup)
 //console.log('admin:', userGroup?.admin)
 const botJid = conn.decodeJid(conn.user.id)
-const botGroup = participants.find(u => conn.decodeJid(u.id) === botJid) || {}
+const botGroup = participants.find(u =>
+  u.jid === botJid ||
+  u.id === botJid ||
+  u.lid === botJid
+) || {}
   
 const isRAdmin = userGroup?.admin == "superadmin" || false
   
@@ -195,10 +199,9 @@ const isBotAdmin = !!(
   botGroup?.admin === 'admin' ||
   botGroup?.admin === 'superadmin'
 )
+console.log('BOT JID:', botJid)
 console.log('botGroup:', botGroup)
 console.log('isBotAdmin:', isBotAdmin)
-console.log('typeof:', typeof isBotAdmin)
-  
 const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
 for (const name in global.plugins) {
 const plugin = global.plugins[name]
