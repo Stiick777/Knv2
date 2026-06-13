@@ -168,15 +168,7 @@ let usedPrefix
 
 const groupMetadata = m.isGroup ? { ...(conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), ...(((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { participants: ((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || []).map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) }) } : {}
 const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
-const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
-const botJid = conn.decodeJid(conn.user.id)
-const botGroup = participants.find(u => conn.decodeJid(u.id) === botJid) || {}
-const isRAdmin = userGroup?.admin == "superadmin" || false
-  console.log('======== ADMIN DEBUG ========')
 console.log('sender:', m.sender)
-console.log('participant:', m.participant)
-console.log('userGroup:', userGroup)
-console.log('isAdmin:', isAdmin)
 
 console.log(
   participants.map(p => ({
@@ -185,6 +177,13 @@ console.log(
     admin: p.admin
   }))
 )
+  const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
+const botJid = conn.decodeJid(conn.user.id)
+const botGroup = participants.find(u => conn.decodeJid(u.id) === botJid) || {}
+const isRAdmin = userGroup?.admin == "superadmin" || false
+  
+
+
 const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
 
