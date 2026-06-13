@@ -172,6 +172,19 @@ const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) ==
 const botJid = conn.decodeJid(conn.user.id)
 const botGroup = participants.find(u => conn.decodeJid(u.id) === botJid) || {}
 const isRAdmin = userGroup?.admin == "superadmin" || false
+  console.log('======== ADMIN DEBUG ========')
+console.log('sender:', m.sender)
+console.log('participant:', m.participant)
+console.log('userGroup:', userGroup)
+console.log('isAdmin:', isAdmin)
+
+console.log(
+  participants.map(p => ({
+    jid: p.jid,
+    lid: p.lid,
+    admin: p.admin
+  }))
+)
 const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
 
