@@ -167,21 +167,24 @@ m.exp += Math.ceil(Math.random() * 10)
 let usedPrefix
 
 const groupMetadata = m.isGroup ? { ...(conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), ...(((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { participants: ((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || []).map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) }) } : {}
-const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
-console.log('sender:', m.sender)
-
-console.log(
-  participants.map(p => ({
-    jid: p.jid,
-    lid: p.lid,
-    admin: p.admin
-  }))
-)
-  console.log(
-  participants.find(p => p.jid === m.sender)
-)
-  console.log(groupMetadata.participants[0])
-  const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
+//const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
+const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({
+  id: participant.id || participant.jid,
+  jid: participant.phoneNumber || participant.jid || participant.id,
+  lid: participant.lid || participant.id,
+  admin: participant.admin
+}))
+  //const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
+  const userGroup = (m.isGroup
+  ? participants.find((u) =>
+      u.jid === m.sender ||
+      u.id === m.sender ||
+      u.lid === m.sender
+    )
+  : {}) || {}
+  console.log('sender:', m.sender)
+console.log('userGroup:', userGroup)
+console.log('admin:', userGroup?.admin)
 const botJid = conn.decodeJid(conn.user.id)
 const botGroup = participants.find(u => conn.decodeJid(u.id) === botJid) || {}
 const isRAdmin = userGroup?.admin == "superadmin" || false
