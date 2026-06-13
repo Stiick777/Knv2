@@ -177,6 +177,10 @@ console.log(
     admin: p.admin
   }))
 )
+  console.log(
+  participants.find(p => p.jid === m.sender)
+)
+  console.log(groupMetadata.participants[0])
   const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
 const botJid = conn.decodeJid(conn.user.id)
 const botGroup = participants.find(u => conn.decodeJid(u.id) === botJid) || {}
