@@ -199,9 +199,9 @@ const isBotAdmin = !!(
   botGroup?.admin === 'admin' ||
   botGroup?.admin === 'superadmin'
 )
-console.log('BOT JID:', botJid)
-console.log('botGroup:', botGroup)
-console.log('isBotAdmin:', isBotAdmin)
+//console.log('BOT JID:', botJid)
+//console.log('botGroup:', botGroup)
+//console.log('isBotAdmin:', isBotAdmin)
 const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
 for (const name in global.plugins) {
 const plugin = global.plugins[name]
