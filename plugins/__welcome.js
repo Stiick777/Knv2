@@ -32,7 +32,7 @@ conn.ev.on('group-participants.update', async (update) => {
         console.log('JID:', jid)
         console.log('ACTION:', action)
 
-        let pp = 'https://i.imgur.com/JP4hV4D.jpeg'
+        let pp = 'https://i.imgur.com/w1Jw7dl.jpeg'
 
         try {
           pp = await conn.profilePictureUrl(jid, 'image')
