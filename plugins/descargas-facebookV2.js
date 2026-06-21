@@ -72,9 +72,9 @@ By *KanBot* 🤖`,
   }
 };
 
-handler.help = ['fb'];
+handler.help = ['fb2'];
 handler.tags = ['descargas'];
-handler.command = ['facebook', 'fb'];
+handler.command = ['facebook2', 'fb2'];
 handler.group = true;
 
 export default handler;
