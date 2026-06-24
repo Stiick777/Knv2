@@ -1,27 +1,14 @@
 import fetch from 'node-fetch'
 
-const processedParticipants = new Set()
+conn.ev.removeAllListeners('group-participants.update')
 
-conn.ev.removeAllListeners('messages.upsert')
-
-conn.ev.on('messages.upsert', async ({ messages }) => {
+conn.ev.on('group-participants.update', async (update) => {
   try {
-    const m = messages?.[0]
-    if (!m) return
+    console.log('==================== GROUP UPDATE ====================')
+    console.log(JSON.stringify(update, null, 2))
 
-    const groupId = m.key?.remoteJid
-    if (!groupId || !groupId.endsWith('@g.us')) return
-
-    const stubType = m.messageStubType
-    const stubParams = m.messageStubParameters || []
-
-    // 27 = agregado / 28 = eliminado
-    if (![27, 28].includes(stubType)) return
-
-    console.log('================ SYSTEM STUB ================')
-    console.log('GROUP ID:', groupId)
-    console.log('STUB TYPE:', stubType)
-    console.log('STUB PARAMS:', JSON.stringify(stubParams, null, 2))
+    const groupId = update.id
+    if (!groupId) return
 
     const groupMetadata = await conn.groupMetadata(groupId).catch(() => null)
     if (!groupMetadata) return
@@ -32,41 +19,117 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
       year: 'numeric'
     })
 
-    for (const raw of stubParams) {
+    // Detectar acción real aunque action/type vengan undefined
+    let eventType =
+      update.action ||
+      update.type ||
+      update.event ||
+      update.stubType ||
+      ''
+
+    // Normalizar a string
+    if (typeof eventType !== 'string') eventType = String(eventType)
+
+    console.log('EVENT TYPE RAW:', eventType)
+
+    // participantes del evento
+    let participants = update.participants || []
+
+    // Si no vienen participantes, intentar leerlos de otras propiedades
+    if (!participants.length && update.messageStubParameters) {
+      participants = update.messageStubParameters
+    }
+
+    // Normalizar tipo de evento
+    let isAdd = false
+    let isRemove = false
+
+    const upperType = eventType.toUpperCase()
+
+    if (
+      upperType.includes('GROUP_PARTICIPANT_ADD') ||
+      eventType === 'add' ||
+      eventType === '27' ||
+      update.messageStubType === 27
+    ) {
+      isAdd = true
+    }
+
+    if (
+      upperType.includes('GROUP_PARTICIPANT_REMOVE') ||
+      eventType === 'remove' ||
+      eventType === '28' ||
+      update.messageStubType === 28
+    ) {
+      isRemove = true
+    }
+
+    console.log('IS ADD:', isAdd)
+    console.log('IS REMOVE:', isRemove)
+    console.log('PARTICIPANTS RAW:', participants)
+
+    for (const rawUser of participants) {
       try {
-        let parsed = null
+        let jid = null
         let lid = null
         let phoneJid = null
-        let jid = null
+        let username = 'Usuario'
 
-        // Si viene como JSON string
-        if (typeof raw === 'string') {
+        console.log('RAW USER:', rawUser)
+
+        // Caso 1: viene como string JSON dentro de messageStubParameters
+        if (typeof rawUser === 'string') {
           try {
-            parsed = JSON.parse(raw)
+            const parsed = JSON.parse(rawUser)
+
             lid = parsed.id || null
             phoneJid = parsed.phoneNumber || null
+
+            // preferir el número real @s.whatsapp.net para menciones/nombre/foto
             jid = phoneJid || lid
+
+            console.log('PARSED USER:', parsed)
           } catch {
-            jid = raw
+            // si no es JSON, puede ser directamente un jid
+            jid = rawUser
           }
-        } else if (typeof raw === 'object' && raw !== null) {
-          lid = raw.id || null
-          phoneJid = raw.phoneNumber || null
+        }
+
+        // Caso 2: viene como objeto normal
+        else if (typeof rawUser === 'object' && rawUser !== null) {
+          lid = rawUser.id || null
+          phoneJid = rawUser.phoneNumber || null
           jid = phoneJid || lid
         }
 
         if (!jid) continue
 
-        // Evitar duplicados del mismo evento
-        const uniqueKey = `${groupId}-${stubType}-${jid}-${m.key?.id || ''}`
-        if (processedParticipants.has(uniqueKey)) continue
-        processedParticipants.add(uniqueKey)
-        setTimeout(() => processedParticipants.delete(uniqueKey), 60 * 1000)
-
         console.log('JID FINAL:', jid)
-        console.log('PHONE JID:', phoneJid)
         console.log('LID:', lid)
+        console.log('PHONE JID:', phoneJid)
 
+        // Buscar participante dentro del grupo por cualquiera de los IDs
+        const participantData = groupMetadata.participants.find(p =>
+          p.id === jid ||
+          p.id === lid ||
+          p.id === phoneJid
+        )
+
+        console.log('PARTICIPANT DATA:', participantData)
+
+        // Nombre
+        try {
+          username =
+            participantData?.notify ||
+            participantData?.name ||
+            participantData?.verifiedName ||
+            await conn.getName(jid) ||
+            jid.split('@')[0]
+        } catch {
+          username = jid.split('@')[0]
+        }
+
+        // Foto
         let pp = 'https://i.imgur.com/JP4hV4D.jpeg'
         try {
           pp = await conn.profilePictureUrl(jid, 'image')
@@ -76,23 +139,15 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
           } catch {}
         }
 
-        let username = 'Usuario'
-        try {
-          username =
-            await conn.getName(phoneJid || jid) ||
-            (phoneJid || jid).split('@')[0]
-        } catch {
-          username = (phoneJid || jid).split('@')[0]
-        }
-
+        // número visible para mención
+        const numeroVisible = (phoneJid || jid).split('@')[0]
         const mentionJid = phoneJid || jid
-        const numero = mentionJid.split('@')[0]
 
         // BIENVENIDA
-        if (stubType === 27) {
+        if (isAdd) {
           const texto = `
 ╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
-¡Bienvenido, ✰ @${numero}!
+¡Bienvenido, ✰ @${numeroVisible}!
 A ${groupMetadata.subject}
 ● ${fecha}
 ╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
@@ -101,28 +156,20 @@ Nos alegra tenerte aquí.
 🌸*ੈ✩‧₊˚༺☆༻*ੈ✩˚🌸
 `.trim()
 
-          try {
-            await conn.sendMessage(groupId, {
-              image: { url: pp },
-              caption: texto,
-              mentions: [mentionJid]
-            })
-            console.log(`✅ Bienvenida enviada a ${mentionJid}`)
-          } catch (err) {
-            console.error('Error enviando bienvenida con imagen:', err)
-            await conn.sendMessage(groupId, {
-              text: texto,
-              mentions: [mentionJid]
-            })
-            console.log(`✅ Bienvenida enviada en texto a ${mentionJid}`)
-          }
+          await conn.sendMessage(groupId, {
+            image: { url: pp },
+            caption: texto,
+            mentions: [mentionJid]
+          })
+
+          console.log(`✅ Bienvenida enviada a ${mentionJid}`)
         }
 
         // DESPEDIDA
-        if (stubType === 28) {
+        if (isRemove) {
           const texto = `
 ╭══•🔥ೋ•๑♡๑•ೋ🔥•══╮
-¡Adiós, ✰ @${numero}!
+¡Adiós, ✰ @${numeroVisible}!
 DE ${groupMetadata.subject}
 ● ${fecha}
 ╰══•🔥ೋ•๑♡๑•ೋ🔥•══╯
@@ -131,29 +178,20 @@ Gracias por haber estado con nosotros.
 🥀*ੈ✩‧₊˚༺☆༻*ੈ✩˚🍁
 `.trim()
 
-          try {
-            await conn.sendMessage(groupId, {
-              image: { url: pp },
-              caption: texto,
-              mentions: [mentionJid]
-            })
-            console.log(`✅ Despedida enviada a ${mentionJid}`)
-          } catch (err) {
-            console.error('Error enviando despedida con imagen:', err)
-            await conn.sendMessage(groupId, {
-              text: texto,
-              mentions: [mentionJid]
-            })
-            console.log(`✅ Despedida enviada en texto a ${mentionJid}`)
-          }
+          await conn.sendMessage(groupId, {
+            image: { url: pp },
+            caption: texto,
+            mentions: [mentionJid]
+          })
+
+          console.log(`✅ Despedida enviada a ${mentionJid}`)
         }
 
       } catch (err) {
-        console.error('❌ Error procesando stub participant:', err)
+        console.error('❌ Error procesando participante:', err)
       }
     }
-
   } catch (e) {
-    console.error('❌ Error en messages.upsert bienvenida/despedida:', e)
+    console.error('❌ Error en bienvenida/despedida:', e)
   }
 })
