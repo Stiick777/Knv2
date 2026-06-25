@@ -1,131 +1,3 @@
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-function normalizeNumber(jid = '') {
-  return jid.split('@')[0].replace(/[^\d]/g, '')
-}
-
-function buildCandidateJids(inputJid, blocklist = []) {
-  const num = normalizeNumber(inputJid)
-  const candidates = new Set()
-
-  // PN normal
-  if (num) candidates.add(`${num}@s.whatsapp.net`)
-
-  // Si el input ya viene con otro dominio, también lo guardamos
-  if (inputJid) candidates.add(inputJid)
-
-  // Buscar posibles LID del mismo número dentro de blocklist
-  for (const jid of blocklist || []) {
-    const jidNum = normalizeNumber(jid)
-    if (jidNum === num) candidates.add(jid)
-  }
-
-  return [...candidates]
-}
-
-async function getBlocklistSafe(conn) {
-  try {
-    if (typeof conn.fetchBlocklist === 'function') {
-      const list = await conn.fetchBlocklist()
-      return Array.isArray(list) ? list : []
-    }
-  } catch (e) {
-    console.log('[BLOCK] Error obteniendo blocklist:', e?.message || e)
-  }
-  return []
-}
-
-async function tryBlock(conn, jid) {
-  // Método 1
-  if (typeof conn.updateBlockStatus === 'function') {
-    try {
-      console.log(`[BLOCK] updateBlockStatus -> ${jid}`)
-      const res = await Promise.race([
-        conn.updateBlockStatus(jid, 'block'),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error(`Timeout updateBlockStatus: ${jid}`)), 8000)
-        )
-      ])
-      return { ok: true, method: 'updateBlockStatus', jid, result: res }
-    } catch (e) {
-      console.log(`[BLOCK] updateBlockStatus FALLÓ para ${jid}:`, e?.message || e)
-    }
-  }
-
-  // Método 2
-  if (typeof conn.query === 'function') {
-    try {
-      console.log(`[BLOCK] query blocklist -> ${jid}`)
-      const res = await Promise.race([
-        conn.query({
-          tag: 'iq',
-          attrs: {
-            xmlns: 'blocklist',
-            to: '@s.whatsapp.net',
-            type: 'set'
-          },
-          content: [{
-            tag: 'item',
-            attrs: {
-              action: 'block',
-              jid
-            }
-          }]
-        }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error(`Timeout query blocklist: ${jid}`)), 8000)
-        )
-      ])
-      return { ok: true, method: 'query-blocklist', jid, result: res }
-    } catch (e) {
-      console.log(`[BLOCK] query blocklist FALLÓ para ${jid}:`, e?.message || e)
-    }
-  }
-
-  return { ok: false, jid }
-}
-
-async function blockUser(conn, senderJid) {
-  console.log('\n[BLOCK] ===== INICIO BLOQUEO =====')
-  console.log('[BLOCK] sender original:', senderJid)
-
-  const blocklistBefore = await getBlocklistSafe(conn)
-  console.log('[BLOCK] blocklist antes:', blocklistBefore)
-
-  const candidates = buildCandidateJids(senderJid, blocklistBefore)
-
-  console.log('[BLOCK] candidatos a bloquear:', candidates)
-
-  // Probar cada candidato
-  for (const jid of candidates) {
-    const attempt = await tryBlock(conn, jid)
-    if (attempt.ok) {
-      console.log('[BLOCK] intento exitoso:', attempt)
-
-      // Revalidar blocklist
-      const blocklistAfter = await getBlocklistSafe(conn)
-      console.log('[BLOCK] blocklist después:', blocklistAfter)
-
-      if (blocklistAfter.includes(jid)) {
-        console.log('[BLOCK] usuario confirmado en blocklist:', jid)
-        console.log('[BLOCK] ===== FIN BLOQUEO =====\n')
-        return { ok: true, ...attempt, verified: true }
-      }
-
-      // Si no aparece, igual devolvemos el intento exitoso
-      console.log('[BLOCK] no se pudo verificar en blocklist, pero el método respondió OK')
-      console.log('[BLOCK] ===== FIN BLOQUEO =====\n')
-      return { ok: true, ...attempt, verified: false }
-    }
-  }
-
-  console.log('[BLOCK] No se pudo bloquear con ningún candidato.')
-  console.log('[BLOCK] ===== FIN BLOQUEO =====\n')
-  return { ok: false, method: null, result: null }
-}
-
 export async function before(m, { conn, isOwner, isROwner }) {
   try {
     if (m.isBaileys && m.fromMe) return !0
@@ -133,60 +5,58 @@ export async function before(m, { conn, isOwner, isROwner }) {
     if (!m.message) return !0
 
     const text = m.text || ''
-    if (
-      text.includes('PIEDRA') ||
-      text.includes('PAPEL') ||
-      text.includes('TIJERA') ||
-      text.includes('jad code') ||
-      text.includes('code') ||
-      text.includes('serbot') ||
-      text.includes('jadibot')
-    ) return !0
-
     const bot = global.db.data.settings?.[conn.user.jid] || {}
+    if (!bot.antiPrivate || isOwner || isROwner) return !1
 
-    console.log('\n========== ANTI PRIVATE ==========')
-    console.log('Sender:', m.sender)
-    console.log('Chat:', m.chat)
-    console.log('Text:', text)
-    console.log('antiPrivate:', bot.antiPrivate)
-    console.log('isOwner:', isOwner)
-    console.log('isROwner:', isROwner)
-    console.log('conn.user.jid:', conn.user?.jid)
+    console.log('\n========== DEBUG LID / PN ==========')
+    console.log('m.sender:', m.sender)
+    console.log('m.chat:', m.chat)
+    console.log('m.pushName:', m.pushName)
+    console.log('m.name:', m.name)
+    console.log('m.participant:', m.participant)
+    console.log('m.key:', JSON.stringify(m.key, null, 2))
+    console.log('m.message:', JSON.stringify(m.message, null, 2))
 
-    if (bot.antiPrivate && !isOwner && !isROwner) {
-      const sender = (m.sender || m.chat || '').trim()
+    console.log('\n--- conn.user ---')
+    console.log(conn.user)
 
-      await m.reply(
-        `> 🍧 Hola @${sender.split('@')[0]}, lo siento, no está permitido escribirme al privado, por lo cual serás bloqueado/a.\n\n> Puedes unirte al grupo oficial del bot para su funcionamiento o cualquier consulta 👇\n\n${gp1}`,
-        false,
-        { mentions: [sender] }
-      )
+    console.log('\n--- conn.contacts[m.sender] ---')
+    console.log(conn.contacts?.[m.sender])
 
-      console.log('[ANTI-PRIVATE] Aviso enviado correctamente.')
-      console.log('[ANTI-PRIVATE] Esperando 3 segundos antes de bloquear...')
-      await delay(3000)
+    console.log('\n--- conn.contacts[m.chat] ---')
+    console.log(conn.contacts?.[m.chat])
 
-      const blocked = await blockUser(conn, sender)
+    // buscar coincidencias por número dentro de contacts
+    const num = (m.sender || '').split('@')[0]
+    console.log('\n--- buscando coincidencias en conn.contacts por número:', num, '---')
 
-      console.log('[ANTI-PRIVATE] Resultado final:', blocked)
-
-      if (!blocked.ok) {
-        console.log('[ANTI-PRIVATE] No se logró bloquear al usuario:', sender)
-      } else {
-        console.log(`[ANTI-PRIVATE] Usuario bloqueado con método: ${blocked.method}`)
-        console.log(`[ANTI-PRIVATE] JID bloqueado: ${blocked.jid}`)
+    const matches = []
+    for (const [jid, data] of Object.entries(conn.contacts || {})) {
+      if (jid.includes(num) || JSON.stringify(data).includes(num)) {
+        matches.push({ jid, data })
       }
     }
 
-    console.log('==================================\n')
+    console.log('matches:', JSON.stringify(matches, null, 2))
+
+    // revisar chats/store si existen
+    console.log('\n--- conn.chats?.[m.sender] ---')
+    console.log(conn.chats?.[m.sender])
+
+    console.log('\n--- conn.chats?.[m.chat] ---')
+    console.log(conn.chats?.[m.chat])
+
+    // responder y no bloquear todavía
+    await m.reply(
+      `DEBUG activo para detectar LID de @${m.sender.split('@')[0]}`,
+      false,
+      { mentions: [m.sender] }
+    )
+
+    console.log('====================================\n')
     return !1
   } catch (e) {
-    console.error('\n❌ ERROR EN ANTI-PRIVATE ❌')
-    console.error(e)
-    console.error('Mensaje:', e?.message)
-    console.error('Stack:', e?.stack)
-    console.error('============================\n')
+    console.error('❌ ERROR DEBUG LID:', e)
     return !1
   }
 }
