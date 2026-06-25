@@ -1,17 +1,15 @@
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 export async function before(m, { conn, isOwner, isROwner }) {
   try {
-    // Ignorar mensajes del propio bot enviados por Baileys
     if (m.isBaileys && m.fromMe) return !0
-
-    // Solo actuar en privado
     if (m.isGroup) return !1
-
-    // Si no hay mensaje, salir
     if (!m.message) return !0
 
     const text = m.text || ''
 
-    // Ignorar ciertas palabras/comandos
     if (
       text.includes('PIEDRA') ||
       text.includes('PAPEL') ||
@@ -22,7 +20,6 @@ export async function before(m, { conn, isOwner, isROwner }) {
       text.includes('jadibot')
     ) return !0
 
-    // Obtener settings del bot correctamente desde conn.user.jid
     const bot = global.db.data.settings?.[conn.user.jid] || {}
 
     console.log('\n========== ANTI PRIVATE ==========')
@@ -33,35 +30,50 @@ export async function before(m, { conn, isOwner, isROwner }) {
     console.log('isOwner:', isOwner)
     console.log('isROwner:', isROwner)
     console.log('conn.user.jid:', conn.user?.jid)
+    console.log('typeof conn.updateBlockStatus:', typeof conn.updateBlockStatus)
 
-    // Si antiPrivate está activo y no es owner/real owner
     if (bot.antiPrivate && !isOwner && !isROwner) {
-      console.log('[ANTI-PRIVATE] antiPrivate activo, enviando aviso...')
+      const jid = (m.sender || m.chat || '').trim()
+
+      console.log('[ANTI-PRIVATE] JID a bloquear:', jid)
 
       await m.reply(
-        `> 🍧 Hola @${m.sender.split('@')[0]}, lo siento, no está permitido escribirme al privado, por lo cual serás bloqueado/a.\n\n> Puedes unirte al grupo oficial del bot para su funcionamiento o cualquier consulta 👇\n\n${gp1}`,
+        `> 🍧 Hola @${jid.split('@')[0]}, lo siento, no está permitido escribirme al privado, por lo cual serás bloqueado/a.\n\n> Puedes unirte al grupo oficial del bot para su funcionamiento o cualquier consulta 👇\n\n${gp1}`,
         false,
-        { mentions: [m.sender] }
+        { mentions: [jid] }
       )
 
       console.log('[ANTI-PRIVATE] Aviso enviado correctamente.')
       console.log('[ANTI-PRIVATE] Esperando 3 segundos antes de bloquear...')
+      await delay(3000)
 
-      // Pequeña espera para que el mensaje se alcance a enviar
-      await new Promise(resolve => setTimeout(resolve, 3000))
+      // Verifica si el método existe
+      if (typeof conn.updateBlockStatus !== 'function') {
+        console.log('[ANTI-PRIVATE] ERROR: conn.updateBlockStatus no existe.')
+        return !1
+      }
 
-      console.log('[ANTI-PRIVATE] Intentando bloquear a:', m.sender)
+      console.log('[ANTI-PRIVATE] Intentando bloquear a:', jid)
 
-      const res = await conn.updateBlockStatus(m.sender, 'block')
+      try {
+        const result = await Promise.race([
+          conn.updateBlockStatus(jid, 'block'),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout en updateBlockStatus (10s)')), 10000)
+          )
+        ])
 
-      console.log('[ANTI-PRIVATE] Resultado del bloqueo:', res)
-      console.log('[ANTI-PRIVATE] Usuario bloqueado correctamente:', m.sender)
+        console.log('[ANTI-PRIVATE] Resultado del bloqueo:', result)
+        console.log('[ANTI-PRIVATE] Usuario bloqueado correctamente:', jid)
+      } catch (blockErr) {
+        console.log('[ANTI-PRIVATE] ERROR AL BLOQUEAR:')
+        console.log(blockErr)
+        console.log('Mensaje:', blockErr?.message)
+        console.log('Stack:', blockErr?.stack)
+      }
     } else {
       console.log('[ANTI-PRIVATE] No se bloqueó.')
-      console.log('Motivo:')
-      console.log('- antiPrivate:', bot.antiPrivate)
-      console.log('- isOwner:', isOwner)
-      console.log('- isROwner:', isROwner)
+      console.log('Motivo -> antiPrivate:', bot.antiPrivate, '| isOwner:', isOwner, '| isROwner:', isROwner)
     }
 
     console.log('==================================\n')
@@ -69,8 +81,9 @@ export async function before(m, { conn, isOwner, isROwner }) {
   } catch (e) {
     console.error('\n❌ ERROR EN ANTI-PRIVATE ❌')
     console.error(e)
-    console.error('Stack:', e?.stack || 'Sin stack')
+    console.error('Mensaje:', e?.message)
+    console.error('Stack:', e?.stack)
     console.error('============================\n')
     return !1
   }
-}
+          }
