@@ -1,8 +1,8 @@
 export async function before(m, { conn, groupMetadata }) {
   if (!m.isGroup) return
 
-  const chat = global.db.data.chats[m.chat]
-  if (!chat || !chat.welcome) return
+  //const chat = global.db.data.chats[m.chat]
+  //if (!chat || !chat.welcome) return
 
   let metadata = groupMetadata || await conn.groupMetadata(m.chat).catch(() => null)
   if (!metadata) return
