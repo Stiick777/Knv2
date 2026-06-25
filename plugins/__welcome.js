@@ -48,7 +48,7 @@ for (const user of participants) {
     username = jid.split('@')[0]  
   }  
 
-  let pp = 'https://imgur.com/w1Jw7dl.jpeg'  
+  let pp = 'https://i.imgur.com/w1Jw7dl.jpeg'
 
   try {  
     pp = await conn.profilePictureUrl(jid, 'image')  
