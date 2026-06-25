@@ -1,13 +1,76 @@
-export async function before(m, {conn, isAdmin, isBotAdmin, isOwner, isROwner}) {
-  if (m.isBaileys && m.fromMe) return !0;
-  if (m.isGroup) return !1;
-  if (!m.message) return !0;
-  if (m.text.includes('PIEDRA') || m.text.includes('PAPEL') || m.text.includes('TIJERA') || m.text.includes('jad code') || m.text.includes('code') || m.text.includes('serbot') || m.text.includes('jadibot')) return !0;
-  const chat = global.db.data.chats[m.chat];
-  const bot = global.db.data.settings[this.user.jid] || {};
-  if (bot.antiPrivate && !isOwner && !isROwner) {
-    await m.reply(`> "🍧 Hola @${m.sender.split`@`[0]}, Lo Siento No Esta Permitido Escribirme Al Privado Por Lo Cual Seras Bloqueado/A\n\n> * > Puedes Unirte Al Grupo Oficial Del Bot Para Su Funcionamiento o cualquier consulta* 👇\n\n\n${gp1}`, false, {mentions: [m.sender]});
-    await this.updateBlockStatus(m.chat, 'block');
+export async function before(m, { conn, isOwner, isROwner }) {
+  try {
+    // Ignorar mensajes del propio bot enviados por Baileys
+    if (m.isBaileys && m.fromMe) return !0
+
+    // Solo actuar en privado
+    if (m.isGroup) return !1
+
+    // Si no hay mensaje, salir
+    if (!m.message) return !0
+
+    const text = m.text || ''
+
+    // Ignorar ciertas palabras/comandos
+    if (
+      text.includes('PIEDRA') ||
+      text.includes('PAPEL') ||
+      text.includes('TIJERA') ||
+      text.includes('jad code') ||
+      text.includes('code') ||
+      text.includes('serbot') ||
+      text.includes('jadibot')
+    ) return !0
+
+    // Obtener settings del bot correctamente desde conn.user.jid
+    const bot = global.db.data.settings?.[conn.user.jid] || {}
+
+    console.log('\n========== ANTI PRIVATE ==========')
+    console.log('Sender:', m.sender)
+    console.log('Chat:', m.chat)
+    console.log('Text:', text)
+    console.log('antiPrivate:', bot.antiPrivate)
+    console.log('isOwner:', isOwner)
+    console.log('isROwner:', isROwner)
+    console.log('conn.user.jid:', conn.user?.jid)
+
+    // Si antiPrivate está activo y no es owner/real owner
+    if (bot.antiPrivate && !isOwner && !isROwner) {
+      console.log('[ANTI-PRIVATE] antiPrivate activo, enviando aviso...')
+
+      await m.reply(
+        `> 🍧 Hola @${m.sender.split('@')[0]}, lo siento, no está permitido escribirme al privado, por lo cual serás bloqueado/a.\n\n> Puedes unirte al grupo oficial del bot para su funcionamiento o cualquier consulta 👇\n\n${gp1}`,
+        false,
+        { mentions: [m.sender] }
+      )
+
+      console.log('[ANTI-PRIVATE] Aviso enviado correctamente.')
+      console.log('[ANTI-PRIVATE] Esperando 3 segundos antes de bloquear...')
+
+      // Pequeña espera para que el mensaje se alcance a enviar
+      await new Promise(resolve => setTimeout(resolve, 3000))
+
+      console.log('[ANTI-PRIVATE] Intentando bloquear a:', m.sender)
+
+      const res = await conn.updateBlockStatus(m.sender, 'block')
+
+      console.log('[ANTI-PRIVATE] Resultado del bloqueo:', res)
+      console.log('[ANTI-PRIVATE] Usuario bloqueado correctamente:', m.sender)
+    } else {
+      console.log('[ANTI-PRIVATE] No se bloqueó.')
+      console.log('Motivo:')
+      console.log('- antiPrivate:', bot.antiPrivate)
+      console.log('- isOwner:', isOwner)
+      console.log('- isROwner:', isROwner)
+    }
+
+    console.log('==================================\n')
+    return !1
+  } catch (e) {
+    console.error('\n❌ ERROR EN ANTI-PRIVATE ❌')
+    console.error(e)
+    console.error('Stack:', e?.stack || 'Sin stack')
+    console.error('============================\n')
+    return !1
   }
-  return !1;
 }
