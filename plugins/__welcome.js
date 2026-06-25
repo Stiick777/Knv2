@@ -1,4 +1,4 @@
-/*import fetch from 'node-fetch'
+import fetch from 'node-fetch'
 
 conn.ev.removeAllListeners('group-participants.update')
 
@@ -195,4 +195,4 @@ Gracias por haber estado con nosotros.
     console.error('❌ Error en bienvenida/despedida:', e)
   }
 })
-*/
+
