@@ -2,54 +2,63 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-async function blockUser(conn, jid) {
-  console.log('\n[BLOCK] ===== INICIO BLOQUEO =====')
-  console.log('[BLOCK] JID:', jid)
-  console.log('[BLOCK] typeof conn.updateBlockStatus:', typeof conn.updateBlockStatus)
-  console.log('[BLOCK] typeof conn.fetchBlocklist:', typeof conn.fetchBlocklist)
+function normalizeNumber(jid = '') {
+  return jid.split('@')[0].replace(/[^\d]/g, '')
+}
 
-  // MÉTODO 1: updateBlockStatus normal
+function buildCandidateJids(inputJid, blocklist = []) {
+  const num = normalizeNumber(inputJid)
+  const candidates = new Set()
+
+  // PN normal
+  if (num) candidates.add(`${num}@s.whatsapp.net`)
+
+  // Si el input ya viene con otro dominio, también lo guardamos
+  if (inputJid) candidates.add(inputJid)
+
+  // Buscar posibles LID del mismo número dentro de blocklist
+  for (const jid of blocklist || []) {
+    const jidNum = normalizeNumber(jid)
+    if (jidNum === num) candidates.add(jid)
+  }
+
+  return [...candidates]
+}
+
+async function getBlocklistSafe(conn) {
+  try {
+    if (typeof conn.fetchBlocklist === 'function') {
+      const list = await conn.fetchBlocklist()
+      return Array.isArray(list) ? list : []
+    }
+  } catch (e) {
+    console.log('[BLOCK] Error obteniendo blocklist:', e?.message || e)
+  }
+  return []
+}
+
+async function tryBlock(conn, jid) {
+  // Método 1
   if (typeof conn.updateBlockStatus === 'function') {
     try {
-      console.log('[BLOCK] Probando método 1: conn.updateBlockStatus(...)')
-
+      console.log(`[BLOCK] updateBlockStatus -> ${jid}`)
       const res = await Promise.race([
         conn.updateBlockStatus(jid, 'block'),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout en updateBlockStatus (8s)')), 8000)
+          setTimeout(() => reject(new Error(`Timeout updateBlockStatus: ${jid}`)), 8000)
         )
       ])
-
-      console.log('[BLOCK] Método 1 OK:', res)
-      return { ok: true, method: 'updateBlockStatus', result: res }
+      return { ok: true, method: 'updateBlockStatus', jid, result: res }
     } catch (e) {
-      console.log('[BLOCK] Método 1 FALLÓ')
-      console.log('[BLOCK] Error:', e?.message || e)
+      console.log(`[BLOCK] updateBlockStatus FALLÓ para ${jid}:`, e?.message || e)
     }
   }
 
-  // MÉTODO 2: verificar si ya quedó en blocklist
-  if (typeof conn.fetchBlocklist === 'function') {
+  // Método 2
+  if (typeof conn.query === 'function') {
     try {
-      console.log('[BLOCK] Consultando blocklist...')
-      const beforeList = await conn.fetchBlocklist()
-      console.log('[BLOCK] Blocklist actual:', beforeList)
-
-      if (Array.isArray(beforeList) && beforeList.includes(jid)) {
-        console.log('[BLOCK] El usuario ya estaba bloqueado.')
-        return { ok: true, method: 'already_blocked', result: beforeList }
-      }
-    } catch (e) {
-      console.log('[BLOCK] Error consultando blocklist:', e?.message || e)
-    }
-  }
-
-  // MÉTODO 3: intento alterno con query directa (fallback Baileys)
-  try {
-    console.log('[BLOCK] Probando método 2: query directa a blocklist...')
-
-    if (typeof conn.query === 'function') {
-      const result = await Promise.race([
+      console.log(`[BLOCK] query blocklist -> ${jid}`)
+      const res = await Promise.race([
         conn.query({
           tag: 'iq',
           attrs: {
@@ -57,48 +66,62 @@ async function blockUser(conn, jid) {
             to: '@s.whatsapp.net',
             type: 'set'
           },
-          content: [
-            {
-              tag: 'item',
-              attrs: {
-                action: 'block',
-                jid
-              }
+          content: [{
+            tag: 'item',
+            attrs: {
+              action: 'block',
+              jid
             }
-          ]
+          }]
         }),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout en query blocklist (8s)')), 8000)
+          setTimeout(() => reject(new Error(`Timeout query blocklist: ${jid}`)), 8000)
         )
       ])
-
-      console.log('[BLOCK] Método 2 OK:', result)
-      return { ok: true, method: 'query-blocklist', result }
-    } else {
-      console.log('[BLOCK] conn.query no existe')
-    }
-  } catch (e) {
-    console.log('[BLOCK] Método 2 FALLÓ')
-    console.log('[BLOCK] Error:', e?.message || e)
-  }
-
-  // MÉTODO 4: revalidar blocklist por si el bloqueo sí entró pero no respondió
-  if (typeof conn.fetchBlocklist === 'function') {
-    try {
-      console.log('[BLOCK] Revalidando blocklist...')
-      const afterList = await conn.fetchBlocklist()
-      console.log('[BLOCK] Blocklist final:', afterList)
-
-      if (Array.isArray(afterList) && afterList.includes(jid)) {
-        console.log('[BLOCK] Usuario sí quedó bloqueado tras fallback.')
-        return { ok: true, method: 'verified_in_blocklist', result: afterList }
-      }
+      return { ok: true, method: 'query-blocklist', jid, result: res }
     } catch (e) {
-      console.log('[BLOCK] Error revalidando blocklist:', e?.message || e)
+      console.log(`[BLOCK] query blocklist FALLÓ para ${jid}:`, e?.message || e)
     }
   }
 
-  console.log('[BLOCK] No se pudo bloquear al usuario.')
+  return { ok: false, jid }
+}
+
+async function blockUser(conn, senderJid) {
+  console.log('\n[BLOCK] ===== INICIO BLOQUEO =====')
+  console.log('[BLOCK] sender original:', senderJid)
+
+  const blocklistBefore = await getBlocklistSafe(conn)
+  console.log('[BLOCK] blocklist antes:', blocklistBefore)
+
+  const candidates = buildCandidateJids(senderJid, blocklistBefore)
+
+  console.log('[BLOCK] candidatos a bloquear:', candidates)
+
+  // Probar cada candidato
+  for (const jid of candidates) {
+    const attempt = await tryBlock(conn, jid)
+    if (attempt.ok) {
+      console.log('[BLOCK] intento exitoso:', attempt)
+
+      // Revalidar blocklist
+      const blocklistAfter = await getBlocklistSafe(conn)
+      console.log('[BLOCK] blocklist después:', blocklistAfter)
+
+      if (blocklistAfter.includes(jid)) {
+        console.log('[BLOCK] usuario confirmado en blocklist:', jid)
+        console.log('[BLOCK] ===== FIN BLOQUEO =====\n')
+        return { ok: true, ...attempt, verified: true }
+      }
+
+      // Si no aparece, igual devolvemos el intento exitoso
+      console.log('[BLOCK] no se pudo verificar en blocklist, pero el método respondió OK')
+      console.log('[BLOCK] ===== FIN BLOQUEO =====\n')
+      return { ok: true, ...attempt, verified: false }
+    }
+  }
+
+  console.log('[BLOCK] No se pudo bloquear con ningún candidato.')
   console.log('[BLOCK] ===== FIN BLOQUEO =====\n')
   return { ok: false, method: null, result: null }
 }
@@ -110,7 +133,6 @@ export async function before(m, { conn, isOwner, isROwner }) {
     if (!m.message) return !0
 
     const text = m.text || ''
-
     if (
       text.includes('PIEDRA') ||
       text.includes('PAPEL') ||
@@ -133,32 +155,28 @@ export async function before(m, { conn, isOwner, isROwner }) {
     console.log('conn.user.jid:', conn.user?.jid)
 
     if (bot.antiPrivate && !isOwner && !isROwner) {
-      const jid = (m.sender || m.chat || '').trim()
-
-      console.log('[ANTI-PRIVATE] JID a bloquear:', jid)
+      const sender = (m.sender || m.chat || '').trim()
 
       await m.reply(
-        `> 🍧 Hola @${jid.split('@')[0]}, lo siento, no está permitido escribirme al privado, por lo cual serás bloqueado/a.\n\n> Puedes unirte al grupo oficial del bot para su funcionamiento o cualquier consulta 👇\n\n${gp1}`,
+        `> 🍧 Hola @${sender.split('@')[0]}, lo siento, no está permitido escribirme al privado, por lo cual serás bloqueado/a.\n\n> Puedes unirte al grupo oficial del bot para su funcionamiento o cualquier consulta 👇\n\n${gp1}`,
         false,
-        { mentions: [jid] }
+        { mentions: [sender] }
       )
 
       console.log('[ANTI-PRIVATE] Aviso enviado correctamente.')
       console.log('[ANTI-PRIVATE] Esperando 3 segundos antes de bloquear...')
       await delay(3000)
 
-      const blocked = await blockUser(conn, jid)
+      const blocked = await blockUser(conn, sender)
 
       console.log('[ANTI-PRIVATE] Resultado final:', blocked)
 
       if (!blocked.ok) {
-        console.log('[ANTI-PRIVATE] No se logró bloquear al usuario:', jid)
+        console.log('[ANTI-PRIVATE] No se logró bloquear al usuario:', sender)
       } else {
         console.log(`[ANTI-PRIVATE] Usuario bloqueado con método: ${blocked.method}`)
+        console.log(`[ANTI-PRIVATE] JID bloqueado: ${blocked.jid}`)
       }
-    } else {
-      console.log('[ANTI-PRIVATE] No se bloqueó.')
-      console.log('Motivo -> antiPrivate:', bot.antiPrivate, '| isOwner:', isOwner, '| isROwner:', isROwner)
     }
 
     console.log('==================================\n')
