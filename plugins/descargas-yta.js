@@ -15,31 +15,32 @@ const handler = async (m, { conn, text }) => {
     });
 
     // ============================================================
-    // 🔥 API FAA (AUDIO)
+    // 🔥 API DELIRIUS
     // ============================================================
-    const apiUrl =
-      `https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(text)}`;
+    const apiUrl = `https://api.delirius.store/download/ytmp3?url=${encodeURIComponent(text)}`;
 
     const res = await fetch(apiUrl);
     const json = await res.json();
 
-    if (!json.status || !json.result?.mp3) {
-      throw new Error("La API FAA falló o no devolvió audio");
+    if (!json.status || !json.data?.download) {
+      throw new Error("La API no devolvió el audio.");
     }
 
     const {
       title = "audio",
-      thumbnail,
-      duration,
-      mp3
-    } = json.result;
+      author = "Desconocido",
+      views = "0",
+      likes = "0",
+      image,
+      download
+    } = json.data;
 
     // ============================================================
-    // 📦 Tamaño del archivo (HEAD)
+    // 📦 Obtener tamaño del archivo
     // ============================================================
     let sizeMB = 0;
     try {
-      const head = await fetch(mp3, { method: "HEAD" });
+      const head = await fetch(download, { method: "HEAD" });
       const length = head.headers.get("content-length");
       sizeMB = length ? Number(length) / (1024 * 1024) : 0;
     } catch {
@@ -51,28 +52,35 @@ const handler = async (m, { conn, text }) => {
     });
 
     // ============================================================
-    // 📸 Enviar portada
+    // 📸 Portada
     // ============================================================
-    if (thumbnail) {
+    if (image) {
       await conn.sendMessage(
         m.chat,
         {
-          image: { url: thumbnail },
-          caption: `🎶 *${title}*\n⏱ ${duration}s\n📦 ${sizeMB.toFixed(2)} MB\n🎧 MP3`
+          image: { url: image },
+          caption:
+`🎶 *${title}*
+
+👤 Autor: ${author}
+👁️ Vistas: ${Number(views).toLocaleString()}
+❤️ Likes: ${Number(likes).toLocaleString()}
+📦 Tamaño: ${sizeMB.toFixed(2)} MB
+🎧 Formato: MP3`
         },
         { quoted: m }
       );
     }
 
     // ============================================================
-    // 🎧 Enviar audio / documento
+    // 🎧 Audio o documento
     // ============================================================
     const isHeavy = sizeMB > 10;
 
     await conn.sendMessage(
       m.chat,
       {
-        [isHeavy ? "document" : "audio"]: { url: mp3 },
+        [isHeavy ? "document" : "audio"]: { url: download },
         mimetype: "audio/mpeg",
         fileName: `${title}.mp3`,
         ...(isHeavy && {
@@ -83,7 +91,12 @@ const handler = async (m, { conn, text }) => {
     );
 
   } catch (error) {
-    console.error("Error YTMP3:", error.message);
+    console.error("Error YTMP3:", error);
+
+    await conn.sendMessage(m.chat, {
+      react: { text: '❌', key: m.key }
+    });
+
     return m.reply(`⚠️ Error: ${error.message}`);
   }
 };
